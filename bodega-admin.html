@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Admin Tony Tony">
+<title data-id="th-modified">⚙️ Admin - Bodega Tony Tony</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+:root{--rojo:#e63946;--amarillo:#f4d35e;--verde:#2dc653;--oscuro:#1a1a2e;--sombra:0 4px 20px rgba(0,0,0,0.12);--bg:#f5f5f5;--card:#fff;--text:#1a1a2e;--subtext:#888;--border:#eee;--gris:#f1f1f1;}
+.dark-mode{--bg:#0f0f1a;--card:#1a1a2e;--text:#f0f0f0;--subtext:#aaa;--border:#2a2a3e;--gris:#2a2a3e;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+header{background:var(--oscuro);color:white;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--amarillo);}
+.logo span{color:var(--rojo);}
+.tabs{display:flex;background:var(--card);border-bottom:3px solid var(--amarillo);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{padding:11px 14px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--subtext);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all 0.2s;}
+.tab-btn.active{color:var(--rojo);border-bottom-color:var(--rojo);}
+.view{display:none;padding:16px;}
+.view.active{display:block;}
+.admin-section{background:var(--card);border-radius:16px;padding:18px;box-shadow:var(--sombra);margin-bottom:16px;}
+.admin-section h3{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;margin-bottom:14px;color:var(--text);border-left:4px solid var(--rojo);padding-left:10px;}
+.form-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+.form-row input,.form-row select{flex:1;min-width:120px;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border 0.2s;background:var(--bg);color:var(--text);}
+.form-row input:focus,.form-row select:focus{border-color:var(--rojo);}
+.btn-primary{background:var(--rojo);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;}
+.btn-secondary{background:var(--oscuro);color:white;border:none;border-radius:10px;padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;}
+.btn-verde{background:var(--verde);color:white;border:none;border-radius:10px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;}
+.photo-upload-area{width:100%;height:100px;border:2px dashed #ddd;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:700;color:#999;gap:6px;overflow:hidden;margin-bottom:10px;}
+.photo-upload-area img{width:100%;height:100%;object-fit:cover;}
+.variants-input-area{margin-bottom:12px;}
+.variants-input-area>label{font-size:13px;font-weight:700;display:block;margin-bottom:6px;color:var(--subtext);}
+.variant-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.variant-tag{background:var(--oscuro);color:white;border-radius:50px;padding:4px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;}
+.variant-tag button{background:none;border:none;color:white;cursor:pointer;font-size:16px;padding:0;line-height:1;}
+.variant-add-row{display:flex;gap:8px;}
+.variant-add-row input{flex:1;padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;background:var(--bg);color:var(--text);}
+.variant-add-row button{background:var(--oscuro);color:white;border:none;border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;font-size:13px;white-space:nowrap;}
+.product-list-admin{display:flex;flex-direction:column;gap:10px;}
+.product-item-admin{display:flex;align-items:center;gap:10px;background:var(--gris);border-radius:12px;padding:10px 14px;}
+.product-item-admin .thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.product-item-admin .pemoji{font-size:28px;flex-shrink:0;}
+.product-item-admin .info{flex:1;min-width:0;}
+.product-item-admin .info .name{font-weight:700;font-size:14px;}
+.product-item-admin .info .cat{font-size:12px;color:var(--subtext);}
+.del-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:8px;}
+.del-btn:hover{background:#ffd6d6;}
+.edit-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:8px;}
+.edit-btn:hover{background:#fff3cd;}
+.pedido-card{background:var(--gris);border-radius:14px;padding:14px;margin-bottom:12px;}
+.estado-badge{font-size:11px;font-weight:800;padding:4px 10px;border-radius:50px;white-space:nowrap;}
+.estado-pendiente{background:#fff3cd;color:#856404;}
+.estado-confirmado{background:#d4edda;color:#155724;}
+.estado-preparacion{background:#cce5ff;color:#004085;}
+.estado-camino{background:#ffe5d0;color:#c05621;}
+.estado-entregado{background:#d4edda;color:#155724;}
+/* 14. SOPORTE */
+.soporte-card{background:var(--gris);border-radius:14px;padding:14px;margin-bottom:10px;}
+.soporte-estado{font-size:11px;font-weight:800;padding:3px 9px;border-radius:50px;}
+.s-nuevo{background:#fff3cd;color:#856404;}
+.s-revision{background:#cce5ff;color:#004085;}
+.s-resuelto{background:#d4edda;color:#155724;}
+/* LOCK */
+.lock-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--oscuro);}
+.lock-card{background:#1e1e2e;border-radius:24px;padding:30px 24px;text-align:center;max-width:300px;width:100%;}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid #555;background:transparent;transition:background 0.15s;}
+.pin-dot.filled{background:var(--rojo);border-color:var(--rojo);}
+.pin-key{background:#2a2a3e;color:white;border:none;border-radius:14px;padding:18px;font-family:'Nunito',sans-serif;font-weight:800;font-size:20px;cursor:pointer;transition:background 0.15s,transform 0.1s;}
+.pin-key:active{background:var(--rojo);transform:scale(0.92);}
+.repartidor-item{display:flex;align-items:center;gap:10px;background:var(--gris);border-radius:12px;padding:10px 14px;margin-bottom:8px;}
+.toggle-switch{position:relative;width:44px;height:24px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#ccc;border-radius:24px;transition:0.3s;}
+.toggle-slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background:white;border-radius:50%;transition:0.3s;}
+input:checked+.toggle-slider{background:var(--verde);}
+input:checked+.toggle-slider:before{transform:translateX(20px);}
+/* stats mejoradas */
+.stat-card{background:var(--gris);border-radius:14px;padding:14px;text-align:center;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--stat-color,var(--rojo));}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
+.stat-lbl{font-size:11px;color:var(--subtext);font-weight:700;margin-top:2px;}
+/* pedido card mejorado */
+.pedido-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;}
+.pedido-meta-chip{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--subtext);}
+/* config status chip */
+.config-ok{color:var(--verde);font-weight:700;font-size:12px;margin-top:6px;}
+.config-warn{color:var(--naranja);font-weight:700;font-size:12px;margin-top:6px;}
+</style>
+<meta property="og:title" content="⚙️ Admin - Bodega Tony Tony" data-id="th-modified" ><meta name="description" content="Collection of Documents" data-id="th-modified" ><meta property="og:description" content="Collection of Documents" data-id="th-modified" ><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified" ><meta property="og:image:width" content="1501" data-id="th-modified" ><meta property="og:image:height" content="1501" data-id="th-modified" ><meta property="og:image:type" content="image/png" data-id="th-modified" ><meta property="og:url" content="https://aqua-michaela-46.tiiny.site/" data-id="th-modified" ><meta property="og:type" content="website" data-id="th-modified" ><script defer data-domain="aqua-michaela-46.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script><script type="text/javascript" src="https://tiiny.host/ad-script.js"></script></head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-card">
+    <div style="font-size:50px;margin-bottom:12px;">🔐</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:4px;color:white;">ADMIN</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--rojo);letter-spacing:1px;margin-bottom:20px;">BODEGA TONY TONY</div>
+    <div id="pinDisplay" style="display:flex;justify-content:center;gap:12px;margin-bottom:24px;">
+      <div class="pin-dot" id="dot0"></div><div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div><div class="pin-dot" id="dot3"></div>
+      <div class="pin-dot" id="dot4"></div><div class="pin-dot" id="dot5"></div>
+    </div>
+    <p id="pinError" style="color:var(--rojo);font-size:13px;font-weight:700;margin-bottom:12px;min-height:20px;text-align:center;"></p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" onclick="pinClear()" style="background:#555;font-size:14px;">⌫</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" onclick="checkPin()" style="background:var(--rojo);">✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel" style="display:none;">
+  <header>
+    <div>
+      <div class="logo">Admin <span>Tony</span> Tony</div>
+      <div style="font-size:11px;color:#aaa;">Panel de Administración</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button onclick="toggleDark()" id="darkBtn" style="background:none;border:none;font-size:22px;cursor:pointer;">🌙</button>
+      <button onclick="lockPanel()" style="background:var(--rojo);color:white;border:none;border-radius:50px;padding:8px 14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;">🔒 Salir</button>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showAdminTab('productos')" id="tab-productos">📦 Productos</button>
+    <button class="tab-btn" onclick="showAdminTab('pedidos')" id="tab-pedidos">📋 Pedidos</button>
+    <button class="tab-btn" onclick="showAdminTab('repartidores')" id="tab-repartidores">🛵 Repartidores</button>
+    <button class="tab-btn" onclick="showAdminTab('zonas')" id="tab-zonas">🗺️ Zonas</button>
+    <button class="tab-btn" onclick="showAdminTab('soporte')" id="tab-soporte">📞 Soporte</button>
+    <button class="tab-btn" onclick="showAdminTab('config')" id="tab-config">⚙️ Config</button>
+  </div>
+
+  <!-- PRODUCTOS -->
+  <div class="view active" id="view-productos">
+    <div class="admin-section">
+      <h3>➕ Agregar Producto</h3>
+      <label for="newPhoto" style="cursor:pointer;display:block;">
+        <div class="photo-upload-area" id="photoPreview"><span style="font-size:30px">📸</span><span>Toca para agregar foto</span></div>
+        <input type="file" id="newPhoto" accept="image/*" style="display:none;" onchange="previewPhoto(this)">
+      </label>
+      <div class="form-row">
+        <input type="text" id="newEmoji" placeholder="Emoji 🍎" maxlength="4" style="max-width:80px;text-align:center;font-size:20px;">
+        <input type="text" id="newName" placeholder="Nombre del producto">
+      </div>
+      <div class="form-row">
+        <input type="number" id="newPrice" placeholder="Precio ($)" min="0" step="0.01">
+        <input type="text" id="newCategory" placeholder="Categoría">
+      </div>
+      <div class="form-row">
+        <select id="newEtiqueta" style="flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);">
+          <option value="">Sin etiqueta</option>
+          <option value="popular">⭐ Popular</option>
+          <option value="recomendado">👍 Recomendado</option>
+          <option value="hoy">⏰ Oferta por hoy</option>
+        </select>
+        <select id="newTipo" style="flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);">
+          <option value="normal">Normal</option>
+          <option value="combo">📦 Combo</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label style="display:flex;align-items:center;gap:8px;flex:1;font-weight:700;font-size:14px;cursor:pointer;padding:10px;border:2px solid var(--border);border-radius:10px;">
+          <input type="checkbox" id="newOferta" style="width:18px;height:18px;accent-color:var(--rojo);">🔥 Es oferta
+        </label>
+        <input type="number" id="newPrecioAnterior" placeholder="Precio anterior $" min="0" step="0.01" style="flex:1;">
+        <label style="display:flex;align-items:center;gap:6px;flex:0.7;font-weight:700;font-size:13px;cursor:pointer;padding:10px;border:2px solid var(--border);border-radius:10px;">
+          <input type="checkbox" id="newVisible" checked style="width:18px;height:18px;accent-color:var(--verde);">👁️ Visible
+        </label>
+      </div>
+      <!-- 7. AGOTADO -->
+      <div class="form-row">
+        <label style="display:flex;align-items:center;gap:8px;flex:1;font-weight:700;font-size:13px;cursor:pointer;padding:10px;border:2px solid var(--border);border-radius:10px;">
+          <input type="checkbox" id="newAgotado" style="width:18px;height:18px;accent-color:#555;">❌ Agotado
+        </label>
+      </div>
+      <div class="variants-input-area">
+        <label>🎨 Variantes (sabores, tamaños) — opcional</label>
+        <div class="variant-tags" id="variantTags"></div>
+        <div class="variant-add-row">
+          <input type="text" id="variantInput" placeholder="ej: Cola, Uva..." onkeyup="if(event.key==='Enter')addVariantTag()">
+          <button onclick="addVariantTag()">+ Agregar</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="addProduct()" style="width:100%;">✅ Agregar Producto</button>
+    </div>
+
+    <div class="admin-section">
+      <h3>📦 Mis Productos</h3>
+      <div style="margin-bottom:10px;">
+        <input type="text" id="adminSearch" placeholder="🔍 Buscar producto..." oninput="renderProductList()" style="width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);">
+      </div>
+      <div class="product-list-admin" id="adminProductList"></div>
+    </div>
+
+    <div style="text-align:center;padding-bottom:20px;">
+      <button onclick="cargarInventario()" style="background:none;border:2px solid var(--border);border-radius:12px;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:13px;cursor:pointer;color:var(--subtext);">📦 Cargar inventario inicial</button>
+    </div>
+  </div>
+
+  <!-- PEDIDOS -->
+  <div class="view" id="view-pedidos">
+    <!-- STATS RÁPIDAS EN PEDIDOS -->
+    <div id="pedidosStatsBar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;"></div>
+    <div class="admin-section">
+      <h3>📋 Pedidos</h3>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+        <button onclick="filterPedidos('todos')" id="fp-todos" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button>
+        <button onclick="filterPedidos('pendiente')" id="fp-pendiente" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">⏳ Pendientes</button>
+        <button onclick="filterPedidos('confirmado')" id="fp-confirmado" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Confirmados</button>
+        <button onclick="filterPedidos('camino')" id="fp-camino" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🛵 En camino</button>
+        <button onclick="filterPedidos('entregado')" id="fp-entregado" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">📦 Entregados</button>
+      </div>
+      <div id="pedidosList"><p style="color:var(--subtext);">Cargando pedidos...</p></div>
+    </div>
+  </div>
+
+  <!-- REPARTIDORES -->
+  <div class="view" id="view-repartidores">
+    <div class="admin-section">
+      <h3>➕ Agregar Repartidor</h3>
+      <div class="form-row">
+        <input type="text" id="repNombre" placeholder="Nombre completo">
+        <input type="tel" id="repTelefono" placeholder="Teléfono">
+      </div>
+      <div class="form-row">
+        <input type="text" id="repPlaca" placeholder="Placa del vehículo">
+        <input type="text" id="repVehiculo" placeholder="Tipo (moto, carro...)">
+      </div>
+      <button class="btn-primary" onclick="addRepartidor()" style="width:100%;">✅ Agregar Repartidor</button>
+    </div>
+    <div class="admin-section">
+      <h3>🛵 Repartidores</h3>
+      <div id="repartidoresList"></div>
+    </div>
+  </div>
+
+  <!-- ZONAS -->
+  <div class="view" id="view-zonas">
+    <div class="admin-section">
+      <h3>➕ Agregar Zona</h3>
+      <div class="form-row">
+        <input type="text" id="zonaNombre" placeholder="Nombre de la zona">
+        <input type="number" id="zonaCosto" placeholder="Costo ($)" min="0" step="0.5">
+      </div>
+      <button class="btn-primary" onclick="addZona()" style="width:100%;">✅ Agregar Zona</button>
+    </div>
+    <div class="admin-section">
+      <h3>🗺️ Zonas de entrega</h3>
+      <div id="zonasList"></div>
+    </div>
+  </div>
+
+  <!-- 14. SOPORTE -->
+  <div class="view" id="view-soporte">
+    <div class="admin-section">
+      <h3>📞 Soporte / Reclamos</h3>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+        <button onclick="filterSoporte('todos')" id="fs-todos" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button>
+        <button onclick="filterSoporte('nuevo')" id="fs-nuevo" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🆕 Nuevos</button>
+        <button onclick="filterSoporte('en_revision')" id="fs-revision" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🔍 En revisión</button>
+        <button onclick="filterSoporte('resuelto')" id="fs-resuelto" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Resueltos</button>
+      </div>
+      <div id="soporteList"><p style="color:var(--subtext);">Cargando...</p></div>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="view" id="view-config">
+    <div class="admin-section">
+      <h3>📱 WhatsApp</h3>
+      <div class="form-row">
+        <input type="tel" id="configWhatsapp" placeholder="+58424...">
+        <button class="btn-primary" onclick="saveWhatsapp()">Guardar</button>
+      </div>
+    </div>
+    <div class="admin-section">
+      <h3>💳 Métodos de Pago</h3>
+      <div id="metodosConfig"></div>
+    </div>
+    <div class="admin-section">
+      <h3>🛵 Envío</h3>
+      <label style="display:flex;align-items:center;gap:12px;font-weight:700;cursor:pointer;">
+        <label class="toggle-switch">
+          <input type="checkbox" id="envioGratis" onchange="saveEnvioGratis()">
+          <span class="toggle-slider"></span>
+        </label>
+        Domicilio gratis
+      </label>
+    </div>
+    <div class="admin-section">
+      <h3>⏱️ Tiempo de Preparación</h3>
+      <p style="font-size:13px;color:var(--subtext);margin-bottom:10px;">Minutos estimados. Se muestra al cliente.</p>
+      <div class="form-row">
+        <input type="number" id="configTiempo" placeholder="ej: 30" min="1" max="180">
+        <button class="btn-primary" onclick="saveTiempo()">Guardar</button>
+      </div>
+    </div>
+    <!-- 2. PEDIDO MÍNIMO -->
+    <div class="admin-section">
+      <h3>💰 Pedido Mínimo</h3>
+      <p style="font-size:13px;color:var(--subtext);margin-bottom:10px;">Monto mínimo para aceptar pedidos. Pon 0 para desactivar.</p>
+      <div class="form-row">
+        <input type="number" id="configPedidoMinimo" placeholder="ej: 3.00" min="0" step="0.5">
+        <button class="btn-primary" onclick="savePedidoMinimo()">Guardar</button>
+      </div>
+    </div>
+    <div class="admin-section">
+      <h3>🕐 Horario de Atención</h3>
+      <p style="font-size:13px;color:var(--subtext);margin-bottom:6px;">Formato 24h: <b>0=12am · 9=9am · 12=12pm · 22=10pm · 23=11pm</b></p>
+      <p style="font-size:12px;color:var(--subtext);margin-bottom:10px;">💡 Soporta horarios nocturnos. Ej: apertura 22, cierre 6 = 10pm a 6am.</p>
+      <div class="form-row">
+        <input type="number" id="configApertura" placeholder="Apertura (0–23)" min="0" max="23">
+        <input type="number" id="configCierre" placeholder="Cierre (0–23)" min="0" max="23">
+        <button class="btn-primary" onclick="saveHorario()">Guardar</button>
+      </div>
+      <div id="horarioStatus" style="font-size:13px;margin-top:8px;font-weight:700;"></div>
+    </div>
+    <div class="admin-section">
+      <h3>📊 Estadísticas</h3>
+      <div id="statsPanel" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PIN = '300419';
+let darkMode    = localStorage.getItem('darkMode') === '1';
+let products    = [];
+let currentVariants = [];
+let pendingPhotoBase64 = '';
+let pedidosFiltro = 'todos';
+let soporteFiltro = 'todos';
+let allPedidos  = [];
+let allSoporte  = [];
+let repartidores = [];
+let zonas       = [];
+let configData  = { whatsapp: '+584242520138', metodosPago: { efectivo: true, pagoMovil: true, transferencia: false }, envioGratis: true, pedidoMinimo: 0 };
+
+function applyDark() {
+  document.body.classList.toggle('dark-mode', darkMode);
+  const btn = document.getElementById('darkBtn');
+  if (btn) btn.textContent = darkMode ? '☀️' : '🌙';
+}
+function toggleDark() { darkMode = !darkMode; localStorage.setItem('darkMode', darkMode?'1':'0'); applyDark(); }
+applyDark();
+
+firebase.initializeApp({
+  apiKey:"AIzaSyBdv2cOMgbeBuW-V9Buz8EzGAoElnvySoI",
+  authDomain:"bodegatonytony.firebaseapp.com",
+  projectId:"bodegatonytony",
+  storageBucket:"bodegatonytony.firebasestorage.app",
+  messagingSenderId:"763208241886",
+  appId:"1:763208241886:web:dd4a04d68c2c72ed24a84f"
+});
+const db = firebase.firestore();
+
+// ── PIN ──
+let pinEntered = '';
+function pinPress(digit) {
+  if (pinEntered.length >= 6) return;
+  pinEntered += digit; updatePinDots();
+  if (pinEntered.length === 6) setTimeout(checkPin, 200);
+}
+function pinClear() { pinEntered = pinEntered.slice(0,-1); updatePinDots(); document.getElementById('pinError').textContent = ''; }
+function updatePinDots() {
+  for (let i = 0; i < 6; i++) { const d = document.getElementById('dot'+i); if (d) d.classList.toggle('filled', i < pinEntered.length); }
+}
+function checkPin() {
+  if (pinEntered === ADMIN_PIN) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    pinEntered = ''; updatePinDots(); initAdmin();
+  } else {
+    document.getElementById('pinError').textContent = '❌ PIN incorrecto';
+    pinEntered = ''; updatePinDots();
+    setTimeout(() => { document.getElementById('pinError').textContent = ''; }, 2000);
+  }
+}
+function lockPanel() {
+  document.getElementById('lockScreen').style.display = 'flex';
+  document.getElementById('adminPanel').style.display = 'none';
+  pinEntered = ''; updatePinDots(); document.getElementById('pinError').textContent = '';
+}
+
+// ── INIT ──
+function initAdmin() {
+  db.collection('productos').onSnapshot(snap => { products = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderProductList(); loadStats(); });
+  db.collection('pedidos').orderBy('fecha','desc').limit(200).onSnapshot(snap => { allPedidos = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderPedidos(); loadStats(); });
+  db.collection('repartidores').onSnapshot(snap => { repartidores = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderRepartidores(); });
+  db.collection('zonas').onSnapshot(snap => { zonas = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderZonas(); });
+  db.collection('soporte').orderBy('fecha','desc').limit(100).onSnapshot(snap => { allSoporte = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderSoporteAdmin(); });
+  db.collection('config').doc('tienda').onSnapshot(snap => {
+    if (snap.exists) {
+      configData = { ...configData, ...snap.data() };
+      const el = document.getElementById('configWhatsapp');
+      if (el) el.value = configData.whatsapp || '';
+      const envioEl = document.getElementById('envioGratis');
+      if (envioEl) envioEl.checked = configData.envioGratis !== false;
+      const tiempoEl = document.getElementById('configTiempo');
+      if (tiempoEl && configData.tiempoPreparacion) tiempoEl.value = configData.tiempoPreparacion;
+      const minimoEl = document.getElementById('configPedidoMinimo');
+      if (minimoEl && configData.pedidoMinimo != null) minimoEl.value = configData.pedidoMinimo;
+      const aperturaEl = document.getElementById('configApertura');
+      const cierreEl   = document.getElementById('configCierre');
+      if (aperturaEl && configData.horario) aperturaEl.value = configData.horario.apertura;
+      if (cierreEl   && configData.horario) cierreEl.value   = configData.horario.cierre;
+      const hEl = document.getElementById('horarioStatus');
+      if (hEl && configData.horario) {
+        const a = configData.horario.apertura, c = configData.horario.cierre;
+        hEl.textContent = `✅ Horario: ${fmtHora(a)} – ${fmtHora(c)}${a>=c?' (nocturno)':''}`;
+      }
+      renderMetodosConfig();
+    }
+  });
+}
+
+// ── TABS ──
+function showAdminTab(tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if (tab === 'config')   { renderMetodosConfig(); loadStats(); }
+  if (tab === 'soporte')  renderSoporteAdmin();
+  if (tab === 'pedidos')  loadStats();
+}
+
+// ── FOTO ──
+function previewPhoto(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 400; let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = h*MAX/w; w = MAX; } } else { if (h > MAX) { w = w*MAX/h; h = MAX; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      pendingPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      const prev = document.getElementById('photoPreview');
+      prev.innerHTML = `<img src="${pendingPhotoBase64}">`;
+      prev.style.border = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── VARIANTES ──
+function addVariantTag() {
+  const input = document.getElementById('variantInput');
+  const val = input.value.trim();
+  if (!val || currentVariants.includes(val)) return;
+  currentVariants.push(val); renderVariantTags(); input.value = '';
+}
+function removeVariantTag(v) { currentVariants = currentVariants.filter(x => x !== v); renderVariantTags(); }
+function renderVariantTags() {
+  document.getElementById('variantTags').innerHTML = currentVariants.map(v =>
+    `<div class="variant-tag">${v} <button onclick="removeVariantTag('${v}')">×</button></div>`).join('');
+}
+
+// ── AGREGAR PRODUCTO ──
+async function addProduct() {
+  const emoji    = document.getElementById('newEmoji').value.trim() || '📦';
+  const name     = document.getElementById('newName').value.trim();
+  const price    = parseFloat(document.getElementById('newPrice').value);
+  const category = document.getElementById('newCategory').value.trim() || 'General';
+  const etiqueta = document.getElementById('newEtiqueta').value || '';
+  const tipo     = document.getElementById('newTipo').value || 'normal';
+  const oferta   = document.getElementById('newOferta').checked || false;
+  const precioAnterior = parseFloat(document.getElementById('newPrecioAnterior').value) || 0;
+  const visible  = document.getElementById('newVisible').checked !== false;
+  const agotado  = document.getElementById('newAgotado').checked || false;
+  if (!name)               { showToast('⚠️ Escribe el nombre'); return; }
+  if (isNaN(price)||price<=0) { showToast('⚠️ Precio inválido'); return; }
+  showToast('⏳ Guardando...');
+  await db.collection('productos').add({ emoji, name, price, category, photo: pendingPhotoBase64, variants: currentVariants, etiqueta, tipo, oferta, precioAnterior: oferta&&precioAnterior?precioAnterior:0, visible, agotado });
+  ['newEmoji','newName','newPrice','newCategory','newPrecioAnterior'].forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('newEtiqueta').value = '';
+  document.getElementById('newOferta').checked = false;
+  document.getElementById('newVisible').checked = true;
+  document.getElementById('newAgotado').checked = false;
+  document.getElementById('newPhoto').value = '';
+  document.getElementById('photoPreview').innerHTML = '<span style="font-size:30px">📸</span><span>Toca para agregar foto</span>';
+  document.getElementById('photoPreview').style.border = '2px dashed #ddd';
+  pendingPhotoBase64 = ''; currentVariants = []; renderVariantTags();
+  showToast('✅ Producto agregado');
+}
+
+async function deleteProduct(id) {
+  if (!confirm('¿Eliminar este producto?')) return;
+  await db.collection('productos').doc(id).delete();
+  showToast('🗑️ Eliminado');
+}
+
+async function toggleVisible(id, currentlyVisible) {
+  await db.collection('productos').doc(id).update({ visible: !currentlyVisible });
+  showToast(!currentlyVisible ? '👁️ Producto visible' : '🙈 Producto oculto');
+}
+
+// 7. TOGGLE AGOTADO
+async function toggleAgotado(id, currentlyAgotado) {
+  await db.collection('productos').doc(id).update({ agotado: !currentlyAgotado });
+  showToast(!currentlyAgotado ? '❌ Marcado como agotado' : '✅ Disponible de nuevo');
+}
+
+function renderProductList() {
+  const list = document.getElementById('adminProductList');
+  if (!list) return;
+  const q = (document.getElementById('adminSearch')?.value || '').toLowerCase();
+  const filtered = q ? products.filter(p => p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q)) : products;
+  if (filtered.length === 0) { list.innerHTML = `<p style="color:var(--subtext);text-align:center;padding:20px;">No hay productos</p>`; return; }
+  list.innerHTML = filtered.map(p => `
+    <div class="product-item-admin">
+      ${p.photo ? `<img src="${p.photo}" class="thumb">` : `<div class="pemoji">${p.emoji||'📦'}</div>`}
+      <div class="info">
+        <div class="name">${p.name}${p.agotado?' <span style="font-size:11px;color:#e63946;">❌ Agotado</span>':''}</div>
+        <div class="cat">${p.category||'General'} — $ ${p.price}${p.oferta?' 🔥':''}${p.etiqueta?' ⭐':''}</div>
+      </div>
+      <button onclick="toggleAgotado('${p.id}',${!!p.agotado})" style="background:none;border:none;font-size:18px;cursor:pointer;padding:4px;" title="${p.agotado?'Marcar disponible':'Marcar agotado'}">${p.agotado?'🔴':'🟢'}</button>
+      <button onclick="toggleVisible('${p.id}',${p.visible!==false})" style="background:none;border:none;font-size:18px;cursor:pointer;padding:4px;">${p.visible!==false?'👁️':'🙈'}</button>
+      <button class="edit-btn" onclick="openEditModal('${p.id}')">✏️</button>
+      <button class="del-btn" onclick="deleteProduct('${p.id}')">🗑️</button>
+    </div>`).join('');
+}
+
+// ── EDITAR PRODUCTO ──
+let editingVariants = [];
+let editingPhotoBase64 = '';
+
+function openEditModal(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  editingVariants = [...(p.variants || [])];
+  const modal = document.createElement('div');
+  modal.id = 'editModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:999;display:flex;align-items:flex-end;';
+  modal.innerHTML = `
+    <div style="background:var(--card);border-radius:24px 24px 0 0;padding:20px;width:100%;max-height:90vh;overflow-y:auto;">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;margin-bottom:16px;border-left:4px solid var(--rojo);padding-left:10px;color:var(--text);">✏️ Editar</div>
+      <label style="cursor:pointer;display:block;margin-bottom:10px;">
+        <div id="editPhotoPreview" style="width:100%;height:100px;border:2px dashed #ddd;border-radius:12px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          ${p.photo?`<img src="${p.photo}" style="width:100%;height:100%;object-fit:cover;">`:`<span style="font-size:30px">${p.emoji||'📦'}</span>`}
+        </div>
+        <input type="file" id="editPhoto" accept="image/*" style="display:none;" onchange="previewEditPhoto(this)">
+      </label>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <input type="text" id="editEmoji" value="${p.emoji||''}" maxlength="4" style="width:80px;padding:10px;border:2px solid var(--border);border-radius:10px;font-size:20px;text-align:center;outline:none;background:var(--bg);color:var(--text);">
+        <input type="text" id="editName" value="${p.name}" style="flex:1;padding:10px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);">
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <input type="number" id="editPrice" value="${p.price}" style="flex:1;padding:10px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);">
+        <input type="text" id="editCategory" value="${p.category||''}" style="flex:1;padding:10px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);">
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;cursor:pointer;padding:8px 12px;border:2px solid var(--border);border-radius:10px;">
+          <input type="checkbox" id="editOferta" ${p.oferta?'checked':''} style="width:16px;height:16px;accent-color:var(--rojo);">🔥 Oferta
+        </label>
+        <input type="number" id="editPrecioAnterior" value="${p.precioAnterior||''}" placeholder="Precio anterior" style="flex:1;min-width:100px;padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;background:var(--bg);color:var(--text);">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;cursor:pointer;padding:8px 12px;border:2px solid var(--border);border-radius:10px;">
+          <input type="checkbox" id="editVisible" ${p.visible!==false?'checked':''} style="width:16px;height:16px;accent-color:var(--verde);">👁️ Visible
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:700;font-size:13px;cursor:pointer;padding:8px 12px;border:2px solid var(--border);border-radius:10px;">
+          <input type="checkbox" id="editAgotado" ${p.agotado?'checked':''} style="width:16px;height:16px;accent-color:#555;">❌ Agotado
+        </label>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--subtext);">🎨 Variantes</div>
+        <div id="editVariantTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="editVariantInput" placeholder="Nueva variante..." onkeyup="if(event.key==='Enter')addEditVariant()" style="flex:1;padding:8px 12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;background:var(--bg);color:var(--text);">
+          <button onclick="addEditVariant()" style="background:var(--oscuro);color:white;border:none;border-radius:10px;padding:8px 14px;font-weight:800;cursor:pointer;">+</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeEditModal()" style="flex:1;padding:12px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;cursor:pointer;background:var(--card);color:var(--text);">Cancelar</button>
+        <button onclick="saveEdit('${id}')" style="flex:2;padding:12px;background:var(--rojo);color:white;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;">✅ Guardar</button>
+      </div>
+    </div>`;
+  modal.onclick = e => { if (e.target === modal) closeEditModal(); };
+  document.body.appendChild(modal);
+  renderEditVariantTags();
+}
+
+function previewEditPhoto(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX = 400; let w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = h*MAX/w; w = MAX; } } else { if (h > MAX) { w = w*MAX/h; h = MAX; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      editingPhotoBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      const prev = document.getElementById('editPhotoPreview');
+      prev.innerHTML = `<img src="${editingPhotoBase64}" style="width:100%;height:100%;object-fit:cover;">`;
+      prev.style.border = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function addEditVariant() {
+  const input = document.getElementById('editVariantInput');
+  const val = input.value.trim();
+  if (!val || editingVariants.includes(val)) return;
+  editingVariants.push(val); renderEditVariantTags(); input.value = '';
+}
+function removeEditVariant(v) { editingVariants = editingVariants.filter(x => x !== v); renderEditVariantTags(); }
+function renderEditVariantTags() {
+  const el = document.getElementById('editVariantTags');
+  if (!el) return;
+  el.innerHTML = editingVariants.map(v => `<div class="variant-tag">${v} <button onclick="removeEditVariant('${v}')">×</button></div>`).join('');
+}
+
+async function saveEdit(id) {
+  const name     = document.getElementById('editName').value.trim();
+  const price    = parseFloat(document.getElementById('editPrice').value);
+  const category = document.getElementById('editCategory').value.trim() || 'General';
+  const emoji    = document.getElementById('editEmoji').value.trim() || '📦';
+  const oferta   = document.getElementById('editOferta').checked;
+  const precioAnterior = parseFloat(document.getElementById('editPrecioAnterior').value) || 0;
+  const visible  = document.getElementById('editVisible').checked;
+  const agotado  = document.getElementById('editAgotado').checked;
+  const p = products.find(x => x.id === id);
+  if (!name)               { showToast('⚠️ Escribe el nombre'); return; }
+  if (isNaN(price)||price<=0) { showToast('⚠️ Precio inválido'); return; }
+  const photo = editingPhotoBase64 || (p ? p.photo : '');
+  showToast('⏳ Guardando...');
+  await db.collection('productos').doc(id).update({ emoji, name, price, category, photo, variants: editingVariants, oferta, precioAnterior: oferta&&precioAnterior?precioAnterior:0, visible, agotado });
+  editingPhotoBase64 = ''; closeEditModal(); showToast('✅ Actualizado');
+}
+function closeEditModal() { const m = document.getElementById('editModal'); if (m) m.remove(); editingPhotoBase64 = ''; }
+
+// ── PEDIDOS ──
+function filterPedidos(estado) {
+  pedidosFiltro = estado;
+  document.querySelectorAll('[id^="fp-"]').forEach(b => { b.style.background='var(--gris)';b.style.color='var(--text)';b.className='';b.style.cssText+=';border:none;border-radius:50px;padding:6px 12px;font-family:"Nunito",sans-serif;font-weight:700;font-size:12px;cursor:pointer;'; });
+  const active = document.getElementById('fp-' + estado);
+  if (active) { active.style.background='var(--rojo)'; active.style.color='white'; }
+  renderPedidos();
+}
+
+// 11. CLIENTES FRECUENTES — contar pedidos por teléfono
+function clientesFrecuentes(umbral = 3) {
+  const counts = {};
+  allPedidos.forEach(p => { if (p.telefono) counts[p.telefono] = (counts[p.telefono]||0) + 1; });
+  return counts;
+}
+
+function renderPedidos() {
+  const el = document.getElementById('pedidosList');
+  if (!el) return;
+  const filtered = pedidosFiltro === 'todos' ? allPedidos : allPedidos.filter(p => p.estado === pedidosFiltro);
+  if (filtered.length === 0) { el.innerHTML = `<p style="color:var(--subtext);text-align:center;padding:20px;">No hay pedidos</p>`; return; }
+
+  const estadoInfo = {
+    pendiente:   { label:'⏳ Pendiente',      cls:'estado-pendiente' },
+    confirmado:  { label:'✅ Confirmado',      cls:'estado-confirmado' },
+    preparacion: { label:'🍳 En preparación', cls:'estado-preparacion' },
+    preparando:  { label:'🍳 En preparación', cls:'estado-preparacion' },
+    camino:      { label:'🛵 En camino',       cls:'estado-camino' },
+    en_camino:   { label:'🛵 En camino',       cls:'estado-camino' },
+    entregado:   { label:'📦 Entregado',       cls:'estado-entregado' }
+  };
+
+  // 11. Clientes frecuentes
+  const frecuentes = clientesFrecuentes(3);
+
+  el.innerHTML = filtered.map(p => {
+    const fecha    = new Date(p.fecha).toLocaleString('es-VE',{dateStyle:'short',timeStyle:'short'});
+    const ei       = estadoInfo[p.estado] || estadoInfo.pendiente;
+    const repObj   = (typeof p.repartidor === 'object' && p.repartidor) ? p.repartidor : null;
+    const repNombre   = p.nombreRepartidor || repObj?.nombre || '';
+    const repTelefono = p.telefonoRepartidor || repObj?.telefono || '';
+    const esFrecuente = p.telefono && (frecuentes[p.telefono]||0) >= 3;
+
+    const repSelect = `
+      <div style="margin-top:8px;">
+        <div style="font-size:12px;font-weight:700;margin-bottom:4px;color:var(--subtext);">🛵 Repartidor</div>
+        ${repNombre ? `<div style="font-size:13px;font-weight:700;color:var(--verde);margin-bottom:4px;">👤 ${repNombre} · 📞 ${repTelefono}</div>` : '<div style="font-size:12px;color:var(--subtext);margin-bottom:4px;">Sin asignar</div>'}
+        <select onchange="asignarRepartidor('${p.id}',this.value)" style="width:100%;padding:6px;border:2px solid var(--border);border-radius:8px;font-family:'Nunito',sans-serif;font-size:13px;background:var(--bg);color:var(--text);">
+          <option value="">Sin repartidor</option>
+          ${repartidores.map(r => `<option value="${r.id}" ${repNombre===r.nombre?'selected':''}>${r.nombre} — ${r.placa||'—'}</option>`).join('')}
+        </select>
+      </div>`;
+
+    const geoBtn = p.geo
+      ? `<a href="https://maps.google.com/?q=${p.geo.lat},${p.geo.lng}" target="_blank" style="display:inline-block;margin-top:4px;font-size:12px;color:var(--verde);font-weight:700;">📍 Ver GPS</a>`
+      : '';
+
+    const ea = p.estado;
+    const estadoBtns = `<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;">
+      <button onclick="updateEstado('${p.id}','confirmado')" style="background:${ea==='confirmado'?'#1b7a3e':'#2dc653'};color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">✅ Confirmar</button>
+      <button onclick="updateEstado('${p.id}','preparacion')" style="background:${ea==='preparacion'||ea==='preparando'?'#004085':'#007bff'};color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🍳 Preparando</button>
+      <button onclick="updateEstado('${p.id}','camino')" style="background:${ea==='camino'||ea==='en_camino'?'#b34000':'#ff6b2b'};color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🛵 En camino</button>
+      <button onclick="updateEstado('${p.id}','entregado')" style="background:${ea==='entregado'?'#0a3d7a':'#1565c0'};color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">📦 Entregado</button>
+    </div>`;
+
+    const notifBtn = `<button onclick="enviarNotifWA('${p.id}')" style="width:100%;margin-top:6px;padding:8px;background:#25d366;color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">📲 Notificar cliente</button>`;
+    // 10. ENVIAR PEDIDO A REPARTIDOR
+    const repartidorWABtn = repTelefono ? `<button onclick="notifRepartidorWA('${p.id}')" style="width:100%;margin-top:6px;padding:8px;background:#1a1a2e;color:white;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">🛵 Enviar pedido al repartidor</button>` : '';
+
+    return `<div class="pedido-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+        <div>
+          <div style="font-weight:800;font-size:15px;">👤 ${p.nombre} ${esFrecuente?'⭐':''}</div>
+          ${esFrecuente?'<div style="font-size:11px;color:#ff6b2b;font-weight:700;">⭐ Cliente frecuente</div>':''}
+        </div>
+        <span class="estado-badge ${ei.cls}">${ei.label}</span>
+      </div>
+      <div class="pedido-meta">
+        <span class="pedido-meta-chip">📞 ${p.telefono}</span>
+        <span class="pedido-meta-chip">💳 ${p.metodoPago||'—'}</span>
+        ${p.zona?`<span class="pedido-meta-chip">🗺️ ${p.zona}</span>`:''}
+        <span class="pedido-meta-chip">${p.entrega==='domicilio'?'🛵 Domicilio':'🏪 Recoger'}</span>
+        ${p.tiempoEstimado?`<span class="pedido-meta-chip">⏱️ ${p.tiempoEstimado}min</span>`:''}
+      </div>
+      ${p.entrega==='domicilio'&&p.direccion?`<div style="font-size:12px;color:var(--subtext);margin-bottom:4px;">📌 ${p.direccion}</div>`:''}
+      ${geoBtn}
+      <div style="font-size:13px;margin:6px 0;white-space:pre-line;background:var(--card);border-radius:8px;padding:8px;">${p.productos}</div>
+      ${p.comprobante?`<img src="${p.comprobante}" style="width:100%;max-height:140px;object-fit:cover;border-radius:10px;margin-bottom:6px;cursor:pointer;" onclick="zoomImg('${p.comprobante}')">` : ''}
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);margin:4px 0;">$ ${p.total?.toFixed(2)||'0.00'}</div>
+      ${estadoBtns}
+      ${p.entrega==='domicilio' ? repSelect : ''}
+      ${repartidorWABtn}
+      ${notifBtn}
+      <div style="font-size:11px;color:var(--subtext);margin-top:6px;">🕐 ${fecha}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── ACTUALIZAR ESTADO ──
+async function updateEstado(id, estado) {
+  const updates = { estado };
+  if (estado === 'confirmado') {
+    updates.fechaConfirmacion = new Date().toISOString();
+    const repAsignado = await asignarRepartidorAuto(id);
+    if (repAsignado) {
+      updates.nombreRepartidor   = repAsignado.nombre;
+      updates.telefonoRepartidor = repAsignado.telefono;
+      updates.repartidor = { nombre: repAsignado.nombre, telefono: repAsignado.telefono, estado: 'asignado' };
+    }
+  }
+  if (estado === 'camino' || estado === 'en_camino') updates.fechaSalida = new Date().toISOString();
+  if (estado === 'entregado') updates.fechaEntrega = new Date().toISOString();
+  await db.collection('pedidos').doc(id).update(updates);
+  const msgs = { confirmado:'✅ Confirmado', camino:'🛵 En camino', entregado:'📦 Entregado', preparacion:'🍳 En preparación', preparando:'🍳 En preparación' };
+  showToast(msgs[estado] || '✅ Estado actualizado');
+}
+
+async function asignarRepartidorAuto(pedidoId) {
+  if (!repartidores || repartidores.length === 0) return null;
+  const ocupados = new Set(allPedidos.filter(p => p.id !== pedidoId && ['confirmado','preparacion','camino'].includes(p.estado) && p.nombreRepartidor).map(p => p.nombreRepartidor));
+  return repartidores.find(r => !ocupados.has(r.nombre)) || null;
+}
+
+async function asignarRepartidor(pedidoId, repartidorId) {
+  if (!repartidorId) {
+    await db.collection('pedidos').doc(pedidoId).update({ repartidor: null, nombreRepartidor: '', telefonoRepartidor: '' });
+    showToast('❌ Repartidor removido'); return;
+  }
+  const rep = repartidores.find(r => r.id === repartidorId);
+  if (!rep) return;
+  await db.collection('pedidos').doc(pedidoId).update({
+    repartidor: { nombre: rep.nombre, telefono: rep.telefono, estado: 'asignado' },
+    nombreRepartidor: rep.nombre, telefonoRepartidor: rep.telefono,
+  });
+  showToast(`🛵 ${rep.nombre} asignado`);
+}
+
+// 10. ENVIAR PEDIDO AL REPARTIDOR POR WHATSAPP
+function notifRepartidorWA(pedidoId) {
+  const pedido  = allPedidos.find(p => p.id === pedidoId);
+  if (!pedido) return;
+  const repNombre   = pedido.nombreRepartidor || '';
+  const repTelefono = pedido.telefonoRepartidor || '';
+  if (!repTelefono) { showToast('⚠️ No hay repartidor asignado'); return; }
+  const geoLink = pedido.geo ? `https://maps.google.com/?q=${pedido.geo.lat},${pedido.geo.lng}` : 'No disponible';
+  let msg = `🛵 *NUEVO PEDIDO*\n\n`;
+  msg += `Cliente: ${pedido.nombre}\n`;
+  msg += `Tel: ${pedido.telefono}\n`;
+  msg += `Ubicación: ${geoLink}\n\n`;
+  msg += `*Pedido:*\n${pedido.productos}\n`;
+  msg += `Pago: ${pedido.metodoPago||'—'}\n`;
+  msg += `Zona: ${pedido.zona||'—'}\n`;
+  msg += `Total: $${pedido.total?.toFixed(2)||'0.00'}\n\n`;
+  msg += `👉 Confirma cuando lo recibas`;
+  const tel = repTelefono.replace(/\D/g,'');
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function enviarNotifWA(pedidoId) {
+  const pedido = allPedidos.find(p => p.id === pedidoId);
+  if (!pedido) return;
+  const estadoMsgs = {
+    pendiente: '⏳ Tu pedido fue recibido y está pendiente.',
+    confirmado: '✅ ¡Tu pedido fue confirmado! Lo estamos procesando.',
+    preparacion: '🍳 ¡Tu pedido está en preparación! Pronto estará listo.',
+    camino: '🛵 ¡Tu pedido está en camino! Prepárate para recibirlo.',
+    entregado: '📦 ¡Tu pedido fue entregado! Gracias por comprar en Bodega Tony Tony. 🙏'
+  };
+  const repNombre   = pedido.nombreRepartidor || '';
+  const repTelefono = pedido.telefonoRepartidor || '';
+  let msg = `🛒 *Bodega Tony Tony*\n\nHola ${pedido.nombre}! ${estadoMsgs[pedido.estado] || ''}`;
+  if ((pedido.estado === 'camino' || pedido.estado === 'en_camino') && repNombre) {
+    msg += `\n\n🛵 *Tu repartidor:*\n👤 ${repNombre}\n📞 ${repTelefono}`;
+  }
+  const tel = pedido.telefono.replace(/\D/g,'');
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function zoomImg(src) {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  d.innerHTML = `<img src="${src}" style="max-width:100%;max-height:90vh;border-radius:12px;">`;
+  d.onclick = () => d.remove();
+  document.body.appendChild(d);
+}
+
+// ── REPARTIDORES ──
+async function addRepartidor() {
+  const nombre   = document.getElementById('repNombre').value.trim();
+  const telefono = document.getElementById('repTelefono').value.trim();
+  const placa    = document.getElementById('repPlaca').value.trim();
+  const vehiculo = document.getElementById('repVehiculo').value.trim();
+  if (!nombre || !telefono) { showToast('⚠️ Nombre y teléfono requeridos'); return; }
+  await db.collection('repartidores').add({ nombre, telefono, placa, vehiculo, activo: true });
+  ['repNombre','repTelefono','repPlaca','repVehiculo'].forEach(id => { document.getElementById(id).value = ''; });
+  showToast('✅ Repartidor agregado');
+}
+async function deleteRepartidor(id) {
+  if (!confirm('¿Eliminar este repartidor?')) return;
+  await db.collection('repartidores').doc(id).delete();
+  showToast('🗑️ Eliminado');
+}
+function renderRepartidores() {
+  const el = document.getElementById('repartidoresList');
+  if (!el) return;
+  if (repartidores.length === 0) { el.innerHTML = `<p style="color:var(--subtext);text-align:center;padding:20px;">No hay repartidores</p>`; return; }
+  el.innerHTML = repartidores.map(r => `
+    <div class="repartidor-item">
+      <div style="font-size:28px;">🛵</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;">${r.nombre}</div>
+        <div style="font-size:12px;color:var(--subtext);">📞 ${r.telefono} · 🚗 ${r.placa||'—'} ${r.vehiculo?'('+r.vehiculo+')':''}</div>
+      </div>
+      <button onclick="deleteRepartidor('${r.id}')" class="del-btn">🗑️</button>
+    </div>`).join('');
+}
+
+// ── ZONAS ──
+async function addZona() {
+  const nombre = document.getElementById('zonaNombre').value.trim();
+  const costo  = parseFloat(document.getElementById('zonaCosto').value) || 0;
+  if (!nombre) { showToast('⚠️ Escribe el nombre de la zona'); return; }
+  await db.collection('zonas').add({ nombre, costo });
+  document.getElementById('zonaNombre').value = '';
+  document.getElementById('zonaCosto').value = '';
+  showToast('✅ Zona agregada');
+}
+async function deleteZona(id) {
+  if (!confirm('¿Eliminar esta zona?')) return;
+  await db.collection('zonas').doc(id).delete();
+  showToast('🗑️ Zona eliminada');
+}
+function renderZonas() {
+  const el = document.getElementById('zonasList');
+  if (!el) return;
+  if (zonas.length === 0) { el.innerHTML = `<p style="color:var(--subtext);text-align:center;padding:20px;">No hay zonas configuradas</p>`; return; }
+  el.innerHTML = zonas.map(z => `
+    <div style="display:flex;align-items:center;gap:10px;background:var(--gris);border-radius:12px;padding:10px 14px;margin-bottom:8px;">
+      <div style="font-size:24px;">📍</div>
+      <div style="flex:1;"><div style="font-weight:700;">${z.nombre}</div><div style="font-size:12px;color:var(--subtext);">Costo: ${z.costo>0?'$'+z.costo:'Gratis'}</div></div>
+      <button onclick="deleteZona('${z.id}')" class="del-btn">🗑️</button>
+    </div>`).join('');
+}
+
+// ── 14. SOPORTE ADMIN ──
+function filterSoporte(estado) {
+  soporteFiltro = estado;
+  document.querySelectorAll('[id^="fs-"]').forEach(b => { b.style.background='var(--gris)';b.style.color='var(--text)';b.className='';b.style.cssText+=';border:none;border-radius:50px;padding:6px 12px;font-family:"Nunito",sans-serif;font-weight:700;font-size:12px;cursor:pointer;'; });
+  const active = document.getElementById('fs-' + estado) || document.getElementById('fs-revision');
+  if (estado === 'en_revision' && document.getElementById('fs-revision')) { document.getElementById('fs-revision').style.background='var(--rojo)'; document.getElementById('fs-revision').style.color='white'; }
+  else if (active) { active.style.background='var(--rojo)'; active.style.color='white'; }
+  renderSoporteAdmin();
+}
+
+function renderSoporteAdmin() {
+  const el = document.getElementById('soporteList');
+  if (!el) return;
+  const filtered = soporteFiltro === 'todos' ? allSoporte : allSoporte.filter(s => s.estado === soporteFiltro);
+  if (filtered.length === 0) { el.innerHTML = `<p style="color:var(--subtext);text-align:center;padding:20px;">No hay reportes</p>`; return; }
+  const estadoClsMap = { nuevo:'s-nuevo', en_revision:'s-revision', resuelto:'s-resuelto' };
+  el.innerHTML = filtered.map(s => {
+    const fecha = new Date(s.fecha).toLocaleString('es-VE',{dateStyle:'short',timeStyle:'short'});
+    const cls   = estadoClsMap[s.estado] || 's-nuevo';
+    return `<div class="soporte-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div style="font-weight:800;font-size:14px;">👤 ${s.clienteNombre}</div>
+        <span class="soporte-estado ${cls}">${s.estado==='nuevo'?'🆕 Nuevo':s.estado==='en_revision'?'🔍 En revisión':'✅ Resuelto'}</span>
+      </div>
+      <div style="font-size:12px;color:var(--subtext);margin-bottom:4px;">📞 ${s.telefono} ${s.pedidoId?'· Pedido: #'+s.pedidoId.slice(-6):''}</div>
+      <div style="font-size:13px;font-weight:700;color:var(--rojo);margin-bottom:4px;">⚠️ ${s.tipoProblema}</div>
+      <div style="font-size:13px;margin-bottom:8px;">${s.descripcion}</div>
+      ${s.imagenURL ? `<img src="${s.imagenURL}" style="width:100%;max-height:120px;object-fit:cover;border-radius:10px;margin-bottom:8px;cursor:pointer;" onclick="zoomImg('${s.imagenURL}')">` : ''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        <button onclick="updateSoporte('${s.id}','en_revision')" style="background:${s.estado==='en_revision'?'#004085':'#007bff'};color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🔍 En revisión</button>
+        <button onclick="updateSoporte('${s.id}','resuelto')" style="background:${s.estado==='resuelto'?'#155724':'#2dc653'};color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">✅ Resuelto</button>
+        <button onclick="responderSoporteWA('${s.id}')" style="background:#25d366;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">💬 Responder WA</button>
+      </div>
+      <div style="font-size:11px;color:var(--subtext);">🕐 ${fecha}</div>
+    </div>`;
+  }).join('');
+}
+
+async function updateSoporte(id, estado) {
+  await db.collection('soporte').doc(id).update({ estado, fechaActualizacion: new Date().toISOString() });
+  if (estado === 'en_revision') {
+    showToast('🔍 Marcado en revisión');
+    // Confirmación automática al cliente
+    const s = allSoporte.find(x => x.id === id);
+    if (s && s.telefono) {
+      const tel = s.telefono.replace(/\D/g,'');
+      const msg = `🛒 *Bodega Tony Tony*\n\nHola ${s.clienteNombre}, tu reporte fue recibido ✅\nEstamos revisando: *${s.tipoProblema}*\nTe contactaremos pronto. ¡Gracias!`;
+      setTimeout(() => {
+        if (confirm('¿Enviar confirmación automática al cliente por WhatsApp?')) {
+          window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+      }, 300);
+    }
+  } else {
+    showToast('✅ Reporte resuelto');
+  }
+}
+
+function responderSoporteWA(id) {
+  const s = allSoporte.find(x => x.id === id);
+  if (!s) return;
+  const tel = s.telefono.replace(/\D/g,'');
+  const msg = `🛒 *Bodega Tony Tony*\n\nHola ${s.clienteNombre}, hemos recibido tu reporte sobre: *${s.tipoProblema}*.\nEstamos revisando tu caso y te contactaremos pronto. ¡Gracias por avisarnos!`;
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// ── CONFIG ──
+async function saveWhatsapp() {
+  const wa = document.getElementById('configWhatsapp').value.trim();
+  if (!wa) { showToast('⚠️ Escribe el número'); return; }
+  if (!wa.startsWith('+')) { showToast('⚠️ El número debe empezar con + (ej: +584241234567)'); return; }
+  await db.collection('config').doc('tienda').set({ whatsapp: wa }, { merge: true });
+  showToast('✅ WhatsApp actualizado: ' + wa);
+}
+async function saveEnvioGratis() {
+  const val = document.getElementById('envioGratis').checked;
+  await db.collection('config').doc('tienda').set({ envioGratis: val }, { merge: true });
+  showToast(val ? '✅ Domicilio gratis activado' : '❌ Domicilio con costo activado');
+}
+async function saveTiempo() {
+  const val = parseInt(document.getElementById('configTiempo').value);
+  if (isNaN(val)||val<1||val>300) { showToast('⚠️ Ingresa un tiempo entre 1 y 300 minutos'); return; }
+  await db.collection('config').doc('tienda').set({ tiempoPreparacion: val }, { merge: true });
+  showToast(`✅ Tiempo: ${val} minutos (rango mostrado: ${val}–${val+10} min)`);
+}
+async function savePedidoMinimo() {
+  const raw = document.getElementById('configPedidoMinimo').value;
+  const val = parseFloat(raw);
+  if (raw === '' || isNaN(val) || val < 0) { showToast('⚠️ Ingresa un monto válido (0 para desactivar)'); return; }
+  await db.collection('config').doc('tienda').set({ pedidoMinimo: val }, { merge: true });
+  showToast(val > 0 ? `✅ Mínimo: $${val.toFixed(2)}` : '✅ Sin mínimo de pedido');
+}
+
+function fmtHora(n) {
+  const h = Number(n);
+  if (h === 0)  return '12:00 AM';
+  if (h < 12)  return `${String(h).padStart(2,'0')}:00 AM`;
+  if (h === 12) return '12:00 PM';
+  return `${String(h-12).padStart(2,'0')}:00 PM`;
+}
+async function saveHorario() {
+  const apertura = parseInt(document.getElementById('configApertura').value);
+  const cierre   = parseInt(document.getElementById('configCierre').value);
+  if (isNaN(apertura)||isNaN(cierre)) { showToast('⚠️ Ingresa apertura y cierre'); return; }
+  if (apertura<0||apertura>23||cierre<0||cierre>23) { showToast('⚠️ Valores entre 0 y 23'); return; }
+  await db.collection('config').doc('tienda').set({ horario: { apertura, cierre } }, { merge: true });
+  const el = document.getElementById('horarioStatus');
+  el.textContent = `✅ Horario: ${fmtHora(apertura)} – ${fmtHora(cierre)}${apertura>=cierre?' (nocturno)':''}`;
+  showToast('✅ Horario actualizado');
+}
+
+function estadoLabel(estado) {
+  const map = { pendiente:'⏳ Pendiente', confirmado:'✅ Confirmado', preparando:'🍳 En preparación', preparacion:'🍳 En preparación', en_camino:'🛵 En camino', camino:'🛵 En camino', entregado:'📦 Entregado' };
+  return map[estado] || '❓ Desconocido';
+}
+
+async function toggleMetodo(metodo, valor) {
+  const metodosPago = { ...configData.metodosPago, [metodo]: valor };
+  await db.collection('config').doc('tienda').set({ metodosPago }, { merge: true });
+  showToast('✅ Métodos de pago actualizados');
+}
+function renderMetodosConfig() {
+  const el = document.getElementById('metodosConfig');
+  if (!el) return;
+  const labels = { efectivo:'💵 Efectivo', pagoMovil:'📱 Pago Móvil', transferencia:'🏦 Transferencia' };
+  el.innerHTML = Object.entries(labels).map(([k, label]) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+      <span style="font-weight:700;">${label}</span>
+      <label class="toggle-switch">
+        <input type="checkbox" ${configData.metodosPago[k]?'checked':''} onchange="toggleMetodo('${k}',this.checked)">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>`).join('');
+}
+
+// 1. ESTADÍSTICAS MEJORADAS
+function loadStats() {
+  const hoy = new Date().toDateString();
+  const pedidosHoy   = allPedidos.filter(p => new Date(p.fecha).toDateString() === hoy);
+  const entregadosHoy = pedidosHoy.filter(p => p.estado === 'entregado');
+  const ventasHoy    = entregadosHoy.reduce((s, p) => s + (p.total||0), 0);
+  const pendientes   = allPedidos.filter(p => p.estado === 'pendiente').length;
+  const enCamino     = allPedidos.filter(p => ['camino','en_camino'].includes(p.estado)).length;
+  const ingresoTotal = allPedidos.filter(p => p.estado === 'entregado').reduce((s, p) => s + (p.total||0), 0);
+  const totalEntregados = allPedidos.filter(p => p.estado === 'entregado').length;
+  const ticketPromedio  = totalEntregados > 0 ? ingresoTotal / totalEntregados : 0;
+
+  // Producto más vendido
+  const conteo = {};
+  allPedidos.forEach(p => {
+    if (p.productos) {
+      p.productos.split('\n').forEach(linea => {
+        const match = linea.match(/^\s*\S+\s+(.+?)\s+×\s+(\d+)/);
+        if (match) {
+          const nombre = match[1].replace(/\(.*\)/, '').trim();
+          const qty    = parseInt(match[2]) || 1;
+          conteo[nombre] = (conteo[nombre] || 0) + qty;
+        }
+      });
+    }
+  });
+  const masVendido = Object.entries(conteo).sort((a,b) => b[1]-a[1])[0];
+
+  // Panel principal (config tab)
+  const el = document.getElementById('statsPanel');
+  if (el) {
+    el.innerHTML = [
+      ['📅', 'Pedidos hoy', pedidosHoy.length, '#ff6b2b'],
+      ['💵', 'Ventas hoy', '$'+ventasHoy.toFixed(2), '#2dc653'],
+      ['⏳', 'Pendientes', pendientes, '#f4d35e'],
+      ['💰', 'Total ingresado', '$'+ingresoTotal.toFixed(2), '#e63946'],
+      ['🧾', 'Ticket promedio', '$'+ticketPromedio.toFixed(2), '#7b2ff7'],
+      ['🏆', 'Más vendido', masVendido ? masVendido[0].slice(0,14) : '—', '#1565c0'],
+    ].map(([emoji, label, val, color]) => `
+      <div class="stat-card" style="--stat-color:${color};">
+        <div style="font-size:22px;">${emoji}</div>
+        <div class="stat-val" style="color:${color};">${val}</div>
+        <div class="stat-lbl">${label}</div>
+      </div>`).join('');
+  }
+
+  // Mini-stats en tab pedidos
+  const pBar = document.getElementById('pedidosStatsBar');
+  if (pBar) {
+    pBar.innerHTML = [
+      ['⏳', pendientes,  '#856404','#fff3cd', 'Pendientes'],
+      ['🍳', allPedidos.filter(p=>['preparacion','preparando'].includes(p.estado)).length, '#004085','#cce5ff', 'Preparando'],
+      ['🛵', enCamino,   '#c05621','#ffe5d0', 'En camino'],
+      ['📦', entregadosHoy.length, '#155724','#d4edda', 'Entregados hoy'],
+    ].map(([e, n, color, bg, lbl]) => `
+      <div style="background:${bg};border-radius:12px;padding:10px 8px;text-align:center;">
+        <div style="font-size:18px;">${e}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${color};">${n}</div>
+        <div style="font-size:10px;color:${color};font-weight:700;">${lbl}</div>
+      </div>`).join('');
+  }
+}
+
+// ── INVENTARIO ──
+async function cargarInventario() {
+  if (!confirm('¿Cargar todos los productos del inventario?')) return;
+  const inventario = [
+    {emoji:'🧻',name:'Papel Higiénico Luciano 4/84M',price:0.7,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🧴',name:'Desodorante Hombre Speed Stick 9G',price:0.5,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🧴',name:'Desodorante Mujer Speed Stick 9G',price:0.8,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🦷',name:'Crema Dental Alident 75G',price:0.8,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🦷',name:'Pasta de Dientes Colgate 90G',price:0.8,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🧼',name:'Jabón Anita Almendra 80G',price:1.2,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🧼',name:'Jabón Bebé Las Llaves 160G',price:1.0,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🪒',name:'Afeitadora Hombre Dorco',price:0.7,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🪒',name:'Afeitadora Mujer Dorco',price:0.7,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🩸',name:'Toallas Sanitarias Wanita 10pcs',price:1.4,category:'Higiene Personal',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🧴',name:'Shampoo H&S Limpieza Renovadora 18ML',price:0.4,category:'Cabello',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'💆',name:'Nutribela Reparación Intensiva 27ML',price:0.6,category:'Cabello',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🫧',name:'Cloro Ultra ABI 900ML',price:0.7,category:'Limpieza del Hogar',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🍽️',name:'Lava Platos Axion 150G',price:1.3,category:'Limpieza del Hogar',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🧺',name:'Detergente Alive Floral 500G',price:1.5,category:'Limpieza del Hogar',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🍼',name:'Pañal Baby Finger M 18UN',price:0.3,category:'Bebé',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🍼',name:'Pañal Baby Finger G 18UN',price:0.3,category:'Bebé',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🌽',name:'Harina Pan 1K',price:1.8,category:'Víveres',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🌾',name:'Harina Kaly 1K',price:1.4,category:'Víveres',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🍚',name:'Arroz Kaly 900G',price:1.6,category:'Víveres',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'☕',name:'Café Arauca 200G',price:2.7,category:'Víveres',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🥚',name:'Huevos',price:0.2,category:'Víveres',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🐟',name:'Atún Willinger 170G',price:1.8,category:'Víveres',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'🥤',name:'Glup',price:1.5,category:'Refrescos',variants:['Cola 2L','Kolita 2L','Uva 2L'],photo:'',visible:true,agotado:false},
+    {emoji:'🧃',name:'Justy',price:1.5,category:'Refrescos',variants:['Durazno','Pera','Manzana'],photo:'',visible:true,agotado:false},
+    {emoji:'🍬',name:'Boka',price:0.4,category:'Dulces',variants:['Parchita','Salpicón','Limón','Naranja'],photo:'',visible:true,agotado:false},
+    {emoji:'🧀',name:'Queso Duro',price:4.5,category:'Frescos',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'✏️',name:'Bolígrafo Azul',price:0.3,category:'Papelería',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'💊',name:'Acetaminofen 500MG',price:0.1,category:'Farmacia',variants:[],photo:'',visible:true,agotado:false},
+    {emoji:'💡',name:'Bombillo LED Veneluz 15W',price:1.1,category:'Varios',variants:[],photo:'',visible:true,agotado:false},
+  ];
+  showToast('⏳ Cargando productos...');
+  for (const p of inventario) { await db.collection('productos').add(p); }
+  showToast('✅ ¡Inventario cargado!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
