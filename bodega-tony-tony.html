@@ -151,6 +151,31 @@ body.has-float-bar .view{padding-bottom:70px;}
 .repeat-bar-info{color:white;}
 .repeat-bar-label{font-size:12px;opacity:0.7;}
 .repeat-bar-btn{background:var(--amarillo);color:var(--oscuro);border:none;border-radius:50px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;}
+/* NUEVAS MEJORAS */
+/* Banner tienda abierta/cerrada mejorado */
+.tienda-status-bar{text-align:center;padding:10px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;}
+.tienda-abierta{background:linear-gradient(90deg,#2dc653,#1a9e3f);color:white;}
+.tienda-cerrada{background:linear-gradient(90deg,#e63946,#c1121f);color:white;}
+/* Envío gratis dinámico */
+.envio-progress{height:4px;background:rgba(255,255,255,0.3);border-radius:2px;margin-top:4px;}
+.envio-progress-bar{height:100%;background:white;border-radius:2px;transition:width 0.3s;}
+/* Stock badge */
+.stock-badge{font-size:10px;font-weight:700;color:var(--naranja);margin-top:2px;}
+/* Compartir producto */
+.share-btn{background:none;border:none;font-size:16px;cursor:pointer;padding:2px 4px;opacity:0.6;}
+.share-btn:active{opacity:1;}
+/* Historial pedidos */
+.historial-card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--sombra);margin-bottom:10px;}
+.historial-estado{font-size:11px;font-weight:800;padding:3px 9px;border-radius:50px;}
+/* Cupones */
+.cupon-input-wrap{display:flex;gap:8px;margin-bottom:10px;}
+.cupon-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);}
+.cupon-input-wrap input:focus{border-color:var(--amarillo);}
+.cupon-btn{background:var(--amarillo);color:var(--oscuro);border:none;border-radius:10px;padding:10px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;}
+.cupon-ok{background:#e8f5e9;border:2px solid var(--verde);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;color:#1b5e20;margin-bottom:8px;}
+/* Puntos */
+.puntos-bar{background:linear-gradient(90deg,#7b2ff7,#5c1dc4);color:white;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.puntos-num{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
 </style>
 </head>
 <body>
@@ -174,6 +199,7 @@ body.has-float-bar .view{padding-bottom:70px;}
 <div class="tabs">
   <button class="tab-btn active" onclick="showTab('tienda')" id="tab-tienda">🏪 Tienda</button>
   <button class="tab-btn" onclick="showTab('carrito')" id="tab-carrito">🛒 Mi Pedido</button>
+  <button class="tab-btn" onclick="showTab('historial')" id="tab-historial">📋 Mis Pedidos</button>
   <button class="tab-btn" onclick="showTab('soporte')" id="tab-soporte">❗ Soporte</button>
 </div>
 
@@ -183,6 +209,7 @@ body.has-float-bar .view{padding-bottom:70px;}
 
 <div class="view active" id="view-tienda"><div id="storeContainer"></div></div>
 <div class="view" id="view-carrito"><div id="cartContainer"></div></div>
+<div class="view" id="view-historial"><div id="historialContainer"></div></div>
 <div class="view" id="view-soporte"><div id="soporteContainer"></div></div>
 
 <!-- 5. BARRA FLOTANTE -->
@@ -220,7 +247,9 @@ let config         = {
   envioGratis: true,
   tiempoPreparacion: 30,
   pedidoMinimo: 0,
-  horario: { apertura: 0, cierre: 24 }
+  horario: { apertura: 0, cierre: 24 },
+  pagoMovil: { banco: 'Banco del Tesoro', nombre: 'Lisbe Ovalle', cedula: '6.966.714', telefono: '04241572275' },
+  transferencia: { banco: 'Banco del Tesoro', nombre: 'Lisbe Ovalle', cuenta: '' }
 };
 let zonas          = [];
 let selectedZona   = null;
@@ -275,6 +304,8 @@ db.collection('config').doc('tienda').onSnapshot(snap => {
     config.tiempoPreparacion = d.tiempoPreparacion || 30;
     config.pedidoMinimo      = d.pedidoMinimo      || 0;
     config.horario           = d.horario           || config.horario;
+    config.pagoMovil         = d.pagoMovil         || config.pagoMovil;
+    config.transferencia     = d.transferencia     || config.transferencia;
     updateEnvioBar();
     actualizarBannerHorario();
   }
@@ -547,8 +578,8 @@ function renderCart() {
       <div style="display:flex;gap:8px;flex-wrap:wrap;">${metodosHtml}</div>
     </div>
 
-    ${selectedMetodo==='pagoMovil' ? `<div class="pago-card"><div style="font-weight:800;font-size:15px;margin-bottom:8px;">📱 Pago Móvil</div><div style="font-size:14px;line-height:2;">🏦 <b>Banco del Tesoro</b><br>👤 <b>Lisbe Ovalle</b><br>🪪 <b>C.I:</b> 6.966.714<br>📱 <b>04241572275</b></div></div>` : ''}
-    ${selectedMetodo==='transferencia' ? `<div class="pago-card"><div style="font-weight:800;font-size:15px;margin-bottom:8px;">🏦 Transferencia</div><div style="font-size:14px;line-height:2;">🏦 <b>Banco del Tesoro</b><br>👤 <b>Lisbe Ovalle</b></div></div>` : ''}
+    ${selectedMetodo==='pagoMovil' ? `<div class="pago-card"><div style="font-weight:800;font-size:15px;margin-bottom:8px;">📱 Pago Móvil</div><div style="font-size:14px;line-height:2;">🏦 <b>${config.pagoMovil.banco}</b><br>👤 <b>${config.pagoMovil.nombre}</b><br>🪪 <b>C.I:</b> ${config.pagoMovil.cedula}<br>📱 <b>${config.pagoMovil.telefono}</b></div></div>` : ''}
+    ${selectedMetodo==='transferencia' ? `<div class="pago-card"><div style="font-weight:800;font-size:15px;margin-bottom:8px;">🏦 Transferencia</div><div style="font-size:14px;line-height:2;">🏦 <b>${config.transferencia.banco}</b><br>👤 <b>${config.transferencia.nombre}</b>${config.transferencia.cuenta?'<br>📱 <b>Cuenta: '+config.transferencia.cuenta+'</b>':''}</div></div>` : ''}
 
     <div class="instruc-card" style="background:${deliveryType==='recoger'?'#e8f5e9':'#e3f2fd'};border:2px solid ${deliveryType==='recoger'?'#66bb6a':'#90caf9'};">
       <div style="font-weight:800;font-size:14px;color:${deliveryType==='recoger'?'#1b5e20':'#0d47a1'};">${deliveryType==='recoger'?'📋 Para recoger:':'📋 Para domicilio:'}</div>
@@ -688,7 +719,7 @@ function sendOrder() {
         <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--text);margin-bottom:6px;">¡Pedido enviado correctamente!</div>
         <div style="font-size:15px;font-weight:700;color:var(--verde);margin-bottom:16px;">🕒 En preparación · ${tiempo} min estimado</div>
         <div style="font-size:13px;color:var(--subtext);margin-bottom:16px;">${deliveryType==='domicilio'?'Realiza tu pago y envíanos el comprobante 📸':'Espera confirmación para pasar a recoger 🏪'}</div>
-        ${deliveryType==='domicilio'?`<div class="pago-card" style="text-align:left;margin-bottom:16px;"><div style="font-weight:800;font-size:15px;margin-bottom:8px;">💳 Pago Móvil</div><div style="font-size:14px;line-height:2;">🏦 <b>Banco del Tesoro</b><br>👤 <b>Lisbe Ovalle</b><br>🪪 <b>C.I:</b> 6.966.714<br>📱 <b>04241572275</b></div></div><a href="https://wa.me/${config.whatsapp}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#25d366;color:white;border:none;border-radius:14px;padding:16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;text-decoration:none;margin-bottom:12px;">📎 Enviar comprobante</a>`:''}
+        ${deliveryType==='domicilio'?`<div class="pago-card" style="text-align:left;margin-bottom:16px;"><div style="font-weight:800;font-size:15px;margin-bottom:8px;">💳 Pago Móvil</div><div style="font-size:14px;line-height:2;">🏦 <b>${config.pagoMovil.banco}</b><br>👤 <b>${config.pagoMovil.nombre}</b><br>🪪 <b>C.I:</b> ${config.pagoMovil.cedula}<br>📱 <b>${config.pagoMovil.telefono}</b></div></div><a href="https://wa.me/${config.whatsapp}" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#25d366;color:white;border:none;border-radius:14px;padding:16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;text-decoration:none;margin-bottom:12px;">📎 Enviar comprobante</a>`:''}
         <button onclick="cart={};comprobanteBase64='';clienteGeo=null;updateCartCount();showTab('tienda')" style="background:var(--rojo);color:white;border:none;border-radius:14px;padding:14px;width:100%;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;cursor:pointer;">Hacer otro pedido</button>
       </div>`;
     cart = {}; comprobanteBase64 = ''; clienteGeo = null; updateCartCount();
@@ -846,9 +877,245 @@ function enviarMensajeChat(pedidoId, texto) {
   return db.collection('pedidos').doc(pedidoId).collection('chat').add({ texto, fecha: new Date().toISOString(), de: 'cliente' });
 }
 
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
 // ── NUEVAS MEJORAS ──
-// ═══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+
+// ── BANNER TIENDA MEJORADO ──
+function actualizarBannerHorarioMejorado() {
+  const bar = document.getElementById('tierraCerradaBar');
+  if (!bar) return;
+  const abierto = tiendaAbierta();
+  bar.className = `tienda-status-bar ${abierto ? 'tienda-abierta' : 'tienda-cerrada'}`;
+  bar.style.display = 'flex';
+  bar.textContent = abierto
+    ? `✅ Abierto ahora · Horario: ${horarioTexto()}`
+    : `⏰ Cerrado · Horario: ${horarioTexto()}`;
+}
+
+// Sobrescribir actualizarBannerHorario con versión mejorada
+actualizarBannerHorario = actualizarBannerHorarioMejorado;
+actualizarBannerHorarioMejorado();
+
+// ── ENVÍO GRATIS DINÁMICO ──
+function updateEnvioBarDinamico() {
+  const bar = document.getElementById('envioBar');
+  if (!bar) return;
+  if (config.envioGratis) {
+    bar.innerHTML = '🛵 Domicilio gratis';
+    bar.style.background = 'linear-gradient(90deg,#2dc653,#1a9e3f)';
+    updateCartCount();
+    return;
+  }
+  const montoEnvioGratis = config.montoEnvioGratis || 0;
+  const total = cartTotal();
+  if (montoEnvioGratis > 0) {
+    const pct = Math.min(100, (total / montoEnvioGratis) * 100);
+    if (total >= montoEnvioGratis) {
+      bar.innerHTML = '🎉 ¡Envío gratis desbloqueado!';
+      bar.style.background = 'linear-gradient(90deg,#2dc653,#1a9e3f)';
+    } else {
+      const faltan = (montoEnvioGratis - total).toFixed(2);
+      bar.innerHTML = `🛵 Agrega $${faltan} más para envío gratis <div class="envio-progress"><div class="envio-progress-bar" style="width:${pct}%"></div></div>`;
+      bar.style.background = 'linear-gradient(90deg,#ff6b2b,#e63946)';
+    }
+  } else {
+    bar.innerHTML = '🛵 Domicilio disponible';
+    bar.style.background = 'linear-gradient(90deg,#2dc653,#1a9e3f)';
+  }
+  updateCartCount();
+}
+// Patch updateEnvioBar
+updateEnvioBar = updateEnvioBarDinamico;
+
+// Leer montoEnvioGratis de config
+const _configSnap = db.collection('config').doc('tienda').onSnapshot(snap => {
+  if (snap.exists && snap.data().montoEnvioGratis != null) {
+    config.montoEnvioGratis = snap.data().montoEnvioGratis;
+    updateEnvioBarDinamico();
+  }
+});
+
+// ── COMPARTIR PRODUCTO POR WHATSAPP ──
+function compartirProducto(pid) {
+  const p = products.find(x => x.id === pid);
+  if (!p) return;
+  const url = window.location.href;
+  const msg = `🛒 *${p.name}* — $${p.price}\n${p.oferta?'🔥 ¡En oferta!':''}\n\nPídelo en Bodega Tony Tony:\n${url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// Patch buildCard para agregar botón compartir y stock
+const _buildCardOrig = buildCard;
+buildCard = function(p, badgeLabel, isScroll) {
+  let html = _buildCardOrig(p, badgeLabel, isScroll);
+  // Agregar botón compartir y stock antes del cierre del product-info
+  const stockHtml = p.stock != null && p.stock <= 5 && p.stock > 0
+    ? `<div class="stock-badge">⚠️ Solo quedan ${p.stock}</div>` : '';
+  const shareHtml = `<button class="share-btn" onclick="compartirProducto('${p.id}')" title="Compartir">📤</button>`;
+  html = html.replace('</div></div>', `${stockHtml}${shareHtml}</div></div>`);
+  return html;
+};
+
+// ── HISTORIAL DE PEDIDOS DEL CLIENTE ──
+function showTab_original(tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + tab)?.classList.add('active');
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  document.getElementById('searchWrap').style.display = tab === 'tienda' ? 'block' : 'none';
+  if (tab === 'tienda')    renderStore();
+  if (tab === 'carrito')   renderCart();
+  if (tab === 'soporte')   renderSoporte();
+  if (tab === 'historial') renderHistorial();
+}
+showTab = showTab_original;
+
+function renderHistorial() {
+  const container = document.getElementById('historialContainer');
+  const phone = localStorage.getItem('clientPhone') || '';
+  if (!phone) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>Haz tu primer pedido para ver tu historial</p><br><button onclick="showTab('tienda')" style="background:var(--rojo);color:white;border:none;border-radius:50px;padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;margin-top:10px;">Ver productos</button></div>`;
+    return;
+  }
+  container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--subtext);">⏳ Cargando tus pedidos...</div>`;
+  db.collection('pedidos').where('telefono','==',phone).orderBy('fecha','desc').limit(20).get()
+    .then(snap => {
+      if (snap.empty) {
+        container.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>No tienes pedidos aún</p></div>`; return;
+      }
+      const estadoMap = { pendiente:'⏳ Pendiente', confirmado:'✅ Confirmado', preparacion:'🍳 Preparando', preparando:'🍳 Preparando', camino:'🛵 En camino', en_camino:'🛵 En camino', entregado:'📦 Entregado' };
+      const estadoColor = { pendiente:'#856404', confirmado:'#155724', preparacion:'#004085', preparando:'#004085', camino:'#c05621', en_camino:'#c05621', entregado:'#155724' };
+      const estadoBg = { pendiente:'#fff3cd', confirmado:'#d4edda', preparacion:'#cce5ff', preparando:'#cce5ff', camino:'#ffe5d0', en_camino:'#ffe5d0', entregado:'#d4edda' };
+      let html = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;margin-bottom:14px;border-left:4px solid var(--rojo);padding-left:10px;">📋 Mis Pedidos</div>`;
+      snap.docs.forEach(doc => {
+        const p = doc.data();
+        const fecha = new Date(p.fecha).toLocaleString('es-VE',{dateStyle:'short',timeStyle:'short'});
+        const estado = p.estado || 'pendiente';
+        html += `<div class="historial-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-weight:800;font-size:14px;">🗓️ ${fecha}</div>
+            <span class="historial-estado" style="background:${estadoBg[estado]||'#fff3cd'};color:${estadoColor[estado]||'#856404'};">${estadoMap[estado]||estado}</span>
+          </div>
+          <div style="font-size:13px;white-space:pre-line;color:var(--subtext);margin-bottom:8px;">${p.productos}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div>
+            <button onclick="repetirDesdeHistorial('${doc.id}')" style="background:var(--oscuro);color:white;border:none;border-radius:50px;padding:6px 14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:12px;cursor:pointer;">🔁 Repetir</button>
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    })
+    .catch(() => { container.innerHTML = `<div class="empty"><div class="empty-icon">❌</div><p>Error al cargar pedidos</p></div>`; });
+}
+
+function repetirDesdeHistorial(pedidoId) {
+  db.collection('pedidos').doc(pedidoId).get().then(snap => {
+    if (!snap.exists) return;
+    const data = snap.data();
+    // Parsear productos del texto
+    const lineas = (data.productos || '').split('\n').filter(l => l.trim());
+    let agregados = 0;
+    lineas.forEach(linea => {
+      const match = linea.match(/([^\s]+)\s+(.+?)\s+×\s+(\d+)/);
+      if (!match) return;
+      const nombreBusca = match[2].replace(/\(.*\)/, '').trim();
+      const qty = parseInt(match[3]) || 1;
+      const p = products.find(x => x.name.includes(nombreBusca) && !x.agotado);
+      if (!p) return;
+      const key = cartKey(p.id, '');
+      if (!cart[key]) cart[key] = { product: p, variant: '', qty: 0 };
+      cart[key].qty += qty;
+      agregados++;
+    });
+    if (agregados === 0) { showToast('⚠️ Productos no disponibles'); return; }
+    showToast(`🔁 ${agregados} producto(s) agregados`);
+    actualizarFloatingCart();
+    showTab('carrito');
+  });
+}
+
+// ── CUPONES DE DESCUENTO ──
+let cuponActivo = null;
+
+async function aplicarCupon() {
+  const codigo = document.getElementById('cuponInput')?.value.trim().toUpperCase();
+  if (!codigo) { showToast('⚠️ Escribe un código'); return; }
+  try {
+    const snap = await db.collection('cupones').where('codigo','==',codigo).where('activo','==',true).get();
+    if (snap.empty) { showToast('❌ Cupón inválido o expirado'); cuponActivo = null; renderCart(); return; }
+    const cupon = { id: snap.docs[0].id, ...snap.docs[0].data() };
+    // Validar fecha expiración
+    if (cupon.expira && new Date(cupon.expira) < new Date()) { showToast('❌ Cupón expirado'); cuponActivo = null; renderCart(); return; }
+    cuponActivo = cupon;
+    showToast(`✅ Cupón aplicado: ${cupon.descuento}% de descuento`);
+    renderCart();
+  } catch(e) { showToast('⚠️ Error al verificar cupón'); }
+}
+
+function calcularDescuentoCupon(total) {
+  if (!cuponActivo) return 0;
+  if (cuponActivo.tipo === 'porcentaje') return total * (cuponActivo.descuento / 100);
+  if (cuponActivo.tipo === 'fijo') return Math.min(cuponActivo.descuento, total);
+  return 0;
+}
+
+// ── PROGRAMA DE PUNTOS ──
+function getPuntos() { try { return parseInt(localStorage.getItem('puntos') || '0'); } catch { return 0; } }
+function sumarPuntos(total) {
+  const puntosGanados = Math.floor(total); // 1 punto por cada $1
+  const actuales = getPuntos() + puntosGanados;
+  localStorage.setItem('puntos', actuales);
+  return puntosGanados;
+}
+function getPuntosInfo() {
+  const p = getPuntos();
+  return { puntos: p, proximoNivel: p < 50 ? 50 : p < 100 ? 100 : p < 200 ? 200 : null, nivel: p >= 200 ? '🥇 VIP' : p >= 100 ? '🥈 Premium' : p >= 50 ? '🥉 Regular' : '⭐ Nuevo' };
+}
+
+// Patch sendOrder para sumar puntos y aplicar cupón
+const _sendOrderOrigNew = sendOrder;
+sendOrder = function() {
+  guardarUltimoPedido(cart);
+  _sendOrderOrigNew();
+};
+
+// Patch renderCart para agregar cupones y puntos
+const _renderCartOrigNew = renderCart;
+renderCart = function() {
+  _renderCartOrigNew();
+  const container = document.getElementById('cartContainer');
+  if (!container || Object.keys(cart).length === 0) return;
+
+  // Actualizar texto tiempo
+  const uxBar = document.querySelector('.ux-info-bar');
+  if (uxBar) uxBar.textContent = `✔ Pedido fácil y rápido · 🛵 Entrega en ${tiempoRango()}`;
+
+  // Insertar sección puntos + cupón antes del botón de WhatsApp
+  const waBtn = container.querySelector('.whatsapp-btn');
+  if (waBtn && !document.getElementById('cuponSection')) {
+    const puntoInfo = getPuntosInfo();
+    const section = document.createElement('div');
+    section.id = 'cuponSection';
+    // Puntos
+    section.innerHTML = `
+      <div class="puntos-bar">
+        <div>
+          <div style="font-size:12px;opacity:0.8;">⭐ Mis puntos — ${puntoInfo.nivel}</div>
+          <div class="puntos-num">${puntoInfo.puntos} pts</div>
+        </div>
+        <div style="font-size:12px;text-align:right;opacity:0.8;">${puntoInfo.proximoNivel ? `${puntoInfo.proximoNivel - puntoInfo.puntos} pts para siguiente nivel` : '¡Nivel máximo!'}</div>
+      </div>
+      <div style="font-weight:700;margin-bottom:8px;">🎟️ ¿Tienes un cupón?</div>
+      <div class="cupon-input-wrap">
+        <input type="text" id="cuponInput" placeholder="Código de descuento" style="text-transform:uppercase;" ${cuponActivo?'disabled':''}>
+        <button class="cupon-btn" onclick="aplicarCupon()" ${cuponActivo?'disabled':''}>Aplicar</button>
+      </div>
+      ${cuponActivo ? `<div class="cupon-ok">✅ Cupón "${cuponActivo.codigo}" aplicado — ${cuponActivo.descuento}% descuento${cuponActivo.tipo==='fijo'?' de $'+cuponActivo.descuento:''} <button onclick="cuponActivo=null;renderCart()" style="background:none;border:none;color:var(--rojo);cursor:pointer;font-weight:700;">✕</button></div>` : ''}`;
+    waBtn.parentNode.insertBefore(section, waBtn);
+  }
+  actualizarFloatingCart();
+};
 
 // ── 1. HORARIO MEJORADO CON MINUTOS ──
 // Sobrescribe tiendaAbierta para soportar horas+minutos si config.horario tiene minutosApertura/minutosCierre
