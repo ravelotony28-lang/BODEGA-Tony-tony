@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#1a1a2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Admin Tony Tony">
-<title data-id="th-modified">⚙️ Admin - Bodega Tony Tony</title>
+<title>⚙️ Admin - Bodega Tony Tony</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -92,7 +92,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
 .config-ok{color:var(--verde);font-weight:700;font-size:12px;margin-top:6px;}
 .config-warn{color:var(--naranja);font-weight:700;font-size:12px;margin-top:6px;}
 </style>
-<meta property="og:title" content="⚙️ Admin - Bodega Tony Tony" data-id="th-modified" ><meta name="description" content="Collection of Documents" data-id="th-modified" ><meta property="og:description" content="Collection of Documents" data-id="th-modified" ><meta property="og:image" content="https://tiiny.host/assets/logo-purple-bg.png" data-id="th-modified" ><meta property="og:image:width" content="1501" data-id="th-modified" ><meta property="og:image:height" content="1501" data-id="th-modified" ><meta property="og:image:type" content="image/png" data-id="th-modified" ><meta property="og:url" content="https://aqua-michaela-46.tiiny.site/" data-id="th-modified" ><meta property="og:type" content="website" data-id="th-modified" ><script defer data-domain="aqua-michaela-46.tiiny.site" src="https://analytics.tiiny.site/js/plausible.js"></script><script type="text/javascript" src="https://tiiny.host/ad-script.js"></script></head>
+</head>
 <body>
 
 <!-- LOCK SCREEN -->
@@ -142,6 +142,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
     <button class="tab-btn" onclick="showAdminTab('pedidos')" id="tab-pedidos">📋 Pedidos</button>
     <button class="tab-btn" onclick="showAdminTab('repartidores')" id="tab-repartidores">🛵 Repartidores</button>
     <button class="tab-btn" onclick="showAdminTab('zonas')" id="tab-zonas">🗺️ Zonas</button>
+    <button class="tab-btn" onclick="showAdminTab('cupones')" id="tab-cupones">🎟️ Cupones</button>
     <button class="tab-btn" onclick="showAdminTab('soporte')" id="tab-soporte">📞 Soporte</button>
     <button class="tab-btn" onclick="showAdminTab('config')" id="tab-config">⚙️ Config</button>
   </div>
@@ -183,11 +184,12 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
           <input type="checkbox" id="newVisible" checked style="width:18px;height:18px;accent-color:var(--verde);">👁️ Visible
         </label>
       </div>
-      <!-- 7. AGOTADO -->
+      <!-- 7. AGOTADO + STOCK -->
       <div class="form-row">
         <label style="display:flex;align-items:center;gap:8px;flex:1;font-weight:700;font-size:13px;cursor:pointer;padding:10px;border:2px solid var(--border);border-radius:10px;">
           <input type="checkbox" id="newAgotado" style="width:18px;height:18px;accent-color:#555;">❌ Agotado
         </label>
+        <input type="number" id="newStock" placeholder="Stock (opcional)" min="0" step="1" style="flex:1;">
       </div>
       <div class="variants-input-area">
         <label>🎨 Variantes (sabores, tamaños) — opcional</label>
@@ -266,6 +268,29 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
     </div>
   </div>
 
+  <!-- CUPONES -->
+  <div class="view" id="view-cupones">
+    <div class="admin-section">
+      <h3>➕ Crear Cupón</h3>
+      <div class="form-row">
+        <input type="text" id="cuponCodigo" placeholder="Código (ej: TONY10)" style="text-transform:uppercase;">
+        <select id="cuponTipo" style="flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);">
+          <option value="porcentaje">% Porcentaje</option>
+          <option value="fijo">$ Monto fijo</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <input type="number" id="cuponDescuento" placeholder="Valor (ej: 10 = 10%)" min="1">
+        <input type="date" id="cuponExpira" placeholder="Fecha expiración (opcional)">
+      </div>
+      <button class="btn-primary" onclick="crearCupon()" style="width:100%;">✅ Crear Cupón</button>
+    </div>
+    <div class="admin-section">
+      <h3>🎟️ Cupones activos</h3>
+      <div id="cuponesList"><p style="color:var(--subtext);">Cargando...</p></div>
+    </div>
+  </div>
+
   <!-- 14. SOPORTE -->
   <div class="view" id="view-soporte">
     <div class="admin-section">
@@ -283,6 +308,33 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
   <!-- CONFIG -->
   <div class="view" id="view-config">
     <div class="admin-section">
+      <h3>📱 Datos de Pago Móvil</h3>
+      <p style="font-size:13px;color:var(--subtext);margin-bottom:10px;">Estos datos se muestran al cliente cuando elige Pago Móvil.</p>
+      <div class="form-row">
+        <input type="text" id="pmBanco" placeholder="Banco (ej: Banco del Tesoro)">
+        <input type="text" id="pmNombre" placeholder="Nombre del titular">
+      </div>
+      <div class="form-row">
+        <input type="text" id="pmCedula" placeholder="Cédula (ej: 6.966.714)">
+        <input type="tel" id="pmTelefono" placeholder="Teléfono (ej: 04241572275)">
+      </div>
+      <button class="btn-primary" onclick="savePagoMovil()" style="width:100%;">💾 Guardar Pago Móvil</button>
+    </div>
+
+    <div class="admin-section">
+      <h3>🏦 Datos de Transferencia</h3>
+      <p style="font-size:13px;color:var(--subtext);margin-bottom:10px;">Se muestra cuando el cliente elige Transferencia.</p>
+      <div class="form-row">
+        <input type="text" id="trBanco" placeholder="Banco">
+        <input type="text" id="trNombre" placeholder="Nombre del titular">
+      </div>
+      <div class="form-row">
+        <input type="text" id="trCuenta" placeholder="Número de cuenta">
+      </div>
+      <button class="btn-primary" onclick="saveTransferencia()" style="width:100%;">💾 Guardar Transferencia</button>
+    </div>
+
+    <div class="admin-section">
       <h3>📱 WhatsApp</h3>
       <div class="form-row">
         <input type="tel" id="configWhatsapp" placeholder="+58424...">
@@ -295,13 +347,18 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
     </div>
     <div class="admin-section">
       <h3>🛵 Envío</h3>
-      <label style="display:flex;align-items:center;gap:12px;font-weight:700;cursor:pointer;">
+      <label style="display:flex;align-items:center;gap:12px;font-weight:700;cursor:pointer;margin-bottom:12px;">
         <label class="toggle-switch">
           <input type="checkbox" id="envioGratis" onchange="saveEnvioGratis()">
           <span class="toggle-slider"></span>
         </label>
-        Domicilio gratis
+        Domicilio siempre gratis
       </label>
+      <p style="font-size:13px;color:var(--subtext);margin-bottom:8px;">O establecer monto mínimo para envío gratis (0 = desactivado):</p>
+      <div class="form-row">
+        <input type="number" id="configMontoEnvio" placeholder="ej: 5.00" min="0" step="0.5">
+        <button class="btn-primary" onclick="saveMontoEnvio()">Guardar</button>
+      </div>
     </div>
     <div class="admin-section">
       <h3>⏱️ Tiempo de Preparación</h3>
@@ -331,6 +388,16 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
       </div>
       <div id="horarioStatus" style="font-size:13px;margin-top:8px;font-weight:700;"></div>
     </div>
+    <div class="admin-section">
+      <h3>📄 Exportar Pedidos PDF</h3>
+      <p style="font-size:13px;color:var(--subtext);margin-bottom:10px;">Genera un resumen de pedidos del mes. Autorización requerida (1 vez al mes).</p>
+      <div id="pdfAuthStatus" style="font-size:13px;font-weight:700;margin-bottom:8px;"></div>
+      <div class="form-row">
+        <input type="password" id="pdfPin" placeholder="PIN de autorización" maxlength="6">
+        <button class="btn-primary" onclick="exportarPDF()">📄 Exportar</button>
+      </div>
+    </div>
+
     <div class="admin-section">
       <h3>📊 Estadísticas</h3>
       <div id="statsPanel" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
@@ -407,6 +474,7 @@ function initAdmin() {
   db.collection('repartidores').onSnapshot(snap => { repartidores = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderRepartidores(); });
   db.collection('zonas').onSnapshot(snap => { zonas = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderZonas(); });
   db.collection('soporte').orderBy('fecha','desc').limit(100).onSnapshot(snap => { allSoporte = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderSoporteAdmin(); });
+  initCupones();
   db.collection('config').doc('tienda').onSnapshot(snap => {
     if (snap.exists) {
       configData = { ...configData, ...snap.data() };
@@ -418,6 +486,21 @@ function initAdmin() {
       if (tiempoEl && configData.tiempoPreparacion) tiempoEl.value = configData.tiempoPreparacion;
       const minimoEl = document.getElementById('configPedidoMinimo');
       if (minimoEl && configData.pedidoMinimo != null) minimoEl.value = configData.pedidoMinimo;
+      // Pago Móvil
+      if (configData.pagoMovil) {
+        const pm = configData.pagoMovil;
+        if (document.getElementById('pmBanco'))    document.getElementById('pmBanco').value    = pm.banco    || '';
+        if (document.getElementById('pmNombre'))   document.getElementById('pmNombre').value   = pm.nombre   || '';
+        if (document.getElementById('pmCedula'))   document.getElementById('pmCedula').value   = pm.cedula   || '';
+        if (document.getElementById('pmTelefono')) document.getElementById('pmTelefono').value = pm.telefono || '';
+      }
+      // Transferencia
+      if (configData.transferencia) {
+        const tr = configData.transferencia;
+        if (document.getElementById('trBanco'))  document.getElementById('trBanco').value  = tr.banco  || '';
+        if (document.getElementById('trNombre')) document.getElementById('trNombre').value = tr.nombre || '';
+        if (document.getElementById('trCuenta')) document.getElementById('trCuenta').value = tr.cuenta || '';
+      }
       const aperturaEl = document.getElementById('configApertura');
       const cierreEl   = document.getElementById('configCierre');
       if (aperturaEl && configData.horario) aperturaEl.value = configData.horario.apertura;
@@ -441,6 +524,7 @@ function showAdminTab(tab) {
   if (tab === 'config')   { renderMetodosConfig(); loadStats(); }
   if (tab === 'soporte')  renderSoporteAdmin();
   if (tab === 'pedidos')  loadStats();
+  if (tab === 'cupones')  renderCupones();
 }
 
 // ── FOTO ──
@@ -490,11 +574,13 @@ async function addProduct() {
   const precioAnterior = parseFloat(document.getElementById('newPrecioAnterior').value) || 0;
   const visible  = document.getElementById('newVisible').checked !== false;
   const agotado  = document.getElementById('newAgotado').checked || false;
+  const stockVal = document.getElementById('newStock').value;
+  const stock    = stockVal !== '' ? parseInt(stockVal) : null;
   if (!name)               { showToast('⚠️ Escribe el nombre'); return; }
   if (isNaN(price)||price<=0) { showToast('⚠️ Precio inválido'); return; }
   showToast('⏳ Guardando...');
-  await db.collection('productos').add({ emoji, name, price, category, photo: pendingPhotoBase64, variants: currentVariants, etiqueta, tipo, oferta, precioAnterior: oferta&&precioAnterior?precioAnterior:0, visible, agotado });
-  ['newEmoji','newName','newPrice','newCategory','newPrecioAnterior'].forEach(id => { document.getElementById(id).value = ''; });
+  await db.collection('productos').add({ emoji, name, price, category, photo: pendingPhotoBase64, variants: currentVariants, etiqueta, tipo, oferta, precioAnterior: oferta&&precioAnterior?precioAnterior:0, visible, agotado, stock });
+  ['newEmoji','newName','newPrice','newCategory','newPrecioAnterior','newStock'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('newEtiqueta').value = '';
   document.getElementById('newOferta').checked = false;
   document.getElementById('newVisible').checked = true;
@@ -537,6 +623,7 @@ function renderProductList() {
         <div class="cat">${p.category||'General'} — $ ${p.price}${p.oferta?' 🔥':''}${p.etiqueta?' ⭐':''}</div>
       </div>
       <button onclick="toggleAgotado('${p.id}',${!!p.agotado})" style="background:none;border:none;font-size:18px;cursor:pointer;padding:4px;" title="${p.agotado?'Marcar disponible':'Marcar agotado'}">${p.agotado?'🔴':'🟢'}</button>
+      <button onclick="editarStock('${p.id}',${p.stock??'null'})" style="background:none;border:none;font-size:16px;cursor:pointer;padding:4px;" title="Editar stock">📦${p.stock!=null?'<span style=\'font-size:10px;font-weight:700;\'>'+p.stock+'</span>':''}</button>
       <button onclick="toggleVisible('${p.id}',${p.visible!==false})" style="background:none;border:none;font-size:18px;cursor:pointer;padding:4px;">${p.visible!==false?'👁️':'🙈'}</button>
       <button class="edit-btn" onclick="openEditModal('${p.id}')">✏️</button>
       <button class="del-btn" onclick="deleteProduct('${p.id}')">🗑️</button>
@@ -965,6 +1052,25 @@ function responderSoporteWA(id) {
 }
 
 // ── CONFIG ──
+async function savePagoMovil() {
+  const banco    = document.getElementById('pmBanco').value.trim();
+  const nombre   = document.getElementById('pmNombre').value.trim();
+  const cedula   = document.getElementById('pmCedula').value.trim();
+  const telefono = document.getElementById('pmTelefono').value.trim();
+  if (!banco || !nombre || !telefono) { showToast('⚠️ Completa banco, nombre y teléfono'); return; }
+  await db.collection('config').doc('tienda').set({ pagoMovil: { banco, nombre, cedula, telefono } }, { merge: true });
+  showToast('✅ Datos de Pago Móvil actualizados');
+}
+
+async function saveTransferencia() {
+  const banco  = document.getElementById('trBanco').value.trim();
+  const nombre = document.getElementById('trNombre').value.trim();
+  const cuenta = document.getElementById('trCuenta').value.trim();
+  if (!banco || !nombre) { showToast('⚠️ Completa banco y nombre'); return; }
+  await db.collection('config').doc('tienda').set({ transferencia: { banco, nombre, cuenta } }, { merge: true });
+  showToast('✅ Datos de Transferencia actualizados');
+}
+
 async function saveWhatsapp() {
   const wa = document.getElementById('configWhatsapp').value.trim();
   if (!wa) { showToast('⚠️ Escribe el número'); return; }
@@ -1134,6 +1240,132 @@ async function cargarInventario() {
   showToast('⏳ Cargando productos...');
   for (const p of inventario) { await db.collection('productos').add(p); }
   showToast('✅ ¡Inventario cargado!');
+}
+
+// ── CUPONES ADMIN ──
+let allCupones = [];
+
+function initCupones() {
+  db.collection('cupones').orderBy('fecha','desc').onSnapshot(snap => {
+    allCupones = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderCupones();
+  });
+}
+
+async function crearCupon() {
+  const codigo    = document.getElementById('cuponCodigo').value.trim().toUpperCase();
+  const tipo      = document.getElementById('cuponTipo').value;
+  const descuento = parseFloat(document.getElementById('cuponDescuento').value);
+  const expira    = document.getElementById('cuponExpira').value;
+  if (!codigo)             { showToast('⚠️ Escribe un código'); return; }
+  if (isNaN(descuento)||descuento<=0) { showToast('⚠️ Ingresa el valor del descuento'); return; }
+  showToast('⏳ Creando cupón...');
+  await db.collection('cupones').add({ codigo, tipo, descuento, expira: expira || null, activo: true, fecha: new Date().toISOString(), usos: 0 });
+  ['cuponCodigo','cuponDescuento','cuponExpira'].forEach(id => { document.getElementById(id).value = ''; });
+  showToast(`✅ Cupón ${codigo} creado`);
+}
+
+async function toggleCupon(id, activo) {
+  await db.collection('cupones').doc(id).update({ activo: !activo });
+  showToast(!activo ? '✅ Cupón activado' : '❌ Cupón desactivado');
+}
+
+async function deleteCupon(id) {
+  if (!confirm('¿Eliminar este cupón?')) return;
+  await db.collection('cupones').doc(id).delete();
+  showToast('🗑️ Cupón eliminado');
+}
+
+function renderCupones() {
+  const el = document.getElementById('cuponesList');
+  if (!el) return;
+  if (allCupones.length === 0) { el.innerHTML = `<p style="color:var(--subtext);text-align:center;padding:20px;">No hay cupones</p>`; return; }
+  el.innerHTML = allCupones.map(c => `
+    <div style="background:var(--gris);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;">
+        <div style="font-weight:800;font-size:15px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:${c.activo?'var(--verde)':'var(--subtext)'};">🎟️ ${c.codigo}</div>
+        <div style="font-size:12px;color:var(--subtext);">${c.tipo==='porcentaje'?c.descuento+'% descuento':'$'+c.descuento+' de descuento'} · ${c.usos||0} usos${c.expira?' · Expira: '+c.expira:''}</div>
+      </div>
+      <button onclick="toggleCupon('${c.id}',${c.activo})" style="background:${c.activo?'#2dc653':'#aaa'};color:white;border:none;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:700;cursor:pointer;">${c.activo?'ON':'OFF'}</button>
+      <button onclick="deleteCupon('${c.id}')" class="del-btn">🗑️</button>
+    </div>`).join('');
+}
+
+// ── CONTROL DE STOCK ──
+async function editarStock(id, stockActual) {
+  const nuevo = prompt(`Stock actual: ${stockActual ?? 'sin límite'}\nNuevo stock (vacío = sin límite):`, stockActual ?? '');
+  if (nuevo === null) return;
+  const val = nuevo.trim() === '' ? null : parseInt(nuevo);
+  if (nuevo.trim() !== '' && isNaN(val)) { showToast('⚠️ Ingresa un número válido'); return; }
+  await db.collection('productos').doc(id).update({ stock: val });
+  showToast(val !== null ? `✅ Stock: ${val} unidades` : '✅ Sin límite de stock');
+}
+
+// ── MONTO ENVÍO GRATIS ──
+async function saveMontoEnvio() {
+  const val = parseFloat(document.getElementById('configMontoEnvio').value) || 0;
+  await db.collection('config').doc('tienda').set({ montoEnvioGratis: val }, { merge: true });
+  showToast(val > 0 ? `✅ Envío gratis desde $${val.toFixed(2)}` : '✅ Monto envío gratis desactivado');
+}
+
+// ── EXPORTAR PDF (1 vez al mes con PIN) ──
+const PDF_PIN = ADMIN_PIN; // usa el mismo PIN del admin
+function exportarPDF() {
+  const pin = document.getElementById('pdfPin').value.trim();
+  if (pin !== PDF_PIN) { showToast('❌ PIN incorrecto'); return; }
+
+  // Verificar si ya exportó este mes
+  const ultimaExport = localStorage.getItem('ultimaExportPDF');
+  const ahora = new Date();
+  if (ultimaExport) {
+    const ultima = new Date(ultimaExport);
+    if (ultima.getMonth() === ahora.getMonth() && ultima.getFullYear() === ahora.getFullYear()) {
+      const pdfEl = document.getElementById('pdfAuthStatus');
+      if (pdfEl) pdfEl.textContent = `⚠️ Ya exportaste este mes (${ultima.toLocaleDateString()})`;
+      if (!confirm('Ya exportaste este mes. ¿Deseas exportar de nuevo?')) return;
+    }
+  }
+
+  // Generar reporte en texto plano (abre ventana imprimible)
+  const mes = ahora.toLocaleDateString('es-VE', { month: 'long', year: 'numeric' });
+  const pedidosMes = allPedidos.filter(p => {
+    const fp = new Date(p.fecha);
+    return fp.getMonth() === ahora.getMonth() && fp.getFullYear() === ahora.getFullYear();
+  });
+  const totalMes = pedidosMes.reduce((s, p) => s + (p.total||0), 0);
+  const entregados = pedidosMes.filter(p => p.estado === 'entregado');
+  const ingresoReal = entregados.reduce((s, p) => s + (p.total||0), 0);
+
+  let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte ${mes}</title>
+    <style>body{font-family:Arial,sans-serif;padding:20px;font-size:13px;}h1{font-size:20px;margin-bottom:4px;}h2{font-size:15px;margin:16px 0 8px;border-bottom:1px solid #ddd;padding-bottom:4px;}table{width:100%;border-collapse:collapse;}th,td{padding:6px 8px;border:1px solid #ddd;text-align:left;}th{background:#f0f0f0;font-weight:700;}.total{font-size:15px;font-weight:700;margin-top:12px;}</style>
+    </head><body>
+    <h1>🛒 Bodega Tony Tony</h1>
+    <p>Reporte de pedidos — ${mes}</p>
+    <p>Generado: ${ahora.toLocaleString('es-VE')}</p>
+    <h2>📊 Resumen</h2>
+    <table><tr><th>Concepto</th><th>Valor</th></tr>
+    <tr><td>Total pedidos</td><td>${pedidosMes.length}</td></tr>
+    <tr><td>Pedidos entregados</td><td>${entregados.length}</td></tr>
+    <tr><td>Monto total facturado</td><td>$${totalMes.toFixed(2)}</td></tr>
+    <tr><td>Ingresos reales (entregados)</td><td>$${ingresoReal.toFixed(2)}</td></tr>
+    </table>
+    <h2>📋 Detalle de Pedidos</h2>
+    <table><tr><th>Fecha</th><th>Cliente</th><th>Teléfono</th><th>Estado</th><th>Total</th></tr>
+    ${pedidosMes.map(p => `<tr><td>${new Date(p.fecha).toLocaleDateString('es-VE')}</td><td>${p.nombre}</td><td>${p.telefono}</td><td>${p.estado}</td><td>$${p.total?.toFixed(2)||'0.00'}</td></tr>`).join('')}
+    </table>
+    <div class="total">Total ingresado: $${ingresoReal.toFixed(2)}</div>
+    </body></html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.print();
+
+  localStorage.setItem('ultimaExportPDF', ahora.toISOString());
+  document.getElementById('pdfPin').value = '';
+  const pdfEl = document.getElementById('pdfAuthStatus');
+  if (pdfEl) pdfEl.textContent = `✅ Exportado el ${ahora.toLocaleDateString()}`;
+  showToast('✅ PDF generado');
 }
 
 function showToast(msg) {
