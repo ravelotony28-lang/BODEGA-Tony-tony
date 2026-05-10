@@ -10,7 +10,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 :root{--rojo:#e63946;--amarillo:#f4d35e;--verde:#2dc653;--oscuro:#1a1a2e;--bg:#f5f5f5;--card:#fff;--text:#1a1a2e;--subtext:#666;--border:#eee;--gris:#f1f1f1;}
-.dark-mode{--bg:#0f0f1a;--card:#1a1a2e;--text:#f0f0f0;--subtext:#bbb;--border:#2a2a3e;--gris:#2a2a3e;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 header{background:var(--oscuro);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
@@ -142,9 +141,8 @@ firebase.initializeApp({
 });
 const db = firebase.firestore();
 
-let products=[], allPedidos=[], pedidosFiltro='todos', pinEntered='', adminPin='', configData={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},envioGratis:true,pedidoMinimo:0,tiempoPreparacion:30};
+let products=[], allPedidos=[], pedidosFiltro='todos', pinEntered='', adminPin='';
 
-// CARGAR PIN DESDE FIRESTORE
 async function loadAdminPin(){
   try{const snap=await db.collection('config').doc('seguridad').get();adminPin=snap.exists?snap.data().adminPin:'300419';}
   catch(e){adminPin='300419';}
@@ -164,13 +162,7 @@ function lockPanel(){document.getElementById('lockScreen').style.display='flex';
 function initAdmin(){
   db.collection('productos').onSnapshot(snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));renderProductList();});
   db.collection('pedidos').orderBy('fecha','desc').limit(100).onSnapshot(snap=>{allPedidos=snap.docs.map(d=>({id:d.id,...d.data()}));renderPedidos();});
-  db.collection('config').doc('tienda').onSnapshot(snap=>{if(snap.exists){configData={...configData,...snap.data()};fillConfig();}});
-}
-
-function fillConfig(){
-  if(document.getElementById('configWhatsapp'))document.getElementById('configWhatsapp').value=configData.whatsapp||'';
-  if(document.getElementById('configPedidoMinimo')&&configData.pedidoMinimo!=null)document.getElementById('configPedidoMinimo').value=configData.pedidoMinimo;
-  if(document.getElementById('configTiempo')&&configData.tiempoPreparacion)document.getElementById('configTiempo').value=configData.tiempoPreparacion;
+  db.collection('config').doc('tienda').onSnapshot(snap=>{if(snap.exists){const d=snap.data();if(document.getElementById('configWhatsapp'))document.getElementById('configWhatsapp').value=d.whatsapp||'';if(document.getElementById('configPedidoMinimo'))document.getElementById('configPedidoMinimo').value=d.pedidoMinimo||0;if(document.getElementById('configTiempo'))document.getElementById('configTiempo').value=d.tiempoPreparacion||30;}});
 }
 
 function showAdminTab(tab){
@@ -189,7 +181,7 @@ async function addProduct(){
   const visible=document.getElementById('newVisible').checked;
   const agotado=document.getElementById('newAgotado').checked;
   if(!name||isNaN(price)||price<=0){showToast('⚠️ Datos inválidos');return;}
-  await db.collection('productos').add({emoji,name,price,category,oferta,precioAnterior:oferta&&precioAnterior?precioAnterior:0,visible,agotado});
+  await db.collection('productos').add({emoji,name,price,category,oferta,precioAnterior:oferta&&precioAnterior?precioAnterior:0,visible,agotado,variants:[],photo:'',etiqueta:'',tipo:'normal',stock:null});
   ['newEmoji','newName','newPrice','newCategory','newPrecioAnterior'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('newOferta').checked=false;document.getElementById('newAgotado').checked=false;
   showToast('✅ Producto agregado');
