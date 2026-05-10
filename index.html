@@ -58,7 +58,7 @@ header{background:var(--oscuro);color:white;padding:14px 16px;padding-top:max(14
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;}
 .product-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--sombra);display:flex;flex-direction:column;position:relative;transition:transform 0.15s,box-shadow 0.15s;cursor:pointer;}
 .product-card:active{transform:scale(0.97);}
-.oferta-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--sombra);flex-shrink:0;width:160px;position:relative;}
+.oferta-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--sombra);flex-shrink:0;width:160px;position:relative;cursor:pointer;}
 .product-img{width:100%;height:130px;object-fit:cover;transition:opacity 0.3s;}
 .product-img.loading{background:linear-gradient(90deg,var(--gris) 25%,var(--border) 50%,var(--gris) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
@@ -158,36 +158,18 @@ header{background:var(--oscuro);color:white;padding:14px 16px;padding-top:max(14
 .floating-cart-btn{background:var(--rojo);color:white;border:none;border-radius:50px;padding:12px 22px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;transition:transform var(--anim);}
 .floating-cart-btn:active{transform:scale(0.95);}
 body.has-float-bar .view{padding-bottom:80px;}
-.upsell-section{background:linear-gradient(135deg,#fff8e1,#fff3e0);border:2px solid var(--amarillo);border-radius:14px;padding:14px;margin-top:12px;}
-.upsell-title{font-size:13px;font-weight:800;color:#856404;margin-bottom:10px;}
-.upsell-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
-.upsell-scroll::-webkit-scrollbar{display:none;}
-.upsell-card{flex-shrink:0;width:120px;background:white;border-radius:12px;padding:8px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.08);}
-.upsell-card .uadd{background:var(--oscuro);color:white;border:none;border-radius:50px;padding:4px 10px;font-size:11px;font-weight:800;cursor:pointer;margin-top:4px;width:100%;transition:background 0.2s;}
-.repeat-bar{background:linear-gradient(90deg,#1a1a2e,#2a2a4e);border-radius:14px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
-.repeat-bar-btn{background:var(--amarillo);color:var(--oscuro);border:none;border-radius:50px;padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;}
-.envio-progress{height:4px;background:rgba(255,255,255,0.3);border-radius:2px;margin-top:4px;}
-.envio-progress-bar{height:100%;background:white;border-radius:2px;transition:width 0.5s ease;}
 .stock-badge{font-size:10px;font-weight:700;color:var(--naranja);margin-top:2px;}
 .share-btn{background:none;border:none;font-size:16px;cursor:pointer;padding:2px 4px;opacity:0.6;transition:opacity 0.2s;}
 .share-btn:active{opacity:1;}
 .historial-card{background:var(--card);border-radius:14px;padding:14px;box-shadow:var(--sombra);margin-bottom:10px;animation:slideIn 0.2s ease;}
 .historial-estado{font-size:11px;font-weight:800;padding:3px 9px;border-radius:50px;}
-.cupon-input-wrap{display:flex;gap:8px;margin-bottom:10px;}
-.cupon-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);transition:border 0.2s;}
-.cupon-input-wrap input:focus{border-color:var(--amarillo);}
-.cupon-btn{background:var(--amarillo);color:var(--oscuro);border:none;border-radius:10px;padding:10px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap;}
-.cupon-ok{background:#e8f5e9;border:2px solid var(--verde);border-radius:10px;padding:8px 12px;font-size:13px;font-weight:700;color:#1b5e20;margin-bottom:8px;}
-.puntos-bar{background:linear-gradient(90deg,#7b2ff7,#5c1dc4);color:white;border-radius:12px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.puntos-num{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
-:focus-visible{outline:3px solid var(--rojo);outline-offset:2px;border-radius:4px;}
-@media(prefers-contrast:high){.product-card{border:2px solid var(--text);}button{border:2px solid currentColor;}}
-@media(max-width:400px){.products-grid{grid-template-columns:repeat(2,1fr);}.logo{font-size:22px;}}
 .tracking-progress{display:flex;gap:2px;margin:12px 0;}
 .tracking-progress-seg{flex:1;height:4px;border-radius:2px;background:var(--border);transition:background 0.3s;}
 .tracking-progress-seg.done{background:var(--verde);}
 .tracking-progress-seg.active{background:var(--amarillo);}
 .tracking-progress-seg.cancel{background:var(--rojo);}
+:focus-visible{outline:3px solid var(--rojo);outline-offset:2px;border-radius:4px;}
+@media(max-width:400px){.products-grid{grid-template-columns:repeat(2,1fr);}.logo{font-size:22px;}}
 </style>
 </head>
 <body>
@@ -203,27 +185,23 @@ body.has-float-bar .view{padding-bottom:80px;}
     <div style="font-size:11px;color:#aaa;margin-top:1px;">🛒 Haz tu pedido aquí</div>
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
-    <button class="dark-btn" id="darkBtn" onclick="toggleDark()" aria-label="Cambiar modo oscuro">🌙</button>
-    <button class="cart-btn" onclick="showTab('carrito')" aria-label="Ver carrito de compras">
-      🛒 <span class="cart-count" id="cartCount" aria-live="polite">0</span>
-    </button>
+    <button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button>
+    <button class="cart-btn" onclick="showTab('carrito')">🛒 <span class="cart-count" id="cartCount">0</span></button>
   </div>
 </header>
 
 <div class="tienda-status-bar tienda-abierta" id="tiendaStatusBar">✅ Abierto ahora</div>
 <div class="envio-bar" id="envioBar">🛵 Domicilio gratis</div>
 
-<div class="tabs" role="tablist" aria-label="Secciones de la tienda">
-  <button class="tab-btn active" onclick="showTab('tienda')" id="tab-tienda" role="tab" aria-selected="true">🏪 Tienda</button>
-  <button class="tab-btn" onclick="showTab('carrito')" id="tab-carrito" role="tab" aria-selected="false">🛒 Mi Pedido</button>
-  <button class="tab-btn" onclick="showTab('tracking')" id="tab-tracking" role="tab" aria-selected="false">📦 Pedido</button>
-  <button class="tab-btn" onclick="showTab('historial')" id="tab-historial" role="tab" aria-selected="false">📋 Mis Pedidos</button>
-  <button class="tab-btn" onclick="showTab('soporte')" id="tab-soporte" role="tab" aria-selected="false">❗ Soporte</button>
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('tienda')" id="tab-tienda">🏪 Tienda</button>
+  <button class="tab-btn" onclick="showTab('carrito')" id="tab-carrito">🛒 Mi Pedido</button>
+  <button class="tab-btn" onclick="showTab('tracking')" id="tab-tracking">📦 Pedido</button>
+  <button class="tab-btn" onclick="showTab('historial')" id="tab-historial">📋 Historial</button>
+  <button class="tab-btn" onclick="showTab('soporte')" id="tab-soporte">❗ Soporte</button>
 </div>
 
-<div class="search-wrap" id="searchWrap">
-  <input type="text" id="searchInput" placeholder="Buscar producto..." oninput="renderStore()">
-</div>
+<div class="search-wrap" id="searchWrap"><input type="text" id="searchInput" placeholder="Buscar producto..." oninput="renderStore()"></div>
 
 <div class="view active" id="view-tienda"><div id="storeContainer"></div></div>
 <div class="view" id="view-carrito"><div id="cartContainer"></div></div>
@@ -232,51 +210,40 @@ body.has-float-bar .view{padding-bottom:80px;}
 <div class="view" id="view-soporte"><div id="soporteContainer"></div></div>
 
 <div class="floating-cart" id="floatingCart">
-  <div class="floating-cart-info">
-    <div class="floating-cart-label">Tu pedido</div>
-    <div class="floating-cart-total" id="floatTotal">$ 0.00</div>
-  </div>
+  <div class="floating-cart-info"><div class="floating-cart-label">Tu pedido</div><div class="floating-cart-total" id="floatTotal">$ 0.00</div></div>
   <button class="floating-cart-btn" onclick="showTab('carrito')">Ver pedido 🛒</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════ FIREBASE ═══════════════
 firebase.initializeApp({apiKey:"AIzaSyBdv2cOMgbeBuW-V9Buz8EzGAoElnvySoI",authDomain:"bodegatonytony.firebaseapp.com",projectId:"bodegatonytony",storageBucket:"bodegatonytony.firebasestorage.app",messagingSenderId:"763208241886",appId:"1:763208241886:web:dd4a04d68c2c72ed24a84f"});
 const db=firebase.firestore();
 
-// ═══════════════ ESTADO ═══════════════
 let products=[],cart={},deliveryType='domicilio',selectedCategory='Todos',comprobanteBase64='',darkMode=localStorage.getItem('darkMode')==='1';
 let config={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},envioGratis:true,tiempoPreparacion:30,pedidoMinimo:0,horario:{apertura:0,cierre:24},pagoMovil:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cedula:'6.966.714',telefono:'04241572275'},transferencia:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cuenta:''}};
-let zonas=[],selectedZona=null,selectedMetodo='pagoMovil',clienteGeo=null,pedidoActivoUnsub=null,cuponActivo=null;
+let zonas=[],selectedZona=null,selectedMetodo='pagoMovil',clienteGeo=null,pedidoActivoUnsub=null;
 
-// ═══════════════ DARK MODE ═══════════════
 function applyDark(){document.body.classList.toggle('dark',darkMode);document.getElementById('darkBtn').textContent=darkMode?'☀️':'🌙';}
 function toggleDark(){darkMode=!darkMode;localStorage.setItem('darkMode',darkMode?'1':'0');applyDark();}
 applyDark();
 
-// ═══════════════ HORARIO ═══════════════
 function tiendaAbierta(){const h=config.horario||{apertura:0,cierre:24};const ahora=new Date();const totalMin=ahora.getHours()*60+ahora.getMinutes();const aperMin=(h.apertura||0)*60+(h.minutosApertura||0);const cierreMin=(h.cierre||24)*60+(h.minutosCierre||0);if(aperMin<cierreMin)return totalMin>=aperMin&&totalMin<cierreMin;return totalMin>=aperMin||totalMin<cierreMin;}
 function horarioTexto(){const h=config.horario||{apertura:10,cierre:22};function fmt(n){const v=Number(n);if(v===0)return'12:00 AM';if(v<12)return`${String(v).padStart(2,'0')}:00 AM`;if(v===12)return'12:00 PM';return`${String(v-12).padStart(2,'0')}:00 PM`;}return`${fmt(h.apertura)} - ${fmt(h.cierre)}`;}
-function actualizarBannerHorario(){const bar=document.getElementById('tiendaStatusBar');if(!bar)return;const abierto=tiendaAbierta();bar.className=`tienda-status-bar ${abierto?'tienda-abierta':'tienda-cerrada'}`;bar.textContent=abierto?`✅ Abierto ahora · Horario: ${horarioTexto()}`:`⏰ Cerrado · Horario: ${horarioTexto()}`;}
+function actualizarBannerHorario(){const bar=document.getElementById('tiendaStatusBar');if(!bar)return;const abierto=tiendaAbierta();bar.className=`tienda-status-bar ${abierto?'tienda-abierta':'tienda-cerrada'}`;bar.textContent=abierto?`✅ Abierto · ${horarioTexto()}`:`⏰ Cerrado · ${horarioTexto()}`;}
 function tiempoRango(){const t=config.tiempoPreparacion||30;return`${t}–${t+10} min`;}
 
-// ═══════════════ LISTENERS ═══════════════
 db.collection('config').doc('tienda').onSnapshot(snap=>{if(snap.exists){const d=snap.data();config.whatsapp=d.whatsapp||config.whatsapp;config.metodosPago=d.metodosPago||config.metodosPago;config.envioGratis=d.envioGratis!==false;config.tiempoPreparacion=d.tiempoPreparacion||30;config.pedidoMinimo=d.pedidoMinimo||0;config.horario=d.horario||config.horario;config.pagoMovil=d.pagoMovil||config.pagoMovil;config.transferencia=d.transferencia||config.transferencia;updateEnvioBar();actualizarBannerHorario();}});
 db.collection('zonas').onSnapshot(snap=>{zonas=snap.docs.map(d=>({id:d.id,...d.data()}));});
 db.collection('productos').onSnapshot(snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.visible!==false);renderStore();});
 setInterval(actualizarBannerHorario,60000);
 
-// ═══════════════ CARRITO ═══════════════
 function cartKey(pid,v){return pid+'_'+(v||'');}
 function getQty(pid,v){return(cart[cartKey(pid,v)]||{}).qty||0;}
-function totalQtyForProduct(pid){return Object.keys(cart).filter(k=>k.startsWith(pid+'_')).reduce((s,k)=>s+cart[k].qty,0);}
 function cartTotal(){return Object.values(cart).reduce((s,i)=>s+i.product.price*i.qty,0);}
 function updateCartCount(){document.getElementById('cartCount').textContent=Object.values(cart).reduce((a,b)=>a+b.qty,0);}
 function updateEnvioBar(){updateCartCount();actualizarFloatingCart();}
 
-// ═══════════════ TABS ═══════════════
 function showTab(tab){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -290,8 +257,8 @@ function showTab(tab){
   if(tab==='tracking'){const pid=localStorage.getItem('pedidoActivoId');if(pid){db.collection('pedidos').doc(pid).get().then(snap=>{if(snap.exists)renderTracking(pid,snap.data());else document.getElementById('trackingContainer').innerHTML='<div class="empty"><div class="empty-icon">📦</div><p>No hay pedido activo</p></div>';});}else{document.getElementById('trackingContainer').innerHTML='<div class="empty"><div class="empty-icon">📦</div><p>No tienes pedidos en curso</p><button onclick="showTab(\'tienda\')" style="background:var(--rojo);color:white;border:none;border-radius:50px;padding:10px 20px;font-weight:700;cursor:pointer;margin-top:10px;">Hacer un pedido</button></div>';}}
 }
 
-// ═══════════════ TIENDA ═══════════════
 function esc(str){return(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
 function renderStore(){
   const container=document.getElementById('storeContainer');
   if(!products.length){container.innerHTML='<div class="empty"><div class="empty-icon">🏪</div><p>¡Pronto hay productos!</p></div>';updateCartCount();return;}
@@ -332,18 +299,16 @@ function pedidoRapido(pid,v){addToCart(pid,v);showTab('carrito');}
 function toggleVariant(pid,v){getQty(pid,v)===0?addToCart(pid,v):changeQty(pid,v,-getQty(pid,v));}
 function addToCart(pid,v){const p=products.find(x=>x.id===pid);if(!p||p.agotado){showToast('❌ No disponible');return;}const key=cartKey(pid,v);if(!cart[key])cart[key]={product:p,variant:v||'',qty:0};cart[key].qty++;renderStore();showToast('✅ Agregado');updateEnvioBar();}
 function changeQty(pid,v,delta){const key=cartKey(pid,v);if(!cart[key])return;cart[key].qty+=delta;if(cart[key].qty<=0)delete cart[key];renderStore();updateEnvioBar();}
+function totalQtyForProduct(pid){return Object.keys(cart).filter(k=>k.startsWith(pid+'_')).reduce((s,k)=>s+cart[k].qty,0);}
 
-// ═══════════════ ZOOM ═══════════════
 function zoomProduct(photo,name,emoji,price){const d=document.createElement('div');d.className='zoom-modal';d.innerHTML=`${photo?`<img src="${photo}" alt="${name}">`:`<div class="zoom-emoji">${emoji}</div>`}<div class="zoom-name">${name}</div><div class="zoom-price">$ ${price}</div><button class="zoom-close" onclick="this.parentElement.remove()">✕ Cerrar</button>`;d.onclick=e=>{if(e.target===d)d.remove();};document.body.appendChild(d);}
 
-// ═══════════════ GEOLOCALIZACIÓN ═══════════════
 function getLocation(){
   if(!navigator.geolocation){showToast('⚠️ Geolocalización no soportada');return;}
   showToast('📍 Obteniendo ubicación...');
-  navigator.geolocation.getCurrentPosition(pos=>{clienteGeo={lat:pos.coords.latitude,lng:pos.coords.longitude};const geoEl=document.getElementById('geoStatus');if(geoEl){geoEl.className='geo-required geo-ok';geoEl.innerHTML=`✅ Ubicación obtenida · <a href="https://maps.google.com/?q=${clienteGeo.lat},${clienteGeo.lng}" target="_blank" style="color:#1b5e20;">Ver en mapa</a>`;}showToast('✅ Ubicación capturada');renderCart();},()=>{showToast('❌ No se pudo obtener ubicación');});
+  navigator.geolocation.getCurrentPosition(pos=>{clienteGeo={lat:pos.coords.latitude,lng:pos.coords.longitude};const geoEl=document.getElementById('geoStatus');if(geoEl){geoEl.className='geo-required geo-ok';geoEl.innerHTML=`✅ Ubicación obtenida`;}showToast('✅ Ubicación capturada');renderCart();},()=>{showToast('❌ No se pudo obtener ubicación');});
 }
 
-// ═══════════════ CARRITO RENDER ═══════════════
 function renderCart(){
   const container=document.getElementById('cartContainer');const keys=Object.keys(cart);
   if(!keys.length){container.innerHTML='<div class="empty"><div class="empty-icon">🛒</div><p>Tu carrito está vacío</p><button onclick="showTab(\'tienda\')" style="background:var(--rojo);color:white;border:none;border-radius:50px;padding:10px 20px;font-weight:700;cursor:pointer;margin-top:10px;">Ver productos</button></div>';return;}
@@ -352,22 +317,22 @@ function renderCart(){
   const minimoHtml=minimo>0?`<div class="minimo-bar ${totalFinal>=minimo?'minimo-ok':'minimo-nok'}">${totalFinal>=minimo?`✅ Mínimo alcanzado ($${minimo})`:`⚠️ Mínimo: $${minimo} — Faltan $${(minimo-totalFinal).toFixed(2)}`}</div>`:'';
   const metodosHtml=Object.entries(config.metodosPago).filter(([,v])=>v).map(([k])=>{const labels={efectivo:'💵 Efectivo',pagoMovil:'📱 Pago Móvil',transferencia:'🏦 Transferencia'};return`<div class="metodo-chip${selectedMetodo===k?' selected':''}" onclick="selectedMetodo='${k}';renderCart()">${labels[k]||k}</div>`;}).join('');
   const zonasHtml=zonas.length>0?`<div style="margin-top:14px;"><div style="font-weight:700;margin-bottom:8px;">📍 Zona de entrega</div><div style="display:flex;flex-wrap:wrap;gap:8px;">${zonas.map(z=>`<div class="zona-chip${selectedZona&&selectedZona.id===z.id?' selected':''}" onclick="selectZona('${z.id}')">${z.nombre}${z.costo>0?' - $'+z.costo:' Gratis'}</div>`).join('')}</div></div>`:'';
-  const abierto=tiendaAbierta(),btnDisabled=!abierto?'disabled':'',btnText=!abierto?`⏰ Cerrado — ${horarioTexto()}`:'📤 Enviar pedido por WhatsApp';
+  const abierto=tiendaAbierta(),btnDisabled=!abierto?'disabled':'',btnText=!abierto?`⏰ Cerrado`:'📤 Enviar pedido por WhatsApp';
   const mapaHtml=clienteGeo&&deliveryType==='domicilio'?`<div style="width:100%;height:180px;border-radius:12px;overflow:hidden;margin:10px 0;"><iframe width="100%" height="180" frameborder="0" style="border:0;border-radius:12px;" src="https://www.google.com/maps/embed/v1/place?q=${clienteGeo.lat},${clienteGeo.lng}&zoom=17&key=AIzaSyD-0hSWNhTpVWezNkZ5XJhPqVWgZZQfGpI" allowfullscreen></iframe></div><a href="https://www.google.com/maps/dir/?api=1&destination=${clienteGeo.lat},${clienteGeo.lng}" target="_blank" style="display:block;width:100%;padding:10px;background:var(--rojo);color:white;border:none;border-radius:10px;text-align:center;font-weight:700;text-decoration:none;margin-bottom:10px;">🗺️ Abrir en Google Maps</a>`:'';
 
   container.innerHTML=`
-    <div class="ux-info-bar">✔ Pedido fácil y rápido · 🕒 Entrega estimada: <strong>${tiempoRango()}</strong><br><small>⏱️ Preparación: ${tiempo} min + 🛵 Envío: 10-20 min</small></div>
+    <div class="ux-info-bar">✔ Pedido fácil y rápido · 🕒 <strong>${tiempoRango()}</strong><br><small>⏱️ Preparación: ${tiempo} min + 🛵 Envío: 10-20 min</small></div>
     ${minimoHtml}
     <div>${itemsHtml}</div>
     <div class="cart-total"><div class="label">Subtotal</div><div class="amount">$ ${total.toFixed(2)}</div>${costoEnvio>0?`<div style="font-size:13px;opacity:0.7;">+ Envío $${costoEnvio.toFixed(2)} = <b>$${totalFinal.toFixed(2)}</b></div>`:'<div style="font-size:13px;color:#2dc653;">🛵 Domicilio gratis</div>'}</div>
-    <div style="margin-top:14px;"><div style="font-weight:700;margin-bottom:8px;">📍 ¿Cómo recibes?</div><div class="delivery-options"><div class="delivery-opt ${deliveryType==='domicilio'?'selected':''}" onclick="setDelivery('domicilio')"><span class="icon">🛵</span>Domicilio</div><div class="delivery-opt ${deliveryType==='recoger'?'selected':''}" onclick="setDelivery('recoger')"><span class="icon">🏪</span>Recoger</div></div></div>
+    <div style="margin-top:14px;"><div style="font-weight:700;">📍 ¿Cómo recibes?</div><div class="delivery-options"><div class="delivery-opt ${deliveryType==='domicilio'?'selected':''}" onclick="setDelivery('domicilio')"><span class="icon">🛵</span>Domicilio</div><div class="delivery-opt ${deliveryType==='recoger'?'selected':''}" onclick="setDelivery('recoger')"><span class="icon">🏪</span>Recoger</div></div></div>
     ${deliveryType==='domicilio'?zonasHtml:''}
-    <div style="margin-top:14px;"><div style="font-weight:700;margin-bottom:8px;">💳 Método de pago</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${metodosHtml}</div></div>
+    <div style="margin-top:14px;"><div style="font-weight:700;">💳 Método de pago</div><div style="display:flex;gap:8px;flex-wrap:wrap;">${metodosHtml}</div></div>
     ${selectedMetodo==='pagoMovil'?`<div class="pago-card"><div style="font-weight:800;">📱 Pago Móvil</div><div>🏦 ${config.pagoMovil.banco}<br>👤 ${config.pagoMovil.nombre}<br>🪪 C.I: ${config.pagoMovil.cedula}<br>📱 ${config.pagoMovil.telefono}</div></div>`:''}
     ${selectedMetodo==='transferencia'?`<div class="pago-card"><div style="font-weight:800;">🏦 Transferencia</div><div>🏦 ${config.transferencia.banco}<br>👤 ${config.transferencia.nombre}${config.transferencia.cuenta?'<br>📱 Cuenta: '+config.transferencia.cuenta:''}</div></div>`:''}
-    <div class="instruc-card" style="background:${deliveryType==='recoger'?'#e8f5e9':'#e3f2fd'};border:2px solid ${deliveryType==='recoger'?'#66bb6a':'#90caf9'};"><div style="font-weight:800;color:${deliveryType==='recoger'?'#1b5e20':'#0d47a1'};">${deliveryType==='recoger'?'📋 Para recoger:':'📋 Para domicilio:'}</div><div style="font-size:13px;margin-top:6px;">${deliveryType==='recoger'?'1️⃣ Paga<br>2️⃣ Envía pedido + comprobante<br>3️⃣ Pasa a buscar 🏪':'1️⃣ Envía tu pedido<br>2️⃣ Espera confirmación<br>3️⃣ Paga y envía comprobante<br>4️⃣ ¡En camino! 🛵'}</div></div>
-    <div class="customer-info" style="margin-top:12px;"><div style="font-weight:700;margin-bottom:8px;">📝 Tus datos</div><input type="text" id="custName" placeholder="Tu nombre *" value="${savedName}"><input type="tel" id="custPhone" placeholder="Tu teléfono *" value="${savedPhone}">${deliveryType==='domicilio'?`<input type="text" id="custAddress" placeholder="Tu dirección *" value="${savedAddr}">`:''}${deliveryType==='domicilio'?`<div id="geoStatus" class="geo-required geo-pending" style="margin-bottom:10px;">${clienteGeo?`✅ Ubicación obtenida`:'📍 Ubicación requerida'}</div><button onclick="getLocation()" style="width:100%;padding:10px;border:2px solid var(--verde);border-radius:12px;background:transparent;color:var(--verde);font-weight:700;cursor:pointer;margin-bottom:10px;">📍 ${clienteGeo?'Actualizar ubicación':'Usar mi ubicación GPS'}</button>${mapaHtml}`:''}</div>
-    ${deliveryType==='recoger'||selectedMetodo!=='efectivo'?`<div style="margin-top:10px;"><div style="font-weight:700;margin-bottom:8px;">📸 Comprobante</div><label for="comprobanteInput" style="cursor:pointer;display:block;"><div id="comprobantePreview" class="comprobante-area"><span>📎 Toca para subir</span></div><input type="file" id="comprobanteInput" accept="image/*" style="display:none;" onchange="previewComprobante(this)"></label></div>`:''}
+    <div class="instruc-card" style="background:${deliveryType==='recoger'?'#e8f5e9':'#e3f2fd'};border:2px solid ${deliveryType==='recoger'?'#66bb6a':'#90caf9'};"><div style="font-weight:800;">${deliveryType==='recoger'?'📋 Para recoger:':'📋 Para domicilio:'}</div><div style="font-size:13px;margin-top:6px;">${deliveryType==='recoger'?'1️⃣ Paga<br>2️⃣ Envía pedido + comprobante<br>3️⃣ Pasa a buscar 🏪':'1️⃣ Envía tu pedido<br>2️⃣ Espera confirmación<br>3️⃣ Paga y envía comprobante<br>4️⃣ ¡En camino! 🛵'}</div></div>
+    <div class="customer-info" style="margin-top:12px;"><div style="font-weight:700;">📝 Tus datos</div><input type="text" id="custName" placeholder="Tu nombre *" value="${savedName}"><input type="tel" id="custPhone" placeholder="Tu teléfono *" value="${savedPhone}">${deliveryType==='domicilio'?`<input type="text" id="custAddress" placeholder="Tu dirección *" value="${savedAddr}">`:''}${deliveryType==='domicilio'?`<div id="geoStatus" class="geo-required geo-pending">${clienteGeo?'✅ Ubicación obtenida':'📍 Ubicación requerida'}</div><button onclick="getLocation()" style="width:100%;padding:10px;border:2px solid var(--verde);border-radius:12px;background:transparent;color:var(--verde);font-weight:700;cursor:pointer;margin-bottom:10px;">📍 ${clienteGeo?'Actualizar ubicación':'Usar mi ubicación GPS'}</button>${mapaHtml}`:''}</div>
+    ${deliveryType==='recoger'||selectedMetodo!=='efectivo'?`<div style="margin-top:10px;"><div style="font-weight:700;">📸 Comprobante</div><label for="comprobanteInput" style="cursor:pointer;display:block;"><div id="comprobantePreview" class="comprobante-area"><span>📎 Toca para subir</span></div><input type="file" id="comprobanteInput" accept="image/*" style="display:none;" onchange="previewComprobante(this)"></label></div>`:''}
     <button class="whatsapp-btn" onclick="sendOrder()" ${btnDisabled}><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>${btnText}</button>`;
 }
 
@@ -375,7 +340,6 @@ function selectZona(id){selectedZona=zonas.find(z=>z.id===id)||null;renderCart()
 function setDelivery(type){deliveryType=type;comprobanteBase64='';renderCart();}
 function previewComprobante(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{comprobanteBase64=e.target.result;document.getElementById('comprobantePreview').innerHTML=`<img src="${comprobanteBase64}" style="width:100%;height:100%;object-fit:cover;">`;};reader.readAsDataURL(file);}
 
-// ═══════════════ ENVIAR PEDIDO ═══════════════
 async function sendOrder(){
   if(!tiendaAbierta()){showToast('⏰ Estamos cerrados');return;}
   const name=document.getElementById('custName')?.value.trim(),phone=document.getElementById('custPhone')?.value.trim(),address=document.getElementById('custAddress')?.value.trim();
@@ -396,7 +360,6 @@ async function sendOrder(){
   }catch(e){showToast('❌ Error al enviar');}
 }
 
-// ═══════════════ TRACKING ═══════════════
 function escucharPedido(pid){if(pedidoActivoUnsub)pedidoActivoUnsub();pedidoActivoUnsub=db.collection('pedidos').doc(pid).onSnapshot(snap=>{if(!snap.exists)return;const d=snap.data(),e=d.estado;if(e==='confirmado')showToast('✅ Confirmado');if(e==='preparacion'||e==='preparando')showToast('🍳 Preparando');if(e==='camino'||e==='en_camino')showToast('🛵 En camino');if(e==='entregado')showToast('📦 Entregado');if(document.getElementById('view-tracking')?.classList.contains('active'))renderTracking(pid,d);});}
 
 function renderTracking(pid,data){
@@ -409,12 +372,11 @@ function renderTracking(pid,data){
   const repHtml=repNombre&&(estado==='camino'||estado==='en_camino')?`<div style="background:var(--gris);border-radius:12px;padding:12px;margin:10px 0;text-align:center;"><div>🛵 Tu repartidor</div><div style="font-weight:800;">${repNombre}</div><a href="https://wa.me/${repTel.replace(/\D/g,'')}" target="_blank" style="display:inline-block;margin-top:6px;background:#25d366;color:white;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;text-decoration:none;">📞 Contactar</a></div>`:'';
   const mapaTrackHtml=data.geo?`<a href="https://www.google.com/maps/dir/?api=1&destination=${data.geo.lat},${data.geo.lng}" target="_blank" style="display:flex;align-items:center;gap:6px;background:#e8f5e9;color:#1b5e20;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:700;font-size:13px;margin:8px 0;">🗺️ Abrir en Google Maps</a>`:'';
   const puedeCancelar=(estado==='pendiente'||estado==='confirmado');
-  container.innerHTML=`<div style="text-align:center;padding:20px 0;"><div style="font-size:40px;">🛒</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;">${corto}</div><span style="display:inline-block;font-size:13px;font-weight:800;padding:6px 14px;border-radius:50px;background:${estadoBg[estado]};color:${estadoColor[estado]};">${estadoMap[estado]||estado}</span></div><div style="background:var(--oscuro);color:white;border-radius:16px;padding:16px;text-align:center;margin:14px 0;"><div style="font-size:12px;opacity:0.7;">Total</div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--amarillo);">$ ${data.total?.toFixed(2)||'0.00'}</div></div><div style="font-weight:800;margin-bottom:6px;">🧺 Productos</div><div style="font-size:13px;white-space:pre-line;color:var(--subtext);">${data.productos||''}</div><div style="font-size:12px;color:var(--subtext);margin-top:10px;">📍 ${data.entrega==='domicilio'?data.direccion||'—':'Recoger en tienda'}<br>💳 ${data.metodoPago||'—'}<br>⏱️ ${data.tiempoEstimado||30} min</div>${mapaTrackHtml}${repHtml}${puedeCancelar?`<button onclick="cancelarPedido('${pid}')" style="width:100%;margin-top:10px;padding:12px;background:var(--rojo);color:white;border:none;border-radius:12px;font-weight:800;cursor:pointer;">❌ Cancelar pedido</button>`:''}<button onclick="showTab('tienda')" style="width:100%;margin-top:14px;padding:12px;background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:12px;font-weight:800;cursor:pointer;">Hacer otro pedido</button>`;
+  container.innerHTML=`<div style="text-align:center;padding:20px 0;"><div style="font-size:40px;">🛒</div><div style="font-family:'Bebas Neue',sans-serif;font-size:32px;">${corto}</div><span style="display:inline-block;font-size:13px;font-weight:800;padding:6px 14px;border-radius:50px;background:${estadoBg[estado]};color:${estadoColor[estado]};">${estadoMap[estado]||estado}</span></div><div style="background:var(--oscuro);color:white;border-radius:16px;padding:16px;text-align:center;margin:14px 0;"><div style="font-size:12px;opacity:0.7;">Total</div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--amarillo);">$ ${data.total?.toFixed(2)||'0.00'}</div></div><div style="font-weight:800;">🧺 Productos</div><div style="font-size:13px;white-space:pre-line;color:var(--subtext);">${data.productos||''}</div><div style="font-size:12px;color:var(--subtext);margin-top:10px;">📍 ${data.entrega==='domicilio'?data.direccion||'—':'Recoger en tienda'}<br>💳 ${data.metodoPago||'—'}<br>⏱️ ${data.tiempoEstimado||30} min</div>${mapaTrackHtml}${repHtml}${puedeCancelar?`<button onclick="cancelarPedido('${pid}')" style="width:100%;margin-top:10px;padding:12px;background:var(--rojo);color:white;border:none;border-radius:12px;font-weight:800;cursor:pointer;">❌ Cancelar pedido</button>`:''}<button onclick="showTab('tienda')" style="width:100%;margin-top:14px;padding:12px;background:var(--card);color:var(--text);border:2px solid var(--border);border-radius:12px;font-weight:800;cursor:pointer;">Hacer otro pedido</button>`;
 }
 
 async function cancelarPedido(pid){if(!confirm('¿Cancelar?'))return;await db.collection('pedidos').doc(pid).update({estado:'cancelado'});showToast('❌ Cancelado');localStorage.removeItem('pedidoActivoId');}
 
-// ═══════════════ HISTORIAL ═══════════════
 function renderHistorial(){
   const container=document.getElementById('historialContainer');const phone=localStorage.getItem('clientPhone')||'';
   if(!phone){container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Haz tu primer pedido</p></div>';return;}
@@ -422,15 +384,13 @@ function renderHistorial(){
   db.collection('pedidos').where('telefono','==',phone).orderBy('fecha','desc').limit(20).get().then(snap=>{if(snap.empty){container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>No tienes pedidos</p></div>';return;}container.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div class="historial-card"><div style="font-weight:800;">#${d.id.slice(-4).toUpperCase()} · ${new Date(p.fecha).toLocaleString('es-VE')}</div><div style="font-size:13px;white-space:pre-line;color:var(--subtext);">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div><span class="historial-estado" style="background:#fff3cd;color:#856404;">${p.estado||'pendiente'}</span></div>`;}).join('');});
 }
 
-// ═══════════════ SOPORTE ═══════════════
 function renderSoporte(){document.getElementById('soporteContainer').innerHTML=`<div class="soporte-form"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);margin-bottom:16px;border-left:4px solid var(--rojo);padding-left:10px;">❗ Reportar problema</div><input type="text" id="sNombre" placeholder="Tu nombre *"><input type="tel" id="sTelefono" placeholder="Tu teléfono *"><textarea id="sDescripcion" placeholder="Describe el problema *"></textarea><button class="soporte-btn" onclick="enviarSoporte()">📤 Enviar reporte</button></div>`;}
 async function enviarSoporte(){const n=document.getElementById('sNombre')?.value.trim(),t=document.getElementById('sTelefono')?.value.trim(),d=document.getElementById('sDescripcion')?.value.trim();if(!n||!t||!d){showToast('⚠️ Completa todos los campos');return;}await db.collection('soporte').add({clienteNombre:n,telefono:t,descripcion:d,estado:'nuevo',fecha:new Date().toISOString()});showToast('✅ Reporte enviado');showTab('tienda');}
 
-// ═══════════════ FLOATING CART ═══════════════
 function actualizarFloatingCart(){const total=cartTotal();const items=Object.values(cart).reduce((a,b)=>a+b.qty,0);const bar=document.getElementById('floatingCart');if(!bar)return;if(items>0){bar.classList.add('visible');document.body.classList.add('has-float-bar');document.getElementById('floatTotal').textContent=`$ ${total.toFixed(2)} · ${items} item${items>1?'s':''}`;}else{bar.classList.remove('visible');document.body.classList.remove('has-float-bar');}}
 
-// ═══════════════ REGISTRO ═══════════════
 function normalizarTelefono(tel){tel=tel.replace(/\s+/g,'').replace(/[^0-9+]/g,'');if(tel.startsWith('+'))return tel;if(tel.startsWith('0'))tel=tel.slice(1);return'+58'+tel;}
+
 setTimeout(()=>{
   if(!localStorage.getItem('clientName')){
     const modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -440,13 +400,10 @@ setTimeout(()=>{
   }
 },800);
 
-// ═══════════════ TOAST ═══════════════
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-// ═══════════════ SPLASH ═══════════════
 setTimeout(()=>{const s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.style.display='none',400);}},1200);
 
-// ═══════════════ SERVICE WORKER ═══════════════
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 </script>
 </body>
