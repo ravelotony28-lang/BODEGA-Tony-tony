@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{--rojo:#e63946;--amarillo:#f4d35e;--verde:#2dc653;--oscuro:#1a1a2e;--sombra:0 4px 20px rgba(0,0,0,0.12);--bg:#f5f5f5;--card:#fff;--text:#1a1a2e;--subtext:#888;--border:#eee;--gris:#f1f1f1;}
 .dark-mode{--bg:#0f0f1a;--card:#1a1a2e;--text:#f0f0f0;--subtext:#aaa;--border:#2a2a3e;--gris:#2a2a3e;}
@@ -33,7 +34,6 @@ header{background:var(--oscuro);color:white;padding:16px 20px;display:flex;align
 .photo-upload-area{width:100%;height:100px;border:2px dashed #ddd;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:13px;font-weight:700;color:#999;gap:6px;overflow:hidden;margin-bottom:10px;}
 .photo-upload-area img{width:100%;height:100%;object-fit:cover;}
 .variants-input-area{margin-bottom:12px;}
-.variants-input-area>label{font-size:13px;font-weight:700;display:block;margin-bottom:6px;color:var(--subtext);}
 .variant-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
 .variant-tag{background:var(--oscuro);color:white;border-radius:50px;padding:4px 10px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;}
 .variant-tag button{background:none;border:none;color:white;cursor:pointer;font-size:16px;padding:0;line-height:1;}
@@ -77,6 +77,9 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
 .pedido-meta-chip{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:2px 8px;font-size:11px;font-weight:700;color:var(--subtext);}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--oscuro);color:white;padding:12px 24px;border-radius:50px;font-weight:700;font-size:14px;z-index:999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.3);}
 .toast.show{transform:translateX(-50%) translateY(0);}
+canvas{max-width:100%;margin:10px 0;}
+.chart-container{background:var(--card);border-radius:16px;padding:16px;box-shadow:var(--sombra);margin-bottom:16px;}
+.chart-container h4{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:12px;color:var(--text);}
 </style>
 </head>
 <body>
@@ -87,9 +90,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
     <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;margin-bottom:4px;color:white;">ADMIN</div>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--rojo);letter-spacing:1px;margin-bottom:20px;">BODEGA TONY TONY</div>
     <div id="pinDisplay" style="display:flex;justify-content:center;gap:12px;margin-bottom:24px;">
-      <div class="pin-dot" id="dot0"></div><div class="pin-dot" id="dot1"></div>
-      <div class="pin-dot" id="dot2"></div><div class="pin-dot" id="dot3"></div>
-      <div class="pin-dot" id="dot4"></div><div class="pin-dot" id="dot5"></div>
+      <div class="pin-dot" id="dot0"></div><div class="pin-dot" id="dot1"></div><div class="pin-dot" id="dot2"></div><div class="pin-dot" id="dot3"></div><div class="pin-dot" id="dot4"></div><div class="pin-dot" id="dot5"></div>
     </div>
     <p id="pinError" style="color:var(--rojo);font-size:13px;font-weight:700;margin-bottom:12px;min-height:20px;text-align:center;"></p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;">
@@ -107,7 +108,8 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
     <button onclick="lockPanel()" style="background:var(--rojo);color:white;border:none;border-radius:50px;padding:8px 14px;font-weight:800;cursor:pointer;">🔒 Salir</button>
   </header>
   <div class="tabs">
-    <button class="tab-btn active" onclick="showAdminTab('productos')" id="tab-productos">📦 Productos</button>
+    <button class="tab-btn active" onclick="showAdminTab('dashboard')" id="tab-dashboard">📊 Dashboard</button>
+    <button class="tab-btn" onclick="showAdminTab('productos')" id="tab-productos">📦 Productos</button>
     <button class="tab-btn" onclick="showAdminTab('pedidos')" id="tab-pedidos">📋 Pedidos</button>
     <button class="tab-btn" onclick="showAdminTab('repartidores')" id="tab-repartidores">🛵 Repartidores</button>
     <button class="tab-btn" onclick="showAdminTab('zonas')" id="tab-zonas">🗺️ Zonas</button>
@@ -116,7 +118,16 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
     <button class="tab-btn" onclick="showAdminTab('config')" id="tab-config">⚙️ Config</button>
   </div>
 
-  <div class="view active" id="view-productos">
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div id="pedidosStatsBar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;"></div>
+    <div class="chart-container"><h4>📊 Ventas últimos 7 días</h4><canvas id="chartVentas"></canvas></div>
+    <div class="chart-container"><h4>🏆 Productos más vendidos</h4><canvas id="chartProductos"></canvas></div>
+    <div class="chart-container"><h4>📈 Ingresos por día (este mes)</h4><canvas id="chartIngresos"></canvas></div>
+  </div>
+
+  <!-- PRODUCTOS -->
+  <div class="view" id="view-productos">
     <div class="admin-section"><h3>➕ Agregar Producto</h3>
       <label for="newPhoto" style="cursor:pointer;display:block;"><div class="photo-upload-area" id="photoPreview"><span>📸 Toca para agregar foto</span></div><input type="file" id="newPhoto" accept="image/*" style="display:none;" onchange="previewPhoto(this)"></label>
       <div class="form-row"><input type="text" id="newEmoji" placeholder="Emoji 🍎" maxlength="4" style="max-width:80px;text-align:center;font-size:20px;"><input type="text" id="newName" placeholder="Nombre del producto"></div>
@@ -131,17 +142,25 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
     <div style="text-align:center;padding-bottom:20px;"><button onclick="cargarInventario()" style="background:none;border:2px solid var(--border);border-radius:12px;padding:10px 20px;font-weight:700;cursor:pointer;color:var(--subtext);">📦 Cargar inventario inicial</button></div>
   </div>
 
-  <div class="view" id="view-pedidos"><div id="pedidosStatsBar" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;"></div><div class="admin-section"><h3>📋 Pedidos</h3><div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"><button onclick="filterPedidos('todos')" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button><button onclick="filterPedidos('pendiente')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">⏳ Pendientes</button><button onclick="filterPedidos('confirmado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Confirmados</button><button onclick="filterPedidos('preparacion')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🍳 Preparando</button><button onclick="filterPedidos('camino')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🛵 En camino</button><button onclick="filterPedidos('entregado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">📦 Entregados</button></div><div id="pedidosList">Cargando...</div></div></div>
+  <!-- PEDIDOS -->
+  <div class="view" id="view-pedidos">
+    <div class="admin-section"><h3>📋 Pedidos</h3><div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"><button onclick="filterPedidos('todos')" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button><button onclick="filterPedidos('pendiente')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">⏳ Pendientes</button><button onclick="filterPedidos('confirmado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Confirmados</button><button onclick="filterPedidos('preparacion')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🍳 Preparando</button><button onclick="filterPedidos('camino')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🛵 En camino</button><button onclick="filterPedidos('entregado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">📦 Entregados</button></div><div id="pedidosList">Cargando...</div></div>
+  </div>
 
+  <!-- REPARTIDORES -->
   <div class="view" id="view-repartidores"><div class="admin-section"><h3>➕ Agregar Repartidor</h3><div class="form-row"><input type="text" id="repNombre" placeholder="Nombre completo"><input type="tel" id="repTelefono" placeholder="Teléfono"></div><div class="form-row"><input type="text" id="repPlaca" placeholder="Placa"><input type="text" id="repVehiculo" placeholder="Tipo (moto, carro...)"></div><button class="btn-primary" onclick="addRepartidor()" style="width:100%;">✅ Agregar Repartidor</button></div><div class="admin-section"><h3>🛵 Repartidores</h3><div id="repartidoresList"></div></div></div>
 
+  <!-- ZONAS -->
   <div class="view" id="view-zonas"><div class="admin-section"><h3>➕ Agregar Zona</h3><div class="form-row"><input type="text" id="zonaNombre" placeholder="Nombre de la zona"><input type="number" id="zonaCosto" placeholder="Costo ($)" min="0" step="0.5"></div><button class="btn-primary" onclick="addZona()" style="width:100%;">✅ Agregar Zona</button></div><div class="admin-section"><h3>🗺️ Zonas de entrega</h3><div id="zonasList"></div></div></div>
 
+  <!-- CUPONES -->
   <div class="view" id="view-cupones"><div class="admin-section"><h3>➕ Crear Cupón</h3><div class="form-row"><input type="text" id="cuponCodigo" placeholder="Código (ej: TONY10)" style="text-transform:uppercase;"><select id="cuponTipo"><option value="porcentaje">% Porcentaje</option><option value="fijo">$ Monto fijo</option></select></div><div class="form-row"><input type="number" id="cuponDescuento" placeholder="Valor" min="1"><input type="date" id="cuponExpira"></div><button class="btn-primary" onclick="crearCupon()" style="width:100%;">✅ Crear Cupón</button></div><div class="admin-section"><h3>🎟️ Cupones activos</h3><div id="cuponesList">Cargando...</div></div></div>
 
+  <!-- SOPORTE -->
   <div class="view" id="view-soporte"><div class="admin-section"><h3>📞 Soporte / Reclamos</h3><div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"><button onclick="filterSoporte('todos')" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button><button onclick="filterSoporte('nuevo')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🆕 Nuevos</button><button onclick="filterSoporte('en_revision')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🔍 En revisión</button><button onclick="filterSoporte('resuelto')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Resueltos</button></div><div id="soporteList">Cargando...</div></div></div>
 
-  <div class="view" id="view-config"><div class="admin-section"><h3>📱 Pago Móvil</h3><div class="form-row"><input type="text" id="pmBanco" placeholder="Banco"><input type="text" id="pmNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="pmCedula" placeholder="Cédula"><input type="tel" id="pmTelefono" placeholder="Teléfono"></div><button class="btn-primary" onclick="savePagoMovil()" style="width:100%;">💾 Guardar</button></div><div class="admin-section"><h3>🏦 Transferencia</h3><div class="form-row"><input type="text" id="trBanco" placeholder="Banco"><input type="text" id="trNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="trCuenta" placeholder="Cuenta"></div><button class="btn-primary" onclick="saveTransferencia()" style="width:100%;">💾 Guardar</button></div><div class="admin-section"><h3>📱 WhatsApp</h3><div class="form-row"><input type="tel" id="configWhatsapp" placeholder="+58424..."><button class="btn-primary" onclick="saveWhatsapp()">Guardar</button></div></div><div class="admin-section"><h3>💳 Métodos de Pago</h3><div id="metodosConfig"></div></div><div class="admin-section"><h3>🛵 Envío</h3><label style="display:flex;align-items:center;gap:12px;font-weight:700;cursor:pointer;margin-bottom:12px;"><label class="toggle-switch"><input type="checkbox" id="envioGratis" onchange="saveEnvioGratis()"><span class="toggle-slider"></span></label>Domicilio siempre gratis</label><div class="form-row"><input type="number" id="configMontoEnvio" placeholder="Monto envío gratis" min="0" step="0.5"><button class="btn-primary" onclick="saveMontoEnvio()">Guardar</button></div></div><div class="admin-section"><h3>⏱️ Tiempo Preparación</h3><div class="form-row"><input type="number" id="configTiempo" placeholder="Minutos" min="1"><button class="btn-primary" onclick="saveTiempo()">Guardar</button></div></div><div class="admin-section"><h3>💰 Pedido Mínimo</h3><div class="form-row"><input type="number" id="configPedidoMinimo" placeholder="$" min="0" step="0.5"><button class="btn-primary" onclick="savePedidoMinimo()">Guardar</button></div></div><div class="admin-section"><h3>🕐 Horario</h3><div class="form-row"><input type="number" id="configApertura" placeholder="Apertura (0-23)" min="0" max="23"><input type="number" id="configCierre" placeholder="Cierre (0-23)" min="0" max="23"><button class="btn-primary" onclick="saveHorario()">Guardar</button></div></div><div class="admin-section"><h3>📊 Estadísticas</h3><div id="statsPanel" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div></div></div>
+  <!-- CONFIG -->
+  <div class="view" id="view-config"><div class="admin-section"><h3>📱 Pago Móvil</h3><div class="form-row"><input type="text" id="pmBanco" placeholder="Banco"><input type="text" id="pmNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="pmCedula" placeholder="Cédula"><input type="tel" id="pmTelefono" placeholder="Teléfono"></div><button class="btn-primary" onclick="savePagoMovil()" style="width:100%;">💾 Guardar</button></div><div class="admin-section"><h3>🏦 Transferencia</h3><div class="form-row"><input type="text" id="trBanco" placeholder="Banco"><input type="text" id="trNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="trCuenta" placeholder="Cuenta"></div><button class="btn-primary" onclick="saveTransferencia()" style="width:100%;">💾 Guardar</button></div><div class="admin-section"><h3>📱 WhatsApp</h3><div class="form-row"><input type="tel" id="configWhatsapp" placeholder="+58424..."><button class="btn-primary" onclick="saveWhatsapp()">Guardar</button></div></div><div class="admin-section"><h3>💳 Métodos de Pago</h3><div id="metodosConfig"></div></div><div class="admin-section"><h3>🛵 Envío</h3><label style="display:flex;align-items:center;gap:12px;font-weight:700;cursor:pointer;margin-bottom:12px;"><label class="toggle-switch"><input type="checkbox" id="envioGratis" onchange="saveEnvioGratis()"><span class="toggle-slider"></span></label>Domicilio siempre gratis</label><div class="form-row"><input type="number" id="configMontoEnvio" placeholder="Monto envío gratis" min="0" step="0.5"><button class="btn-primary" onclick="saveMontoEnvio()">Guardar</button></div></div><div class="admin-section"><h3>⏱️ Tiempo Preparación</h3><div class="form-row"><input type="number" id="configTiempo" placeholder="Minutos" min="1"><button class="btn-primary" onclick="saveTiempo()">Guardar</button></div></div><div class="admin-section"><h3>💰 Pedido Mínimo</h3><div class="form-row"><input type="number" id="configPedidoMinimo" placeholder="$" min="0" step="0.5"><button class="btn-primary" onclick="savePedidoMinimo()">Guardar</button></div></div><div class="admin-section"><h3>🕐 Horario</h3><div class="form-row"><input type="number" id="configApertura" placeholder="Apertura (0-23)" min="0" max="23"><input type="number" id="configCierre" placeholder="Cierre (0-23)" min="0" max="23"><button class="btn-primary" onclick="saveHorario()">Guardar</button></div></div></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -161,6 +180,7 @@ applyDark();
 
 let products=[],currentVariants=[],pendingPhotoBase64='',pedidosFiltro='todos',soporteFiltro='todos',allPedidos=[],allSoporte=[],repartidores=[],zonas=[],allCupones=[],configData={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},envioGratis:true,pedidoMinimo:0};
 let pinEntered='';
+let chartVentas=null,chartProductos=null,chartIngresos=null;
 
 function pinPress(d){if(pinEntered.length>=6)return;pinEntered+=d;updatePinDots();if(pinEntered.length===6)setTimeout(checkPin,200);}
 function pinClear(){pinEntered=pinEntered.slice(0,-1);updatePinDots();document.getElementById('pinError').textContent='';}
@@ -169,8 +189,8 @@ function checkPin(){if(!ADMIN_PIN){document.getElementById('pinError').textConte
 function lockPanel(){document.getElementById('lockScreen').style.display='flex';document.getElementById('adminPanel').style.display='none';pinEntered='';updatePinDots();}
 
 function initAdmin(){
-  db.collection('productos').onSnapshot(snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));renderProductList();loadStats();});
-  db.collection('pedidos').orderBy('fecha','desc').limit(200).onSnapshot(snap=>{allPedidos=snap.docs.map(d=>({id:d.id,...d.data()}));renderPedidos();loadStats();});
+  db.collection('productos').onSnapshot(snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));renderProductList();loadStats();renderCharts();});
+  db.collection('pedidos').orderBy('fecha','desc').limit(200).onSnapshot(snap=>{allPedidos=snap.docs.map(d=>({id:d.id,...d.data()}));renderPedidos();loadStats();renderCharts();});
   db.collection('repartidores').onSnapshot(snap=>{repartidores=snap.docs.map(d=>({id:d.id,...d.data()}));renderRepartidores();});
   db.collection('zonas').onSnapshot(snap=>{zonas=snap.docs.map(d=>({id:d.id,...d.data()}));renderZonas();});
   db.collection('soporte').orderBy('fecha','desc').limit(100).onSnapshot(snap=>{allSoporte=snap.docs.map(d=>({id:d.id,...d.data()}));renderSoporteAdmin();});
@@ -190,8 +210,80 @@ function fillConfigFields(){
   if(configData.horario){if(el('configApertura'))el('configApertura').value=configData.horario.apertura;if(el('configCierre'))el('configCierre').value=configData.horario.cierre;}
 }
 
-function showAdminTab(tab){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('view-'+tab).classList.add('active');document.getElementById('tab-'+tab).classList.add('active');if(tab==='config'){renderMetodosConfig();loadStats();}if(tab==='pedidos')loadStats();}
+function showAdminTab(tab){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(tab==='config'){renderMetodosConfig();loadStats();}
+  if(tab==='dashboard'){loadStats();renderCharts();}
+  if(tab==='pedidos')loadStats();
+}
 
+// ═══════════ GRÁFICOS ═══════════
+function renderCharts(){
+  if(!allPedidos.length)return;
+  
+  // Ventas últimos 7 días
+  const diasSemana=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+  const hoy=new Date();
+  const ventas7dias=Array(7).fill(0);
+  const pedidos7dias=Array(7).fill(0);
+  
+  allPedidos.forEach(p=>{
+    const fp=new Date(p.fecha);
+    const diff=Math.floor((hoy-fp)/(1000*60*60*24));
+    if(diff>=0&&diff<7){
+      const idx=6-diff;
+      ventas7dias[idx]+=(p.total||0);
+      pedidos7dias[idx]++;
+    }
+  });
+  
+  const labels7=Array(7).fill().map((_,i)=>{
+    const d=new Date(hoy);
+    d.setDate(d.getDate()-(6-i));
+    return diasSemana[d.getDay()]+' '+d.getDate();
+  });
+  
+  const ctx1=document.getElementById('chartVentas')?.getContext('2d');
+  if(ctx1){
+    if(chartVentas)chartVentas.destroy();
+    chartVentas=new Chart(ctx1,{type:'bar',data:{labels:labels7,datasets:[{label:'Ventas ($)',data:ventas7dias,backgroundColor:'#2dc653',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+  }
+  
+  // Productos más vendidos
+  const conteo={};
+  allPedidos.forEach(p=>{
+    if(p.productosArray) p.productosArray.forEach(pr=>{conteo[pr.name]=conteo[pr.name]?conteo[pr.name]+pr.qty:pr.qty;});
+  });
+  const top5=Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  
+  const ctx2=document.getElementById('chartProductos')?.getContext('2d');
+  if(ctx2){
+    if(chartProductos)chartProductos.destroy();
+    chartProductos=new Chart(ctx2,{type:'bar',data:{labels:top5.map(t=>t[0].slice(0,15)),datasets:[{label:'Unidades',data:top5.map(t=>t[1]),backgroundColor:['#e63946','#f4d35e','#2dc653','#007bff','#7b2ff7'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}}}});
+  }
+  
+  // Ingresos por día este mes
+  const mesActual=hoy.getMonth(),anioActual=hoy.getFullYear();
+  const diasMes=new Date(anioActual,mesActual+1,0).getDate();
+  const ingresosMes=Array(diasMes).fill(0);
+  allPedidos.forEach(p=>{
+    const fp=new Date(p.fecha);
+    if(fp.getMonth()===mesActual&&fp.getFullYear()===anioActual&&p.estado==='entregado'){
+      ingresosMes[fp.getDate()-1]+=(p.total||0);
+    }
+  });
+  
+  const ctx3=document.getElementById('chartIngresos')?.getContext('2d');
+  if(ctx3){
+    if(chartIngresos)chartIngresos.destroy();
+    chartIngresos=new Chart(ctx3,{type:'line',data:{labels:Array(diasMes).fill().map((_,i)=>'Dia '+(i+1)),datasets:[{label:'Ingresos ($)',data:ingresosMes,borderColor:'#e63946',backgroundColor:'rgba(230,57,70,0.1)',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+  }
+}
+
+// ═══════════ RESTO DE FUNCIONES (MANTENGO LAS MISMAS) ═══════════
 function previewPhoto(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const MAX=400;let w=img.width,h=img.height;if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);pendingPhotoBase64=canvas.toDataURL('image/jpeg',0.7);document.getElementById('photoPreview').innerHTML=`<img src="${pendingPhotoBase64}">`;};img.src=e.target.result;};reader.readAsDataURL(file);}
 function addVariantTag(){const v=document.getElementById('variantInput').value.trim();if(!v||currentVariants.includes(v))return;currentVariants.push(v);renderVariantTags();document.getElementById('variantInput').value='';}
 function removeVariantTag(v){currentVariants=currentVariants.filter(x=>x!==v);renderVariantTags();}
@@ -241,7 +333,17 @@ async function saveHorario(){const a=parseInt(document.getElementById('configApe
 async function toggleMetodo(m,v){const mp={...configData.metodosPago,[m]:v};await db.collection('config').doc('tienda').set({metodosPago:mp},{merge:true});showToast('✅ Actualizado');}
 function renderMetodosConfig(){const el=document.getElementById('metodosConfig');if(!el)return;const labels={efectivo:'💵 Efectivo',pagoMovil:'📱 Pago Móvil',transferencia:'🏦 Transferencia'};el.innerHTML=Object.entries(labels).map(([k,l])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-weight:700;">${l}</span><label class="toggle-switch"><input type="checkbox" ${configData.metodosPago[k]?'checked':''} onchange="toggleMetodo('${k}',this.checked)"><span class="toggle-slider"></span></label></div>`).join('');}
 
-function loadStats(){const hoy=new Date().toDateString();const pedidosHoy=allPedidos.filter(p=>new Date(p.fecha).toDateString()===hoy);const entregadosHoy=pedidosHoy.filter(p=>p.estado==='entregado');const ventasHoy=entregadosHoy.reduce((s,p)=>s+(p.total||0),0);const enProceso=allPedidos.filter(p=>['pendiente','confirmado','preparacion','preparando','camino','en_camino'].includes(p.estado)).length;const ingresoTotal=allPedidos.filter(p=>p.estado==='entregado').reduce((s,p)=>s+(p.total||0),0);const el=document.getElementById('statsPanel');if(el)el.innerHTML=[['📅','Pedidos hoy',pedidosHoy.length,'#ff6b2b'],['💵','Ventas hoy','$'+ventasHoy.toFixed(2),'#2dc653'],['⏳','En proceso',enProceso,'#f4d35e'],['💰','Ingresado','$'+ingresoTotal.toFixed(2),'#e63946']].map(([e,l,v,c])=>`<div class="stat-card" style="--stat-color:${c};"><div style="font-size:22px;">${e}</div><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`).join('');const pBar=document.getElementById('pedidosStatsBar');if(pBar)pBar.innerHTML=[['⏳',allPedidos.filter(p=>p.estado==='pendiente').length,'#856404','#fff3cd'],['🍳',allPedidos.filter(p=>['preparacion','preparando'].includes(p.estado)).length,'#004085','#cce5ff'],['🛵',allPedidos.filter(p=>['camino','en_camino'].includes(p.estado)).length,'#c05621','#ffe5d0'],['📦',entregadosHoy.length,'#155724','#d4edda'],['❌',allPedidos.filter(p=>p.estado==='cancelado').length,'#e63946','#ffd6d6']].map(([e,n,c,bg])=>`<div style="background:${bg};border-radius:12px;padding:10px 8px;text-align:center;"><div style="font-size:18px;">${e}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${c};">${n}</div></div>`).join('');}
+function loadStats(){
+  const hoy=new Date().toDateString();
+  const pedidosHoy=allPedidos.filter(p=>new Date(p.fecha).toDateString()===hoy);
+  const entregadosHoy=pedidosHoy.filter(p=>p.estado==='entregado');
+  const ventasHoy=entregadosHoy.reduce((s,p)=>s+(p.total||0),0);
+  const pendientes=allPedidos.filter(p=>p.estado==='pendiente').length;
+  const enCamino=allPedidos.filter(p=>['camino','en_camino'].includes(p.estado)).length;
+  const ingresoTotal=allPedidos.filter(p=>p.estado==='entregado').reduce((s,p)=>s+(p.total||0),0);
+  const pBar=document.getElementById('pedidosStatsBar');
+  if(pBar)pBar.innerHTML=[['⏳',pendientes,'#856404','#fff3cd','Pendientes'],['🍳',allPedidos.filter(p=>['preparacion','preparando'].includes(p.estado)).length,'#004085','#cce5ff','Preparando'],['🛵',enCamino,'#c05621','#ffe5d0','En camino'],['📦',entregadosHoy.length,'#155724','#d4edda','Entregados hoy']].map(([e,n,c,bg,l])=>`<div style="background:${bg};border-radius:12px;padding:10px 8px;text-align:center;"><div style="font-size:18px;">${e}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${c};">${n}</div><div style="font-size:10px;color:${c};font-weight:700;">${l}</div></div>`).join('');
+}
 
 async function cargarInventario(){if(!confirm('¿Cargar productos?'))return;const inv=[{emoji:'🧻',name:'Papel Higiénico',price:0.7,category:'Higiene'},{emoji:'🌽',name:'Harina Pan 1K',price:1.8,category:'Víveres'},{emoji:'🍚',name:'Arroz 900G',price:1.6,category:'Víveres'},{emoji:'☕',name:'Café 200G',price:2.7,category:'Víveres'},{emoji:'🥤',name:'Glup 2L',price:1.5,category:'Refrescos'},{emoji:'🧀',name:'Queso Duro',price:4.5,category:'Frescos'},{emoji:'🧴',name:'Desodorante',price:0.8,category:'Higiene'},{emoji:'🦷',name:'Crema Dental',price:0.8,category:'Higiene'},{emoji:'🍬',name:'Boka',price:0.4,category:'Dulces'},{emoji:'💡',name:'Bombillo LED',price:1.1,category:'Varios'}];for(const p of inv){await db.collection('productos').add({...p,variants:[],photo:'',visible:true,agotado:false,oferta:false,precioAnterior:0,etiqueta:'',tipo:'normal',stock:null});}showToast('✅ Inventario cargado');}
 
