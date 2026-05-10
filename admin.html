@@ -118,7 +118,6 @@ canvas{max-width:100%;margin:10px 0;}
     <button class="tab-btn" onclick="showAdminTab('config')" id="tab-config">⚙️ Config</button>
   </div>
 
-  <!-- DASHBOARD -->
   <div class="view active" id="view-dashboard">
     <div id="pedidosStatsBar" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;"></div>
     <div class="chart-container"><h4>📊 Ventas últimos 7 días</h4><canvas id="chartVentas"></canvas></div>
@@ -126,7 +125,6 @@ canvas{max-width:100%;margin:10px 0;}
     <div class="chart-container"><h4>📈 Ingresos por día (este mes)</h4><canvas id="chartIngresos"></canvas></div>
   </div>
 
-  <!-- PRODUCTOS -->
   <div class="view" id="view-productos">
     <div class="admin-section"><h3>➕ Agregar Producto</h3>
       <label for="newPhoto" style="cursor:pointer;display:block;"><div class="photo-upload-area" id="photoPreview"><span>📸 Toca para agregar foto</span></div><input type="file" id="newPhoto" accept="image/*" style="display:none;" onchange="previewPhoto(this)"></label>
@@ -142,24 +140,18 @@ canvas{max-width:100%;margin:10px 0;}
     <div style="text-align:center;padding-bottom:20px;"><button onclick="cargarInventario()" style="background:none;border:2px solid var(--border);border-radius:12px;padding:10px 20px;font-weight:700;cursor:pointer;color:var(--subtext);">📦 Cargar inventario inicial</button></div>
   </div>
 
-  <!-- PEDIDOS -->
   <div class="view" id="view-pedidos">
     <div class="admin-section"><h3>📋 Pedidos</h3><div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"><button onclick="filterPedidos('todos')" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button><button onclick="filterPedidos('pendiente')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">⏳ Pendientes</button><button onclick="filterPedidos('confirmado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Confirmados</button><button onclick="filterPedidos('preparacion')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🍳 Preparando</button><button onclick="filterPedidos('camino')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🛵 En camino</button><button onclick="filterPedidos('entregado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">📦 Entregados</button></div><div id="pedidosList">Cargando...</div></div>
   </div>
 
-  <!-- REPARTIDORES -->
   <div class="view" id="view-repartidores"><div class="admin-section"><h3>➕ Agregar Repartidor</h3><div class="form-row"><input type="text" id="repNombre" placeholder="Nombre completo"><input type="tel" id="repTelefono" placeholder="Teléfono"></div><div class="form-row"><input type="text" id="repPlaca" placeholder="Placa"><input type="text" id="repVehiculo" placeholder="Tipo (moto, carro...)"></div><button class="btn-primary" onclick="addRepartidor()" style="width:100%;">✅ Agregar Repartidor</button></div><div class="admin-section"><h3>🛵 Repartidores</h3><div id="repartidoresList"></div></div></div>
 
-  <!-- ZONAS -->
   <div class="view" id="view-zonas"><div class="admin-section"><h3>➕ Agregar Zona</h3><div class="form-row"><input type="text" id="zonaNombre" placeholder="Nombre de la zona"><input type="number" id="zonaCosto" placeholder="Costo ($)" min="0" step="0.5"></div><button class="btn-primary" onclick="addZona()" style="width:100%;">✅ Agregar Zona</button></div><div class="admin-section"><h3>🗺️ Zonas de entrega</h3><div id="zonasList"></div></div></div>
 
-  <!-- CUPONES -->
   <div class="view" id="view-cupones"><div class="admin-section"><h3>➕ Crear Cupón</h3><div class="form-row"><input type="text" id="cuponCodigo" placeholder="Código (ej: TONY10)" style="text-transform:uppercase;"><select id="cuponTipo"><option value="porcentaje">% Porcentaje</option><option value="fijo">$ Monto fijo</option></select></div><div class="form-row"><input type="number" id="cuponDescuento" placeholder="Valor" min="1"><input type="date" id="cuponExpira"></div><button class="btn-primary" onclick="crearCupon()" style="width:100%;">✅ Crear Cupón</button></div><div class="admin-section"><h3>🎟️ Cupones activos</h3><div id="cuponesList">Cargando...</div></div></div>
 
-  <!-- SOPORTE -->
   <div class="view" id="view-soporte"><div class="admin-section"><h3>📞 Soporte / Reclamos</h3><div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"><button onclick="filterSoporte('todos')" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button><button onclick="filterSoporte('nuevo')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🆕 Nuevos</button><button onclick="filterSoporte('en_revision')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🔍 En revisión</button><button onclick="filterSoporte('resuelto')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Resueltos</button></div><div id="soporteList">Cargando...</div></div></div>
 
-  <!-- CONFIG -->
   <div class="view" id="view-config"><div class="admin-section"><h3>📱 Pago Móvil</h3><div class="form-row"><input type="text" id="pmBanco" placeholder="Banco"><input type="text" id="pmNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="pmCedula" placeholder="Cédula"><input type="tel" id="pmTelefono" placeholder="Teléfono"></div><button class="btn-primary" onclick="savePagoMovil()" style="width:100%;">💾 Guardar</button></div><div class="admin-section"><h3>🏦 Transferencia</h3><div class="form-row"><input type="text" id="trBanco" placeholder="Banco"><input type="text" id="trNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="trCuenta" placeholder="Cuenta"></div><button class="btn-primary" onclick="saveTransferencia()" style="width:100%;">💾 Guardar</button></div><div class="admin-section"><h3>📱 WhatsApp</h3><div class="form-row"><input type="tel" id="configWhatsapp" placeholder="+58424..."><button class="btn-primary" onclick="saveWhatsapp()">Guardar</button></div></div><div class="admin-section"><h3>💳 Métodos de Pago</h3><div id="metodosConfig"></div></div><div class="admin-section"><h3>🛵 Envío</h3><label style="display:flex;align-items:center;gap:12px;font-weight:700;cursor:pointer;margin-bottom:12px;"><label class="toggle-switch"><input type="checkbox" id="envioGratis" onchange="saveEnvioGratis()"><span class="toggle-slider"></span></label>Domicilio siempre gratis</label><div class="form-row"><input type="number" id="configMontoEnvio" placeholder="Monto envío gratis" min="0" step="0.5"><button class="btn-primary" onclick="saveMontoEnvio()">Guardar</button></div></div><div class="admin-section"><h3>⏱️ Tiempo Preparación</h3><div class="form-row"><input type="number" id="configTiempo" placeholder="Minutos" min="1"><button class="btn-primary" onclick="saveTiempo()">Guardar</button></div></div><div class="admin-section"><h3>💰 Pedido Mínimo</h3><div class="form-row"><input type="number" id="configPedidoMinimo" placeholder="$" min="0" step="0.5"><button class="btn-primary" onclick="savePedidoMinimo()">Guardar</button></div></div><div class="admin-section"><h3>🕐 Horario</h3><div class="form-row"><input type="number" id="configApertura" placeholder="Apertura (0-23)" min="0" max="23"><input type="number" id="configCierre" placeholder="Cierre (0-23)" min="0" max="23"><button class="btn-primary" onclick="saveHorario()">Guardar</button></div></div></div>
 </div>
 
@@ -216,74 +208,32 @@ function showAdminTab(tab){
   document.getElementById('view-'+tab).classList.add('active');
   document.getElementById('tab-'+tab).classList.add('active');
   if(tab==='config'){renderMetodosConfig();loadStats();}
-  if(tab==='dashboard'){loadStats();renderCharts();}
+  if(tab==='dashboard'){loadStats();setTimeout(renderCharts,300);}
   if(tab==='pedidos')loadStats();
 }
 
-// ═══════════ GRÁFICOS ═══════════
 function renderCharts(){
   if(!allPedidos.length)return;
-  
-  // Ventas últimos 7 días
-  const diasSemana=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
   const hoy=new Date();
+  const diasSemana=['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
   const ventas7dias=Array(7).fill(0);
-  const pedidos7dias=Array(7).fill(0);
-  
-  allPedidos.forEach(p=>{
-    const fp=new Date(p.fecha);
-    const diff=Math.floor((hoy-fp)/(1000*60*60*24));
-    if(diff>=0&&diff<7){
-      const idx=6-diff;
-      ventas7dias[idx]+=(p.total||0);
-      pedidos7dias[idx]++;
-    }
-  });
-  
-  const labels7=Array(7).fill().map((_,i)=>{
-    const d=new Date(hoy);
-    d.setDate(d.getDate()-(6-i));
-    return diasSemana[d.getDay()]+' '+d.getDate();
-  });
-  
+  allPedidos.forEach(p=>{const fp=new Date(p.fecha);const diff=Math.floor((hoy-fp)/(1000*60*60*24));if(diff>=0&&diff<7)ventas7dias[6-diff]+=(p.total||0);});
+  const labels7=Array(7).fill().map((_,i)=>{const d=new Date(hoy);d.setDate(d.getDate()-(6-i));return diasSemana[d.getDay()]+' '+d.getDate();});
   const ctx1=document.getElementById('chartVentas')?.getContext('2d');
-  if(ctx1){
-    if(chartVentas)chartVentas.destroy();
-    chartVentas=new Chart(ctx1,{type:'bar',data:{labels:labels7,datasets:[{label:'Ventas ($)',data:ventas7dias,backgroundColor:'#2dc653',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-  }
-  
-  // Productos más vendidos
+  if(ctx1){if(chartVentas)chartVentas.destroy();chartVentas=new Chart(ctx1,{type:'bar',data:{labels:labels7,datasets:[{label:'Ventas ($)',data:ventas7dias,backgroundColor:'#2dc653',borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}}}});}
   const conteo={};
-  allPedidos.forEach(p=>{
-    if(p.productosArray) p.productosArray.forEach(pr=>{conteo[pr.name]=conteo[pr.name]?conteo[pr.name]+pr.qty:pr.qty;});
-  });
+  allPedidos.forEach(p=>{if(p.productosArray)p.productosArray.forEach(pr=>{conteo[pr.name]=conteo[pr.name]?conteo[pr.name]+pr.qty:pr.qty;});});
   const top5=Object.entries(conteo).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  
   const ctx2=document.getElementById('chartProductos')?.getContext('2d');
-  if(ctx2){
-    if(chartProductos)chartProductos.destroy();
-    chartProductos=new Chart(ctx2,{type:'bar',data:{labels:top5.map(t=>t[0].slice(0,15)),datasets:[{label:'Unidades',data:top5.map(t=>t[1]),backgroundColor:['#e63946','#f4d35e','#2dc653','#007bff','#7b2ff7'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}}}});
-  }
-  
-  // Ingresos por día este mes
+  if(ctx2){if(chartProductos)chartProductos.destroy();chartProductos=new Chart(ctx2,{type:'bar',data:{labels:top5.map(t=>t[0].slice(0,15)),datasets:[{label:'Unidades',data:top5.map(t=>t[1]),backgroundColor:['#e63946','#f4d35e','#2dc653','#007bff','#7b2ff7'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}}}});}
   const mesActual=hoy.getMonth(),anioActual=hoy.getFullYear();
   const diasMes=new Date(anioActual,mesActual+1,0).getDate();
   const ingresosMes=Array(diasMes).fill(0);
-  allPedidos.forEach(p=>{
-    const fp=new Date(p.fecha);
-    if(fp.getMonth()===mesActual&&fp.getFullYear()===anioActual&&p.estado==='entregado'){
-      ingresosMes[fp.getDate()-1]+=(p.total||0);
-    }
-  });
-  
+  allPedidos.forEach(p=>{const fp=new Date(p.fecha);if(fp.getMonth()===mesActual&&fp.getFullYear()===anioActual&&p.estado==='entregado')ingresosMes[fp.getDate()-1]+=(p.total||0);});
   const ctx3=document.getElementById('chartIngresos')?.getContext('2d');
-  if(ctx3){
-    if(chartIngresos)chartIngresos.destroy();
-    chartIngresos=new Chart(ctx3,{type:'line',data:{labels:Array(diasMes).fill().map((_,i)=>'Dia '+(i+1)),datasets:[{label:'Ingresos ($)',data:ingresosMes,borderColor:'#e63946',backgroundColor:'rgba(230,57,70,0.1)',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-  }
+  if(ctx3){if(chartIngresos)chartIngresos.destroy();chartIngresos=new Chart(ctx3,{type:'line',data:{labels:Array(diasMes).fill().map((_,i)=>'Dia '+(i+1)),datasets:[{label:'Ingresos ($)',data:ingresosMes,borderColor:'#e63946',backgroundColor:'rgba(230,57,70,0.1)',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});}
 }
 
-// ═══════════ RESTO DE FUNCIONES (MANTENGO LAS MISMAS) ═══════════
 function previewPhoto(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const MAX=400;let w=img.width,h=img.height;if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);pendingPhotoBase64=canvas.toDataURL('image/jpeg',0.7);document.getElementById('photoPreview').innerHTML=`<img src="${pendingPhotoBase64}">`;};img.src=e.target.result;};reader.readAsDataURL(file);}
 function addVariantTag(){const v=document.getElementById('variantInput').value.trim();if(!v||currentVariants.includes(v))return;currentVariants.push(v);renderVariantTags();document.getElementById('variantInput').value='';}
 function removeVariantTag(v){currentVariants=currentVariants.filter(x=>x!==v);renderVariantTags();}
@@ -294,12 +244,12 @@ async function deleteProduct(id){if(!confirm('¿Eliminar?'))return;await db.coll
 async function toggleVisible(id,v){await db.collection('productos').doc(id).update({visible:!v});showToast(!v?'👁️ Visible':'🙈 Oculto');}
 async function toggleAgotado(id,a){await db.collection('productos').doc(id).update({agotado:!a});showToast(!a?'❌ Agotado':'✅ Disponible');}
 
-function renderProductList(){const el=document.getElementById('adminProductList');if(!el)return;const q=(document.getElementById('adminSearch')?.value||'').toLowerCase();const filtered=q?products.filter(p=>p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q)):products;if(!filtered.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay productos</p>';return;}el.innerHTML=filtered.map(p=>`<div class="product-item-admin">${p.photo?`<img src="${p.photo}" class="thumb">`:`<div class="pemoji">${p.emoji||'📦'}</div>`}<div class="info"><div class="name">${p.name}${p.agotado?' <span style="color:#e63946;">❌</span>':''}</div><div class="cat">${p.category||'General'} — $${p.price}${p.oferta?' 🔥':''}</div></div><button onclick="toggleAgotado('${p.id}',${!!p.agotado})" style="background:none;border:none;font-size:18px;cursor:pointer;">${p.agotado?'🔴':'🟢'}</button><button onclick="editarStock('${p.id}',${p.stock??'null'})" style="background:none;border:none;font-size:16px;cursor:pointer;">📦</button><button onclick="toggleVisible('${p.id}',${p.visible!==false})" style="background:none;border:none;font-size:18px;cursor:pointer;">${p.visible!==false?'👁️':'🙈'}</button><button class="del-btn" onclick="deleteProduct('${p.id}')">🗑️</button></div>`).join('');}
+function renderProductList(){const el=document.getElementById('adminProductList');if(!el)return;const q=(document.getElementById('adminSearch')?.value||'').toLowerCase();const filtered=q?products.filter(p=>p.name.toLowerCase().includes(q)||(p.category||'').toLowerCase().includes(q)):products;if(!filtered.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay productos</p>';return;}el.innerHTML=filtered.map(p=>`<div class="product-item-admin">${p.photo?`<img src="${p.photo}" class="thumb">`:`<div class="pemoji">${p.emoji||'📦'}</div>`}<div class="info"><div class="name">${p.name}${p.agotado?' ❌':''}</div><div class="cat">${p.category||'General'} — $${p.price}${p.oferta?' 🔥':''}</div></div><button onclick="toggleAgotado('${p.id}',${!!p.agotado})" style="background:none;border:none;font-size:18px;cursor:pointer;">${p.agotado?'🔴':'🟢'}</button><button onclick="editarStock('${p.id}',${p.stock??'null'})" style="background:none;border:none;font-size:16px;cursor:pointer;">📦</button><button onclick="toggleVisible('${p.id}',${p.visible!==false})" style="background:none;border:none;font-size:18px;cursor:pointer;">${p.visible!==false?'👁️':'🙈'}</button><button class="del-btn" onclick="deleteProduct('${p.id}')">🗑️</button></div>`).join('');}
 
-async function editarStock(id,s){const n=prompt(`Stock actual: ${s??'sin límite'}\nNuevo stock (vacío = sin límite):`,s??'');if(n===null)return;const v=n.trim()===''?null:parseInt(n);if(n.trim()!==''&&isNaN(v)){showToast('⚠️ Número inválido');return;}await db.collection('productos').doc(id).update({stock:v});showToast(v!==null?`✅ Stock: ${v}`:'✅ Sin límite');}
+async function editarStock(id,s){const n=prompt(`Stock actual: ${s??'sin límite'}\nNuevo stock:`,s??'');if(n===null)return;const v=n.trim()===''?null:parseInt(n);if(n.trim()!==''&&isNaN(v)){showToast('⚠️ Número inválido');return;}await db.collection('productos').doc(id).update({stock:v});showToast(v!==null?`✅ Stock: ${v}`:'✅ Sin límite');}
 
 function filterPedidos(e){pedidosFiltro=e;renderPedidos();}
-function renderPedidos(){const el=document.getElementById('pedidosList');if(!el)return;const filtered=pedidosFiltro==='todos'?allPedidos:allPedidos.filter(p=>p.estado===pedidosFiltro);if(!filtered.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay pedidos</p>';return;}const estadoInfo={pendiente:{label:'⏳ Pendiente',cls:'estado-pendiente'},confirmado:{label:'✅ Confirmado',cls:'estado-confirmado'},preparacion:{label:'🍳 Preparando',cls:'estado-preparacion'},preparando:{label:'🍳 Preparando',cls:'estado-preparacion'},camino:{label:'🛵 En camino',cls:'estado-camino'},en_camino:{label:'🛵 En camino',cls:'estado-camino'},entregado:{label:'📦 Entregado',cls:'estado-entregado'},cancelado:{label:'❌ Cancelado',cls:'estado-cancelado'}};el.innerHTML=filtered.map(p=>{const fecha=new Date(p.fecha).toLocaleString('es-VE',{dateStyle:'short',timeStyle:'short'});const ei=estadoInfo[p.estado]||estadoInfo.pendiente;const repNombre=p.nombreRepartidor||'',repTelefono=p.telefonoRepartidor||'',cortoId='#'+p.id.slice(-4).toUpperCase();const geoBtn=p.geo?`<a href="https://maps.google.com/?q=${p.geo.lat},${p.geo.lng}" target="_blank" style="display:inline-block;margin-top:4px;font-size:12px;color:var(--verde);font-weight:700;">📍 Ver en Google Maps</a>`:'';const ea=p.estado;const puedeCancelar=['pendiente','confirmado','preparacion','preparando'].includes(ea);return`<div class="pedido-card"><div style="display:flex;justify-content:space-between;"><div><div style="font-weight:800;">👤 ${p.nombre}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rojo);">${cortoId}</div></div><span class="estado-badge ${ei.cls}">${ei.label}</span></div><div class="pedido-meta"><span class="pedido-meta-chip">📞 ${p.telefono}</span><span class="pedido-meta-chip">💳 ${p.metodoPago||'—'}</span><span class="pedido-meta-chip">${p.entrega==='domicilio'?'🛵 Domicilio':'🏪 Recoger'}</span></div>${p.entrega==='domicilio'&&p.direccion?`<div style="font-size:12px;color:var(--subtext);">📌 ${p.direccion}</div>`:''}${geoBtn}<div style="font-size:13px;white-space:pre-line;margin:6px 0;">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;"><button onclick="updateEstado('${p.id}','confirmado')" style="background:#2dc653;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">✅ Confirmar</button><button onclick="updateEstado('${p.id}','preparacion')" style="background:#007bff;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🍳 Preparando</button><button onclick="updateEstado('${p.id}','camino')" style="background:#ff6b2b;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🛵 En camino</button><button onclick="updateEstado('${p.id}','entregado')" style="background:#1565c0;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">📦 Entregado</button>${puedeCancelar?`<button onclick="if(confirm('¿Cancelar?'))updateEstado('${p.id}','cancelado')" style="background:var(--rojo);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">❌ Cancelar</button>`:''}</div><div style="font-size:11px;color:var(--subtext);margin-top:6px;">🕐 ${fecha}</div></div>`;}).join('');}
+function renderPedidos(){const el=document.getElementById('pedidosList');if(!el)return;const filtered=pedidosFiltro==='todos'?allPedidos:allPedidos.filter(p=>p.estado===pedidosFiltro);if(!filtered.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay pedidos</p>';return;}const estadoInfo={pendiente:{label:'⏳ Pendiente',cls:'estado-pendiente'},confirmado:{label:'✅ Confirmado',cls:'estado-confirmado'},preparacion:{label:'🍳 Preparando',cls:'estado-preparacion'},preparando:{label:'🍳 Preparando',cls:'estado-preparacion'},camino:{label:'🛵 En camino',cls:'estado-camino'},en_camino:{label:'🛵 En camino',cls:'estado-camino'},entregado:{label:'📦 Entregado',cls:'estado-entregado'},cancelado:{label:'❌ Cancelado',cls:'estado-cancelado'}};el.innerHTML=filtered.map(p=>{const fecha=new Date(p.fecha).toLocaleString('es-VE',{dateStyle:'short',timeStyle:'short'});const ei=estadoInfo[p.estado]||estadoInfo.pendiente;const repNombre=p.nombreRepartidor||'',repTelefono=p.telefonoRepartidor||'',cortoId='#'+p.id.slice(-4).toUpperCase();const geoBtn=p.geo?`<a href="https://maps.google.com/?q=${p.geo.lat},${p.geo.lng}" target="_blank">📍 Ver en Google Maps</a>`:'';const ea=p.estado;const puedeCancelar=['pendiente','confirmado','preparacion','preparando'].includes(ea);return`<div class="pedido-card"><div style="display:flex;justify-content:space-between;"><div><div style="font-weight:800;">👤 ${p.nombre}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rojo);">${cortoId}</div></div><span class="estado-badge ${ei.cls}">${ei.label}</span></div><div class="pedido-meta"><span class="pedido-meta-chip">📞 ${p.telefono}</span><span class="pedido-meta-chip">💳 ${p.metodoPago||'—'}</span><span class="pedido-meta-chip">${p.entrega==='domicilio'?'🛵 Domicilio':'🏪 Recoger'}</span></div>${p.entrega==='domicilio'&&p.direccion?`<div style="font-size:12px;color:var(--subtext);">📌 ${p.direccion}</div>`:''}${geoBtn}<div style="font-size:13px;white-space:pre-line;margin:6px 0;">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;"><button onclick="updateEstado('${p.id}','confirmado')" style="background:#2dc653;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">✅ Confirmar</button><button onclick="updateEstado('${p.id}','preparacion')" style="background:#007bff;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🍳 Preparando</button><button onclick="updateEstado('${p.id}','camino')" style="background:#ff6b2b;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🛵 En camino</button><button onclick="updateEstado('${p.id}','entregado')" style="background:#1565c0;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">📦 Entregado</button>${puedeCancelar?`<button onclick="if(confirm('¿Cancelar?'))updateEstado('${p.id}','cancelado')" style="background:var(--rojo);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">❌ Cancelar</button>`:''}</div><div style="font-size:11px;color:var(--subtext);margin-top:6px;">🕐 ${fecha}</div></div>`;}).join('');}
 
 async function updateEstado(id,estado){const updates={estado};if(estado==='confirmado'){updates.fechaConfirmacion=new Date().toISOString();const repDisponible=repartidores.find(r=>{const ocupado=allPedidos.some(p=>p.id!==id&&['confirmado','preparacion','preparando','camino','en_camino'].includes(p.estado)&&p.nombreRepartidor===r.nombre);return!ocupado;});if(repDisponible){updates.nombreRepartidor=repDisponible.nombre;updates.telefonoRepartidor=repDisponible.telefono;updates.repartidor={nombre:repDisponible.nombre,telefono:repDisponible.telefono,estado:'asignado'};showToast(`🛵 ${repDisponible.nombre} asignado`);}}if(estado==='camino'||estado==='en_camino')updates.fechaSalida=new Date().toISOString();if(estado==='entregado')updates.fechaEntrega=new Date().toISOString();if(estado==='cancelado')updates.fechaCancelacion=new Date().toISOString();await db.collection('pedidos').doc(id).update(updates);showToast('✅ Actualizado');notificarClienteAuto(id,estado);}
 
@@ -337,10 +287,8 @@ function loadStats(){
   const hoy=new Date().toDateString();
   const pedidosHoy=allPedidos.filter(p=>new Date(p.fecha).toDateString()===hoy);
   const entregadosHoy=pedidosHoy.filter(p=>p.estado==='entregado');
-  const ventasHoy=entregadosHoy.reduce((s,p)=>s+(p.total||0),0);
   const pendientes=allPedidos.filter(p=>p.estado==='pendiente').length;
   const enCamino=allPedidos.filter(p=>['camino','en_camino'].includes(p.estado)).length;
-  const ingresoTotal=allPedidos.filter(p=>p.estado==='entregado').reduce((s,p)=>s+(p.total||0),0);
   const pBar=document.getElementById('pedidosStatsBar');
   if(pBar)pBar.innerHTML=[['⏳',pendientes,'#856404','#fff3cd','Pendientes'],['🍳',allPedidos.filter(p=>['preparacion','preparando'].includes(p.estado)).length,'#004085','#cce5ff','Preparando'],['🛵',enCamino,'#c05621','#ffe5d0','En camino'],['📦',entregadosHoy.length,'#155724','#d4edda','Entregados hoy']].map(([e,n,c,bg,l])=>`<div style="background:${bg};border-radius:12px;padding:10px 8px;text-align:center;"><div style="font-size:18px;">${e}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${c};">${n}</div><div style="font-size:10px;color:${c};font-weight:700;">${l}</div></div>`).join('');
 }
