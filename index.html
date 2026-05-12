@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#1a1a2e">
-<meta name="description" content="Bodega Tony Tony - Haz tu pedido aquí 🛒 Delivery">
+<meta name="description" content="Bodega Tony Tony - Mini Market ¡Siempre fresco y cerca!">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Bodega Tony Tony">
@@ -12,6 +12,8 @@
 <meta property="og:title" content="Bodega Tony Tony 🛒">
 <meta property="og:description" content="Pide a domicilio desde tu barrio. Rápido y fácil por WhatsApp.">
 <meta property="og:type" content="website">
+<link rel="apple-touch-icon" href="1000681371.png">
+<link rel="icon" type="image/png" href="1000681371.png">
 <link rel="manifest" href="manifest.json">
 <title>Bodega Tony Tony 🛒</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,31 +28,27 @@
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overscroll-behavior:none;}
 header{background:var(--oscuro);color:white;padding:14px 16px;padding-top:max(14px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--amarillo);line-height:1;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--amarillo);}
 .logo span{color:var(--rojo);}
-.dark-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:50%;transition:background 0.2s;}
-.dark-btn:hover{background:rgba(255,255,255,0.1);}
-.cart-btn{background:var(--rojo);color:white;border:none;border-radius:50px;padding:9px 16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:transform var(--anim),box-shadow 0.2s;box-shadow:0 4px 12px rgba(230,57,70,0.4);}
+.dark-btn{background:none;border:none;font-size:20px;cursor:pointer;padding:4px;border-radius:50%;}
+.cart-btn{background:var(--rojo);color:white;border:none;border-radius:50px;padding:9px 16px;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(230,57,70,0.4);transition:transform 0.2s;}
 .cart-btn:active{transform:scale(0.92);}
-.cart-count{background:var(--amarillo);color:var(--oscuro);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;transition:transform var(--anim);}
-.cart-count.bump{animation:bump 0.35s var(--anim);}
+.cart-count{background:var(--amarillo);color:var(--oscuro);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;}
+.cart-count.bump{animation:bump 0.35s;}
 @keyframes bump{0%{transform:scale(1)}50%{transform:scale(1.5)}100%{transform:scale(1)}}
 .tienda-status-bar{text-align:center;padding:10px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;}
 .tienda-abierta{background:linear-gradient(90deg,#2dc653,#1a9e3f);color:white;}
 .tienda-cerrada{background:linear-gradient(90deg,#e63946,#c1121f);color:white;}
-.envio-bar{background:linear-gradient(90deg,#2dc653,#1a9e3f);color:white;text-align:center;padding:8px 16px;font-size:13px;font-weight:700;transition:background 0.3s;}
+.envio-bar{background:linear-gradient(90deg,#2dc653,#1a9e3f);color:white;text-align:center;padding:8px 16px;font-size:13px;font-weight:700;}
 .tabs{display:flex;background:var(--card);border-bottom:3px solid var(--amarillo);overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
-.tab-btn{padding:11px 16px;border:none;background:transparent;font-family:'Nunito',sans-serif;font-weight:700;font-size:13px;color:var(--subtext);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all 0.2s;}
+.tab-btn{padding:11px 16px;border:none;background:transparent;font-weight:700;font-size:13px;color:var(--subtext);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all 0.2s;}
 .tab-btn.active{color:var(--rojo);border-bottom-color:var(--rojo);}
-.search-wrap{padding:10px 16px;background:var(--card);border-bottom:1px solid var(--border);position:relative;}
-.search-wrap input{width:100%;padding:10px 16px 10px 38px;border:2px solid var(--border);border-radius:50px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;background:var(--bg);color:var(--text);transition:border 0.2s,box-shadow 0.2s;}
-.search-wrap input:focus{border-color:var(--rojo);box-shadow:0 0 0 3px rgba(230,57,70,0.15);}
-.search-wrap::before{content:'🔍';position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:15px;}
+.search-wrap{padding:10px 16px;background:var(--card);border-bottom:1px solid var(--border);}
+.search-wrap input{width:100%;padding:10px 16px;border:2px solid var(--border);border-radius:50px;font-size:14px;outline:none;background:var(--bg);color:var(--text);}
 .view{display:none;padding:14px;animation:fadeIn 0.2s ease;}
 .view.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-.section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--text);margin:16px 0 10px;padding-left:8px;border-left:3px solid var(--amarillo);}
 .ofertas-banner{background:linear-gradient(135deg,#e63946,#ff6b2b);border-radius:16px;padding:16px;margin-bottom:16px;color:white;display:flex;align-items:center;justify-content:space-between;}
 .ofertas-banner .title{font-family:'Bebas Neue',sans-serif;font-size:26px;}
 .scroll-row{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;}
@@ -62,18 +60,16 @@ header{background:var(--oscuro);color:white;padding:14px 16px;padding-top:max(14
 .oferta-card .product-img{height:110px;}
 .product-emoji-big{font-size:46px;text-align:center;padding:14px 0 6px;}
 .product-info{padding:8px 12px 12px;flex:1;display:flex;flex-direction:column;gap:5px;}
-.product-name{font-weight:700;font-size:13px;color:var(--text);line-height:1.3;}
+.product-name{font-weight:700;font-size:13px;}
 .product-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo);}
 .price-old{font-size:12px;color:var(--subtext);text-decoration:line-through;}
 .price-new{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--verde);}
-.price-save{font-size:11px;font-weight:700;color:var(--verde);}
 .badge{position:absolute;top:8px;left:8px;border-radius:50px;padding:3px 9px;font-size:11px;font-weight:800;z-index:2;}
 .badge-oferta{background:var(--rojo);color:white;}
 .cat-badge{position:absolute;top:8px;right:8px;background:var(--amarillo);color:var(--oscuro);border-radius:50px;padding:2px 8px;font-size:10px;font-weight:700;z-index:2;}
-.add-btn{background:var(--oscuro);color:white;border:none;border-radius:50px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer;width:100%;margin-top:auto;transition:background 0.2s,transform var(--anim);}
+.add-btn{background:var(--oscuro);color:white;border:none;border-radius:50px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer;width:100%;margin-top:auto;transition:background 0.2s,transform 0.2s;}
 .add-btn:active{transform:scale(0.95);background:var(--rojo);}
-.quick-btn{background:var(--rojo);color:white;border:none;border-radius:50px;padding:6px 10px;font-weight:800;font-size:11px;cursor:pointer;width:100%;margin-top:4px;}
-.agotado-badge{background:#555;color:white;border:none;border-radius:50px;padding:8px 14px;font-weight:800;font-size:12px;width:100%;margin-top:auto;text-align:center;opacity:0.8;}
+.agotado-badge{background:#555;color:white;border:none;border-radius:50px;padding:8px 14px;font-weight:800;font-size:12px;width:100%;margin-top:auto;text-align:center;}
 .qty-ctrl{display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:auto;}
 .qty-btn{background:var(--gris);border:none;border-radius:50%;width:30px;height:30px;font-size:18px;font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .qty-num{font-weight:800;font-size:16px;min-width:20px;text-align:center;}
@@ -81,7 +77,6 @@ header{background:var(--oscuro);color:white;padding:14px 16px;padding-top:max(14
 .variants-list{display:flex;flex-wrap:wrap;gap:4px;}
 .variant-chip{padding:3px 9px;border:2px solid var(--border);border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;background:var(--card);color:var(--text);}
 .variant-chip.selected{border-color:var(--rojo);background:#fff0f0;color:var(--rojo);}
-.in-cart-badge{font-size:12px;font-weight:700;color:var(--verde);text-align:center;margin-top:auto;}
 .cat-filter{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;scrollbar-width:none;}
 .cat-chip{flex-shrink:0;padding:7px 14px;border-radius:50px;border:2px solid var(--border);background:var(--card);color:var(--subtext);font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap;}
 .cat-chip.active{border-color:var(--rojo);background:var(--rojo);color:white;}
@@ -102,9 +97,6 @@ header{background:var(--oscuro);color:white;padding:14px 16px;padding-top:max(14
 .ux-info-bar{background:linear-gradient(90deg,#e8f5e9,#fff8e1);border:1px solid #ddd;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;color:#555;text-align:center;margin-bottom:10px;}
 .toast{position:fixed;bottom:max(24px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(80px);background:var(--oscuro);color:white;padding:12px 24px;border-radius:50px;font-weight:700;font-size:14px;z-index:999;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);white-space:nowrap;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,0.3);}
 .toast.show{transform:translateX(-50%) translateY(0);}
-.zoom-modal{position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;}
-.zoom-modal img{max-width:100%;max-height:65vh;border-radius:16px;object-fit:contain;}
-.zoom-close{margin-top:18px;background:white;border:none;border-radius:50px;padding:12px 30px;font-weight:800;font-size:15px;cursor:pointer;}
 .floating-cart{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));background:var(--oscuro);display:flex;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,0.25);transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);}
 .floating-cart.visible{transform:translateY(0);}
 .floating-cart-total{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--amarillo);}
@@ -119,22 +111,29 @@ body.has-float-bar .view{padding-bottom:80px;}
 .chat-msg{max-width:80%;padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.4;}
 .chat-msg.mio{background:var(--verde);color:white;align-self:flex-end;border-bottom-right-radius:4px;}
 .chat-msg.tienda{background:var(--gris);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
+.chat-msg.bot{background:#e3f2fd;color:#0d47a1;align-self:flex-start;border-bottom-left-radius:4px;}
 .chat-input-wrap{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);}
 .chat-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:20px;outline:none;background:var(--bg);color:var(--text);}
 .chat-input-wrap button{background:var(--verde);color:white;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;}
-@media(max-width:400px){.products-grid{grid-template-columns:repeat(2,1fr);}.logo{font-size:22px;}}
+@media(max-width:400px){.products-grid{grid-template-columns:repeat(2,1fr);}.logo{font-size:18px;}}
 </style>
 </head>
 <body>
 
 <div id="splash" style="position:fixed;inset:0;background:var(--oscuro);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.4s;">
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:3px;color:var(--amarillo);">Bodega <span style="color:var(--rojo);">Tony</span> Tony</div>
-  <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.2);border-radius:50%;border-top-color:var(--rojo);animation:spin 0.8s linear infinite;margin-top:20px;"></div>
+  <img src="1000681371.png" alt="Bodega Tony Tony" style="width:180px;height:auto;margin-bottom:20px;">
+  <div style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.2);border-radius:50%;border-top-color:var(--rojo);animation:spin 0.8s linear infinite;"></div>
 </div>
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <header>
-  <div><div class="logo">Bodega <span>Tony</span> Tony</div><div style="font-size:11px;color:#aaa;">🛒 Haz tu pedido aquí</div></div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <img src="1000681371.png" alt="Logo" style="width:40px;height:40px;border-radius:8px;">
+    <div>
+      <div class="logo">Bodega <span>Tony</span> Tony</div>
+      <div style="font-size:10px;color:#aaa;">🛒 Haz tu pedido aquí</div>
+    </div>
+  </div>
   <div style="display:flex;align-items:center;gap:8px;">
     <button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button>
     <button class="cart-btn" onclick="showTab('carrito')">🛒 <span class="cart-count" id="cartCount">0</span></button>
@@ -145,11 +144,11 @@ body.has-float-bar .view{padding-bottom:80px;}
 <div class="envio-bar" id="envioBar">🛵 Domicilio gratis</div>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="showTab('tienda')" id="tab-tienda">🏪 Tienda</button>
-  <button class="tab-btn" onclick="showTab('carrito')" id="tab-carrito">🛒 Mi Pedido</button>
-  <button class="tab-btn" onclick="showTab('tracking')" id="tab-tracking">📦 Pedido</button>
-  <button class="tab-btn" onclick="showTab('historial')" id="tab-historial">📋 Historial</button>
-  <button class="tab-btn" onclick="showTab('soporte')" id="tab-soporte">❗ Soporte</button>
+  <button class="tab-btn active" onclick="showTab('tienda')">🏪 Tienda</button>
+  <button class="tab-btn" onclick="showTab('carrito')">🛒 Mi Pedido</button>
+  <button class="tab-btn" onclick="showTab('tracking')">📦 Pedido</button>
+  <button class="tab-btn" onclick="showTab('historial')">📋 Historial</button>
+  <button class="tab-btn" onclick="showTab('soporte')">❗ Soporte</button>
 </div>
 
 <div class="search-wrap"><input type="text" id="searchInput" placeholder="Buscar producto..." oninput="renderStore()"></div>
@@ -166,13 +165,12 @@ body.has-float-bar .view{padding-bottom:80px;}
 </div>
 
 <button class="chat-fab" id="chatFab" onclick="toggleChat()">💬</button>
-
 <div class="chat-window" id="chatWindow">
   <div class="chat-header">
-    <span style="font-weight:800;">💬 Chatea con Bodega Tony</span>
+    <span style="font-weight:800;">💬 Bodega Tony Tony</span>
     <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;">✕</button>
   </div>
-  <div class="chat-messages" id="chatMessages"><div style="text-align:center;color:var(--subtext);padding:20px;">Escribe tu mensaje</div></div>
+  <div class="chat-messages" id="chatMessages"><div style="text-align:center;color:var(--subtext);padding:20px;">👋 ¡Hola! Escribe tu mensaje</div></div>
   <div class="chat-input-wrap">
     <input type="text" id="chatInput" placeholder="Escribe aquí..." onkeyup="if(event.key==='Enter')sendChat()">
     <button onclick="sendChat()">➤</button>
@@ -242,7 +240,7 @@ function renderStore(){
 function buildCard(p,isScroll){
   const cls=isScroll?'oferta-card':'product-card';
   let badges='';if(p.oferta)badges+='<span class="badge badge-oferta">🔥</span>';
-  const imgHtml=p.photo?`<img src="${esc(p.photo)}" class="product-img" onclick="zoomProduct('${esc(p.photo)}','${esc(p.name)}')">`:`<div class="product-emoji-big" onclick="zoomProduct('','${esc(p.name)}')">${p.emoji||'📦'}</div>`;
+  const imgHtml=p.photo?`<img src="${esc(p.photo)}" class="product-img">`:`<div class="product-emoji-big">${p.emoji||'📦'}</div>`;
   const priceHtml=p.oferta&&p.precioAnterior?`<div class="price-old">$ ${p.precioAnterior}</div><div class="price-new">$ ${p.price}</div>`:`<div class="product-price">$ ${p.price}</div>`;
   return`<div class="${cls}">${badges}<span class="cat-badge">${p.category||'General'}</span>${imgHtml}<div class="product-info"><div class="product-name">${p.name}</div>${priceHtml}${buildActionHtml(p)}</div></div>`;
 }
@@ -258,12 +256,7 @@ function filterCat(c){selectedCategory=c;renderStore();}
 function addToCart(pid,v){const p=products.find(x=>x.id===pid);if(!p||p.agotado){showToast('❌ No disponible');return;}const key=cartKey(pid,v);if(!cart[key])cart[key]={product:p,variant:v||'',qty:0};cart[key].qty++;renderStore();showToast('✅ Agregado');updateCartCount();actualizarFloatingCart();}
 function changeQty(pid,v,delta){const key=cartKey(pid,v);if(!cart[key])return;cart[key].qty+=delta;if(cart[key].qty<=0)delete cart[key];renderStore();updateCartCount();actualizarFloatingCart();}
 
-function zoomProduct(photo,name){const d=document.createElement('div');d.className='zoom-modal';d.innerHTML=`${photo?`<img src="${photo}" alt="${name}">`:`<div style="font-size:110px;">📦</div>`}<div style="color:white;font-weight:800;font-size:18px;margin-top:14px;">${name}</div><button class="zoom-close" onclick="this.parentElement.remove()">✕ Cerrar</button>`;d.onclick=e=>{if(e.target===d)d.remove();};document.body.appendChild(d);}
-
-function getLocation(){
-  if(!navigator.geolocation){showToast('⚠️ Geolocalización no soportada');return;}
-  navigator.geolocation.getCurrentPosition(pos=>{clienteGeo={lat:pos.coords.latitude,lng:pos.coords.longitude};showToast('✅ Ubicación obtenida');renderCart();},()=>{showToast('❌ No se pudo obtener ubicación');});
-}
+function getLocation(){if(!navigator.geolocation){showToast('⚠️ No soportada');return;}navigator.geolocation.getCurrentPosition(pos=>{clienteGeo={lat:pos.coords.latitude,lng:pos.coords.longitude};showToast('✅ Ubicación obtenida');renderCart();},()=>{showToast('❌ No se pudo');});}
 
 function renderCart(){
   const container=document.getElementById('cartContainer');const keys=Object.keys(cart);
@@ -317,7 +310,7 @@ function renderHistorial(){
   const container=document.getElementById('historialContainer');const phone=localStorage.getItem('clientPhone')||'';
   if(!phone){container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Haz tu primer pedido</p></div>';return;}
   container.innerHTML='<p style="text-align:center;color:var(--subtext);">⏳ Cargando...</p>';
-  db.collection('pedidos').where('telefono','==',phone).orderBy('fecha','desc').limit(20).get().then(snap=>{if(snap.empty){container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>No tienes pedidos</p></div>';return;}container.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,0.12);"><div style="font-weight:800;">#${d.id.slice(-4).toUpperCase()} · ${new Date(p.fecha).toLocaleString('es-VE')}</div><div style="font-size:13px;white-space:pre-line;color:var(--subtext);">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div><span style="font-size:11px;font-weight:800;padding:3px 9px;border-radius:50px;background:#fff3cd;color:#856404;">${p.estado||'pendiente'}</span></div>`;}).join('');});
+  db.collection('pedidos').where('telefono','==',phone).orderBy('fecha','desc').limit(20).get().then(snap=>{if(snap.empty){container.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>No tienes pedidos</p></div>';return;}container.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div style="background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,0.12);"><div style="font-weight:800;">#${d.id.slice(-4).toUpperCase()} · ${new Date(p.fecha).toLocaleString('es-VE')}</div><div style="font-size:13px;white-space:pre-line;color:var(--subtext);">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div></div>`;}).join('');});
 }
 
 function renderSoporte(){document.getElementById('soporteContainer').innerHTML=`<div style="background:var(--card);border-radius:16px;padding:18px;box-shadow:0 4px 20px rgba(0,0,0,0.12);"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);margin-bottom:16px;">❗ Reportar problema</div><input type="text" id="sNombre" placeholder="Tu nombre *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><input type="tel" id="sTelefono" placeholder="Tu teléfono *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><textarea id="sDescripcion" placeholder="Describe el problema *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);min-height:90px;"></textarea><button onclick="enviarSoporte()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;">📤 Enviar reporte</button></div>`;}
@@ -325,7 +318,9 @@ async function enviarSoporte(){const n=document.getElementById('sNombre')?.value
 
 function actualizarFloatingCart(){const total=cartTotal();const items=Object.values(cart).reduce((a,b)=>a+b.qty,0);const bar=document.getElementById('floatingCart');if(!bar)return;if(items>0){bar.classList.add('visible');document.body.classList.add('has-float-bar');document.getElementById('floatTotal').textContent=`$ ${total.toFixed(2)} · ${items} item${items>1?'s':''}`;}else{bar.classList.remove('visible');document.body.classList.remove('has-float-bar');}}
 
-// ═══════════════ CHAT EN VIVO ═══════════════
+// CHAT EN VIVO + BOT
+const botRespuestas={hola:'👋 ¡Hola! Bienvenido a Bodega Tony Tony. Soy el asistente virtual. ¿En qué puedo ayudarte?\n\n1️⃣ Ver productos\n2️⃣ Hacer un pedido\n3️⃣ Estado de mi pedido\n4️⃣ Hablar con un asesor',1:'Puedes ver todos nuestros productos en la pestaña 🏪 Tienda. ¡Agrega lo que quieras al carrito!',2:'Para hacer un pedido:\n1. Agrega productos al 🛒 carrito\n2. Ve a Mi Pedido\n3. Llena tus datos\n4. Envía por WhatsApp\n\n¿Necesitas ayuda con algo más?',3:'Para ver el estado de tu pedido, ve a la pestaña 📦 Pedido. Ahí puedes hacer seguimiento en tiempo real.',4:'Un momento, te conectamos con un asesor humano... Mientras tanto, puedes escribirnos por WhatsApp: '+config.whatsapp,default:'Gracias por escribirnos 💚 Te responderemos pronto. Para pedidos urgentes, usa el botón de WhatsApp 📤'};
+
 function toggleChat(){const win=document.getElementById('chatWindow');win.classList.toggle('open');if(win.classList.contains('open'))initChat();}
 function initChat(){
   if(chatUnsub)return;
@@ -334,8 +329,8 @@ function initChat(){
   chatUnsub=chatRef.orderBy('fecha','asc').onSnapshot(snap=>{
     const msgs=document.getElementById('chatMessages');
     if(!msgs)return;
-    if(snap.empty){msgs.innerHTML='<div style="text-align:center;color:var(--subtext);padding:20px;">Escribe tu mensaje</div>';return;}
-    msgs.innerHTML=snap.docs.map(d=>{const m=d.data();return`<div class="chat-msg ${m.de==='cliente'?'mio':'tienda'}"><div style="font-size:10px;opacity:0.7;">${m.de==='cliente'?'Tú':'Bodega Tony'}</div>${m.texto}</div>`;}).join('');
+    if(snap.empty){msgs.innerHTML='<div style="text-align:center;color:var(--subtext);padding:20px;">👋 ¡Hola! Escribe tu mensaje</div>';return;}
+    msgs.innerHTML=snap.docs.map(d=>{const m=d.data();return`<div class="chat-msg ${m.de==='cliente'?'mio':m.de==='bot'?'bot':'tienda'}"><div style="font-size:10px;opacity:0.7;">${m.de==='cliente'?'Tú':m.de==='bot'?'🤖 Bot Tony':'Bodega Tony'}</div>${m.texto}</div>`;}).join('');
     msgs.scrollTop=msgs.scrollHeight;
   });
 }
@@ -347,21 +342,32 @@ function sendChat(){
   db.collection('chats').doc(phone).collection('mensajes').add({texto,fecha:new Date().toISOString(),de:'cliente',nombre});
   db.collection('chats').doc(phone).set({ultimoMensaje:texto,fecha:new Date().toISOString(),nombre,telefono:phone},{merge:true});
   input.value='';
+  // Bot responde
+  setTimeout(()=>{
+    const textoLower=texto.toLowerCase().trim();
+    let respuesta=botRespuestas['default'];
+    if(textoLower.includes('hola')||textoLower.includes('buenas')||textoLower.includes('saludos'))respuesta=botRespuestas['hola'];
+    else if(textoLower.includes('1')||textoLower.includes('producto')||textoLower.includes('ver'))respuesta=botRespuestas['1'];
+    else if(textoLower.includes('2')||textoLower.includes('pedido')||textoLower.includes('comprar')||textoLower.includes('orden'))respuesta=botRespuestas['2'];
+    else if(textoLower.includes('3')||textoLower.includes('estado')||textoLower.includes('seguimiento')||textoLower.includes('tracking'))respuesta=botRespuestas['3'];
+    else if(textoLower.includes('4')||textoLower.includes('asesor')||textoLower.includes('persona')||textoLower.includes('humano')||textoLower.includes('hablar'))respuesta=botRespuestas['4'];
+    db.collection('chats').doc(phone).collection('mensajes').add({texto:respuesta,fecha:new Date().toISOString(),de:'bot',nombre:'Bot Tony'});
+    db.collection('chats').doc(phone).set({ultimoMensaje:'Bot: '+respuesta.slice(0,30),fecha:new Date().toISOString()},{merge:true});
+  },800);
 }
 
 function normalizarTelefono(tel){tel=tel.replace(/\s+/g,'').replace(/[^0-9+]/g,'');if(tel.startsWith('+'))return tel;if(tel.startsWith('0'))tel=tel.slice(1);return'+58'+tel;}
-
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 setTimeout(()=>{
   if(!localStorage.getItem('clientName')){
     const modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-    modal.innerHTML=`<div style="background:var(--card);border-radius:24px;padding:28px 20px;width:100%;max-width:320px;text-align:center;"><div style="font-size:50px;">🛒</div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text);margin-bottom:20px;">Bodega Tony Tony</div><input type="text" id="regNombre" placeholder="Tu nombre" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><div style="position:relative;margin-bottom:16px;"><select id="regCodigo" style="position:absolute;left:0;top:0;bottom:0;width:80px;border:2px solid var(--border);border-right:none;border-radius:12px 0 0 12px;font-weight:700;outline:none;background:var(--bg);color:var(--text);"><option value="+58">🇻🇪 +58</option><option value="+57">🇨🇴 +57</option></select><input type="tel" id="regTelefono" placeholder="Número sin código" style="width:100%;padding:12px 16px 12px 90px;border:2px solid var(--border);border-radius:12px;outline:none;background:var(--bg);color:var(--text);"></div><button onclick="window._guardarRegistro()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;">Continuar →</button></div>`;document.body.appendChild(modal);
+    modal.innerHTML=`<div style="background:var(--card);border-radius:24px;padding:28px 20px;width:100%;max-width:320px;text-align:center;"><img src="1000681371.png" style="width:120px;height:auto;margin-bottom:16px;"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text);margin-bottom:20px;">Bodega Tony Tony</div><input type="text" id="regNombre" placeholder="Tu nombre" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><div style="position:relative;margin-bottom:16px;"><select id="regCodigo" style="position:absolute;left:0;top:0;bottom:0;width:80px;border:2px solid var(--border);border-right:none;border-radius:12px 0 0 12px;font-weight:700;outline:none;background:var(--bg);color:var(--text);"><option value="+58">🇻🇪 +58</option><option value="+57">🇨🇴 +57</option></select><input type="tel" id="regTelefono" placeholder="Número sin código" style="width:100%;padding:12px 16px 12px 90px;border:2px solid var(--border);border-radius:12px;outline:none;background:var(--bg);color:var(--text);"></div><button onclick="window._guardarRegistro()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;">Continuar →</button></div>`;document.body.appendChild(modal);
     window._guardarRegistro=function(){const n=document.getElementById('regNombre')?.value.trim();const c=document.getElementById('regCodigo')?.value||'+58';const t=document.getElementById('regTelefono')?.value.trim();if(!n||!t){showToast('⚠️ Completa tus datos');return;}localStorage.setItem('clientName',n);localStorage.setItem('clientPhone',c+t.replace(/\D/g,''));modal.remove();showToast('¡Bienvenido '+n+'! 🎉');};
   }
 },800);
 
-setTimeout(()=>{const s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.style.display='none',400);}},1200);
+setTimeout(()=>{const s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.style.display='none',400);}},1500);
 
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 </script>
