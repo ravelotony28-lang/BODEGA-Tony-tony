@@ -6,8 +6,8 @@
 <meta name="theme-color" content="#1a1a2e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Admin Tony Tony">
-<link rel="apple-touch-icon" href="1000681371.png">
-<link rel="icon" type="image/png" href="1000681371.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" type="image/png" href="logo.png">
 <title>⚙️ Admin - Bodega Tony Tony</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -19,8 +19,8 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 header{background:var(--oscuro);color:white;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.3);}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--amarillo);}
-.logo span{color:var(--rojo);}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--amarillo);}
+.logo-text span{color:var(--rojo);}
 .tabs{display:flex;background:var(--card);border-bottom:3px solid var(--amarillo);overflow-x:auto;scrollbar-width:none;}
 .tabs::-webkit-scrollbar{display:none;}
 .tab-btn{padding:11px 14px;border:none;background:transparent;font-weight:700;font-size:13px;color:var(--subtext);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all 0.2s;}
@@ -85,11 +85,13 @@ canvas{max-width:100%;margin:10px 0;}
 
 <div class="lock-screen" id="lockScreen">
   <div class="lock-card">
-    <img src="1000681371.png" alt="Logo" style="width:100px;height:auto;margin-bottom:12px;">
+    <img src="logo.png" alt="Logo" style="width:100px;height:auto;margin-bottom:12px;" onerror="this.style.display='none'">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:white;">ADMIN</div>
     <div style="font-size:16px;color:var(--rojo);margin-bottom:20px;">BODEGA TONY TONY</div>
     <div id="pinDisplay" style="display:flex;justify-content:center;gap:12px;margin-bottom:24px;">
-      <div class="pin-dot" id="dot0"></div><div class="pin-dot" id="dot1"></div><div class="pin-dot" id="dot2"></div><div class="pin-dot" id="dot3"></div><div class="pin-dot" id="dot4"></div><div class="pin-dot" id="dot5"></div>
+      <div class="pin-dot" id="dot0"></div><div class="pin-dot" id="dot1"></div>
+      <div class="pin-dot" id="dot2"></div><div class="pin-dot" id="dot3"></div>
+      <div class="pin-dot" id="dot4"></div><div class="pin-dot" id="dot5"></div>
     </div>
     <p id="pinError" style="color:var(--rojo);font-size:13px;font-weight:700;margin-bottom:12px;min-height:20px;"></p>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;">
@@ -104,9 +106,9 @@ canvas{max-width:100%;margin:10px 0;}
 <div id="adminPanel" style="display:none;">
   <header>
     <div style="display:flex;align-items:center;gap:10px;">
-      <img src="1000681371.png" style="width:38px;height:38px;border-radius:6px;">
+      <img src="logo.png" alt="Logo" style="width:36px;height:36px;border-radius:6px;" onerror="this.style.display='none'">
       <div>
-        <div class="logo">Admin <span>Tony</span> Tony</div>
+        <div class="logo-text">Admin <span>Tony</span> Tony</div>
         <div style="font-size:11px;color:#aaa;">Panel de Administración</div>
       </div>
     </div>
@@ -116,7 +118,6 @@ canvas{max-width:100%;margin:10px 0;}
     <button class="tab-btn active" onclick="showAdminTab('dashboard')">📊 Dashboard</button>
     <button class="tab-btn" onclick="showAdminTab('productos')">📦 Productos</button>
     <button class="tab-btn" onclick="showAdminTab('pedidos')">📋 Pedidos</button>
-    <button class="tab-btn" onclick="showAdminTab('chat')">💬 Chat</button>
     <button class="tab-btn" onclick="showAdminTab('repartidores')">🛵 Repartidores</button>
     <button class="tab-btn" onclick="showAdminTab('zonas')">🗺️ Zonas</button>
     <button class="tab-btn" onclick="showAdminTab('cupones')">🎟️ Cupones</button>
@@ -150,14 +151,6 @@ canvas{max-width:100%;margin:10px 0;}
     <div class="admin-section"><h3>📋 Pedidos</h3><div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;"><button onclick="filterPedidos('todos')" class="btn-primary" style="font-size:12px;padding:6px 12px;border-radius:50px;">Todos</button><button onclick="filterPedidos('pendiente')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">⏳ Pendientes</button><button onclick="filterPedidos('confirmado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">✅ Confirmados</button><button onclick="filterPedidos('preparacion')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🍳 Preparando</button><button onclick="filterPedidos('camino')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">🛵 En camino</button><button onclick="filterPedidos('entregado')" style="background:var(--gris);border:none;border-radius:50px;padding:6px 12px;font-weight:700;font-size:12px;cursor:pointer;color:var(--text);">📦 Entregados</button></div><div id="pedidosList">Cargando...</div></div>
   </div>
 
-  <div class="view" id="view-chat">
-    <div class="admin-section"><h3>💬 Chat con Clientes</h3>
-      <select id="chatClienteSelect" onchange="cargarChatAdmin()" style="width:100%;padding:10px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);font-size:14px;margin-bottom:10px;"><option value="">Selecciona un cliente...</option></select>
-      <div id="chatAdminMessages" style="max-height:400px;overflow-y:auto;padding:10px;background:var(--bg);border-radius:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px;"><p style="color:var(--subtext);text-align:center;">Selecciona un cliente</p></div>
-      <div style="display:flex;gap:8px;"><input type="text" id="chatAdminInput" placeholder="Escribe tu respuesta..." onkeyup="if(event.key==='Enter')sendChatAdmin()" style="flex:1;padding:12px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);"><button class="btn-primary" onclick="sendChatAdmin()">Enviar</button></div>
-    </div>
-  </div>
-
   <div class="view" id="view-repartidores"><div class="admin-section"><h3>➕ Agregar Repartidor</h3><div class="form-row"><input type="text" id="repNombre" placeholder="Nombre completo"><input type="tel" id="repTelefono" placeholder="Teléfono"></div><div class="form-row"><input type="text" id="repPlaca" placeholder="Placa"><input type="text" id="repVehiculo" placeholder="Tipo"></div><button class="btn-primary" onclick="addRepartidor()" style="width:100%;">✅ Agregar Repartidor</button></div><div class="admin-section"><h3>🛵 Repartidores</h3><div id="repartidoresList"></div></div></div>
 
   <div class="view" id="view-zonas"><div class="admin-section"><h3>➕ Agregar Zona</h3><div class="form-row"><input type="text" id="zonaNombre" placeholder="Nombre"><input type="number" id="zonaCosto" placeholder="Costo ($)" min="0" step="0.5"></div><button class="btn-primary" onclick="addZona()" style="width:100%;">✅ Agregar Zona</button></div><div class="admin-section"><h3>🗺️ Zonas</h3><div id="zonasList"></div></div></div>
@@ -175,9 +168,7 @@ canvas{max-width:100%;margin:10px 0;}
 firebase.initializeApp({apiKey:"AIzaSyBdv2cOMgbeBuW-V9Buz8EzGAoElnvySoI",authDomain:"bodegatonytony.firebaseapp.com",projectId:"bodegatonytony",storageBucket:"bodegatonytony.firebasestorage.app",messagingSenderId:"763208241886",appId:"1:763208241886:web:dd4a04d68c2c72ed24a84f"});
 const db=firebase.firestore();
 
-let ADMIN_PIN='';
-async function loadAdminPin(){try{const snap=await db.collection('config').doc('seguridad').get();ADMIN_PIN=snap.exists?snap.data().adminPin:'';}catch(e){ADMIN_PIN='';}}
-loadAdminPin();
+let ADMIN_PIN='';async function loadAdminPin(){try{const snap=await db.collection('config').doc('seguridad').get();ADMIN_PIN=snap.exists?snap.data().adminPin:'';}catch(e){ADMIN_PIN='';}}loadAdminPin();
 
 let darkMode=localStorage.getItem('darkMode')==='1';
 function applyDark(){document.body.classList.toggle('dark-mode',darkMode);}
@@ -185,12 +176,12 @@ function toggleDark(){darkMode=!darkMode;localStorage.setItem('darkMode',darkMod
 applyDark();
 
 let products=[],currentVariants=[],pendingPhotoBase64='',pedidosFiltro='todos',soporteFiltro='todos',allPedidos=[],allSoporte=[],repartidores=[],zonas=[],allCupones=[],configData={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},envioGratis:true,pedidoMinimo:0};
-let pinEntered='',chartVentas=null,chartProductos=null,chartIngresos=null,chatAdminUnsub=null,chatsClientes=[];
+let pinEntered='',chartVentas=null,chartProductos=null,chartIngresos=null;
 
 function pinPress(d){if(pinEntered.length>=6)return;pinEntered+=d;updatePinDots();if(pinEntered.length===6)setTimeout(checkPin,200);}
 function pinClear(){pinEntered=pinEntered.slice(0,-1);updatePinDots();document.getElementById('pinError').textContent='';}
 function updatePinDots(){for(let i=0;i<6;i++){const d=document.getElementById('dot'+i);if(d)d.classList.toggle('filled',i<pinEntered.length);}}
-function checkPin(){if(!ADMIN_PIN){document.getElementById('pinError').textContent='⏳ Verificando...';setTimeout(checkPin,500);return;}if(pinEntered===ADMIN_PIN){document.getElementById('lockScreen').style.display='none';document.getElementById('adminPanel').style.display='block';pinEntered='';updatePinDots();initAdmin();}else{document.getElementById('pinError').textContent='❌ PIN incorrecto';pinEntered='';updatePinDots();setTimeout(()=>{document.getElementById('pinError').textContent='';},2000);}}
+function checkPin(){if(!ADMIN_PIN){document.getElementById('pinError').textContent='⏳ Cargando...';setTimeout(checkPin,500);return;}if(pinEntered===ADMIN_PIN){document.getElementById('lockScreen').style.display='none';document.getElementById('adminPanel').style.display='block';pinEntered='';updatePinDots();initAdmin();}else{document.getElementById('pinError').textContent='❌ PIN incorrecto';pinEntered='';updatePinDots();setTimeout(()=>{document.getElementById('pinError').textContent='';},2000);}}
 function lockPanel(){document.getElementById('lockScreen').style.display='flex';document.getElementById('adminPanel').style.display='none';pinEntered='';updatePinDots();}
 
 function initAdmin(){
@@ -201,7 +192,6 @@ function initAdmin(){
   db.collection('soporte').orderBy('fecha','desc').limit(100).onSnapshot(snap=>{allSoporte=snap.docs.map(d=>({id:d.id,...d.data()}));renderSoporteAdmin();});
   db.collection('cupones').orderBy('fecha','desc').onSnapshot(snap=>{allCupones=snap.docs.map(d=>({id:d.id,...d.data()}));renderCupones();});
   db.collection('config').doc('tienda').onSnapshot(snap=>{if(snap.exists){configData={...configData,...snap.data()};fillConfigFields();renderMetodosConfig();}});
-  initChatAdmin();
 }
 
 function fillConfigFields(){
@@ -224,7 +214,6 @@ function showAdminTab(tab){
   if(tab==='config'){renderMetodosConfig();loadStats();}
   if(tab==='dashboard'){loadStats();setTimeout(renderCharts,300);}
   if(tab==='pedidos')loadStats();
-  if(tab==='chat')cargarChatAdmin();
 }
 
 function renderCharts(){
@@ -241,25 +230,6 @@ function renderCharts(){
   const ctx3=document.getElementById('chartIngresos')?.getContext('2d');if(ctx3){if(chartIngresos)chartIngresos.destroy();chartIngresos=new Chart(ctx3,{type:'line',data:{labels:Array(diasMes).fill().map((_,i)=>'Dia '+(i+1)),datasets:[{label:'Ingresos ($)',data:ingresosMes,borderColor:'#e63946',backgroundColor:'rgba(230,57,70,0.1)',fill:true,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});}
 }
 
-function initChatAdmin(){
-  db.collection('chats').orderBy('fecha','desc').onSnapshot(snap=>{
-    chatsClientes=snap.docs.map(d=>({id:d.id,...d.data()}));
-    const select=document.getElementById('chatClienteSelect');
-    if(select)select.innerHTML='<option value="">Selecciona un cliente...</option>'+chatsClientes.map(c=>`<option value="${c.id}">${c.nombre||'Sin nombre'} - ${c.telefono||c.id} (${c.ultimoMensaje?c.ultimoMensaje.slice(0,40):'Sin mensajes'})</option>`).join('');
-  });
-}
-function cargarChatAdmin(){
-  const telefono=document.getElementById('chatClienteSelect')?.value;if(!telefono)return;
-  if(chatAdminUnsub)chatAdminUnsub();
-  chatAdminUnsub=db.collection('chats').doc(telefono).collection('mensajes').orderBy('fecha','asc').onSnapshot(snap=>{
-    const el=document.getElementById('chatAdminMessages');if(!el)return;
-    if(snap.empty){el.innerHTML='<p style="text-align:center;color:var(--subtext);">No hay mensajes</p>';return;}
-    el.innerHTML=snap.docs.map(d=>{const m=d.data();const bg=m.de==='admin'||m.de==='bot'?'var(--rojo)':'var(--gris)';const color=m.de==='admin'||m.de==='bot'?'white':'var(--text)';const align=m.de==='admin'||m.de==='bot'?'flex-end':'flex-start';return`<div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${bg};color:${color};align-self:${align};"><div style="font-size:10px;opacity:0.7;">${m.de==='admin'?'Tú':m.de==='bot'?'🤖 Bot':m.nombre||'Cliente'}</div>${m.texto}</div>`;}).join('');
-    el.scrollTop=el.scrollHeight;
-  });
-}
-function sendChatAdmin(){const telefono=document.getElementById('chatClienteSelect')?.value;const texto=document.getElementById('chatAdminInput')?.value.trim();if(!telefono||!texto)return;db.collection('chats').doc(telefono).collection('mensajes').add({texto,fecha:new Date().toISOString(),de:'admin',nombre:'Bodega Tony'});db.collection('chats').doc(telefono).set({ultimoMensaje:texto,fecha:new Date().toISOString()},{merge:true});document.getElementById('chatAdminInput').value='';}
-
 function previewPhoto(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const MAX=400;let w=img.width,h=img.height;if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);pendingPhotoBase64=canvas.toDataURL('image/jpeg',0.7);document.getElementById('photoPreview').innerHTML=`<img src="${pendingPhotoBase64}">`;};img.src=e.target.result;};reader.readAsDataURL(file);}
 function addVariantTag(){const v=document.getElementById('variantInput').value.trim();if(!v||currentVariants.includes(v))return;currentVariants.push(v);renderVariantTags();document.getElementById('variantInput').value='';}
 function renderVariantTags(){document.getElementById('variantTags').innerHTML=currentVariants.map(v=>`<div class="variant-tag">${v}<button onclick="removeVariantTag('${v}')">×</button></div>`).join('');}
@@ -274,9 +244,9 @@ function renderProductList(){const el=document.getElementById('adminProductList'
 async function editarStock(id,s){const n=prompt(`Stock actual: ${s??'sin límite'}\nNuevo stock:`,s??'');if(n===null)return;const v=n.trim()===''?null:parseInt(n);if(n.trim()!==''&&isNaN(v)){showToast('⚠️ Número inválido');return;}await db.collection('productos').doc(id).update({stock:v});showToast(v!==null?`✅ Stock: ${v}`:'✅ Sin límite');}
 
 function filterPedidos(e){pedidosFiltro=e;renderPedidos();}
-function renderPedidos(){const el=document.getElementById('pedidosList');if(!el)return;const filtered=pedidosFiltro==='todos'?allPedidos:allPedidos.filter(p=>p.estado===pedidosFiltro);if(!filtered.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay pedidos</p>';return;}const estadoInfo={pendiente:{label:'⏳ Pendiente',cls:'estado-pendiente'},confirmado:{label:'✅ Confirmado',cls:'estado-confirmado'},preparacion:{label:'🍳 Preparando',cls:'estado-preparacion'},camino:{label:'🛵 En camino',cls:'estado-camino'},entregado:{label:'📦 Entregado',cls:'estado-entregado'},cancelado:{label:'❌ Cancelado',cls:'estado-cancelado'}};el.innerHTML=filtered.map(p=>{const fecha=new Date(p.fecha).toLocaleString('es-VE',{dateStyle:'short',timeStyle:'short'});const ei=estadoInfo[p.estado]||estadoInfo.pendiente;const repNombre=p.nombreRepartidor||'';const cortoId='#'+p.id.slice(-4).toUpperCase();const geoBtn=p.geo?`<a href="https://maps.google.com/?q=${p.geo.lat},${p.geo.lng}" target="_blank">📍 Ver en Google Maps</a>`:'';const ea=p.estado;const puedeCancelar=['pendiente','confirmado','preparacion'].includes(ea);return`<div class="pedido-card"><div style="display:flex;justify-content:space-between;"><div><div style="font-weight:800;">👤 ${p.nombre}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rojo);">${cortoId}</div></div><span class="estado-badge ${ei.cls}">${ei.label}</span></div><div class="pedido-meta"><span class="pedido-meta-chip">📞 ${p.telefono}</span><span class="pedido-meta-chip">💳 ${p.metodoPago||'—'}</span><span class="pedido-meta-chip">${p.entrega==='domicilio'?'🛵 Domicilio':'🏪 Recoger'}</span></div>${p.entrega==='domicilio'&&p.direccion?`<div style="font-size:12px;color:var(--subtext);">📌 ${p.direccion}</div>`:''}${geoBtn}<div style="font-size:13px;white-space:pre-line;margin:6px 0;">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;"><button onclick="updateEstado('${p.id}','confirmado')" style="background:#2dc653;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">✅ Confirmar</button><button onclick="updateEstado('${p.id}','preparacion')" style="background:#007bff;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🍳 Preparando</button><button onclick="updateEstado('${p.id}','camino')" style="background:#ff6b2b;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🛵 En camino</button><button onclick="updateEstado('${p.id}','entregado')" style="background:#1565c0;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">📦 Entregado</button>${puedeCancelar?`<button onclick="if(confirm('¿Cancelar?'))updateEstado('${p.id}','cancelado')" style="background:var(--rojo);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">❌ Cancelar</button>`:''}</div><div style="font-size:11px;color:var(--subtext);margin-top:6px;">🕐 ${fecha}</div></div>`;}).join('');}
+function renderPedidos(){const el=document.getElementById('pedidosList');if(!el)return;const filtered=pedidosFiltro==='todos'?allPedidos:allPedidos.filter(p=>p.estado===pedidosFiltro);if(!filtered.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay pedidos</p>';return;}const estadoInfo={pendiente:{label:'⏳ Pendiente',cls:'estado-pendiente'},confirmado:{label:'✅ Confirmado',cls:'estado-confirmado'},preparacion:{label:'🍳 Preparando',cls:'estado-preparacion'},camino:{label:'🛵 En camino',cls:'estado-camino'},entregado:{label:'📦 Entregado',cls:'estado-entregado'},cancelado:{label:'❌ Cancelado',cls:'estado-cancelado'}};el.innerHTML=filtered.map(p=>{const fecha=new Date(p.fecha).toLocaleString('es-VE',{dateStyle:'short',timeStyle:'short'});const ei=estadoInfo[p.estado]||estadoInfo.pendiente;const cortoId='#'+p.id.slice(-4).toUpperCase();const geoBtn=p.geo?`<a href="https://maps.google.com/?q=${p.geo.lat},${p.geo.lng}" target="_blank">📍 Ver en Google Maps</a>`:'';const ea=p.estado;const puedeCancelar=['pendiente','confirmado','preparacion'].includes(ea);return`<div class="pedido-card"><div style="display:flex;justify-content:space-between;"><div><div style="font-weight:800;">👤 ${p.nombre}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--rojo);">${cortoId}</div></div><span class="estado-badge ${ei.cls}">${ei.label}</span></div><div class="pedido-meta"><span class="pedido-meta-chip">📞 ${p.telefono}</span><span class="pedido-meta-chip">💳 ${p.metodoPago||'—'}</span><span class="pedido-meta-chip">${p.entrega==='domicilio'?'🛵 Domicilio':'🏪 Recoger'}</span></div>${p.entrega==='domicilio'&&p.direccion?`<div style="font-size:12px;color:var(--subtext);">📌 ${p.direccion}</div>`:''}${geoBtn}<div style="font-size:13px;white-space:pre-line;margin:6px 0;">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;"><button onclick="updateEstado('${p.id}','confirmado')" style="background:#2dc653;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">✅ Confirmar</button><button onclick="updateEstado('${p.id}','preparacion')" style="background:#007bff;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🍳 Preparando</button><button onclick="updateEstado('${p.id}','camino')" style="background:#ff6b2b;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">🛵 En camino</button><button onclick="updateEstado('${p.id}','entregado')" style="background:#1565c0;color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">📦 Entregado</button>${puedeCancelar?`<button onclick="if(confirm('¿Cancelar?'))updateEstado('${p.id}','cancelado')" style="background:var(--rojo);color:white;border:none;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:700;cursor:pointer;">❌ Cancelar</button>`:''}</div><div style="font-size:11px;color:var(--subtext);margin-top:6px;">🕐 ${fecha}</div></div>`;}).join('');}
 
-async function updateEstado(id,estado){const updates={estado};if(estado==='confirmado'){updates.fechaConfirmacion=new Date().toISOString();const repDisponible=repartidores.find(r=>{const ocupado=allPedidos.some(p=>p.id!==id&&['confirmado','preparacion','camino','en_camino'].includes(p.estado)&&p.nombreRepartidor===r.nombre);return!ocupado;});if(repDisponible){updates.nombreRepartidor=repDisponible.nombre;updates.telefonoRepartidor=repDisponible.telefono;updates.repartidor={nombre:repDisponible.nombre,telefono:repDisponible.telefono,estado:'asignado'};showToast(`🛵 ${repDisponible.nombre} asignado`);}}if(estado==='camino'||estado==='en_camino')updates.fechaSalida=new Date().toISOString();if(estado==='entregado')updates.fechaEntrega=new Date().toISOString();if(estado==='cancelado')updates.fechaCancelacion=new Date().toISOString();await db.collection('pedidos').doc(id).update(updates);showToast('✅ Actualizado');notificarClienteAuto(id,estado);}
+async function updateEstado(id,estado){const updates={estado};if(estado==='confirmado'){updates.fechaConfirmacion=new Date().toISOString();const repDisponible=repartidores.find(r=>{const ocupado=allPedidos.some(p=>p.id!==id&&['confirmado','preparacion','camino','en_camino'].includes(p.estado)&&p.nombreRepartidor===r.nombre);return!ocupado;});if(repDisponible){updates.nombreRepartidor=repDisponible.nombre;updates.telefonoRepartidor=repDisponible.telefono;updates.repartidor={nombre:repDisponible.nombre,telefono:repDisponible.telefono,estado:'asignado'};showToast(`🛵 ${repDisponible.nombre} asignado automáticamente`);}}if(estado==='camino'||estado==='en_camino')updates.fechaSalida=new Date().toISOString();if(estado==='entregado')updates.fechaEntrega=new Date().toISOString();if(estado==='cancelado')updates.fechaCancelacion=new Date().toISOString();await db.collection('pedidos').doc(id).update(updates);showToast('✅ Actualizado');notificarClienteAuto(id,estado);}
 
 async function notificarClienteAuto(pedidoId,estado){const pedido=allPedidos.find(p=>p.id===pedidoId);if(!pedido||!pedido.telefono)return;const msgs={pendiente:'⏳ Recibido',confirmado:'✅ Confirmado',preparacion:'🍳 Preparando',camino:'🛵 En camino',entregado:'📦 Entregado',cancelado:'❌ Cancelado'};const repNombre=pedido.nombreRepartidor||'';let msg=`🛒 *Bodega Tony Tony*\n\nHola ${pedido.nombre}!\n${msgs[estado]||''}`;if((estado==='camino'||estado==='en_camino')&&repNombre)msg+=`\n\n🛵 Repartidor: ${repNombre}`;let tel=(pedido.telefono||'').replace(/\s+/g,'');if(!tel.startsWith('+')){tel=tel.replace(/^0+/,'');if(!tel.startsWith('57')&&!tel.startsWith('58'))tel='58'+tel;tel='+'+tel;}window.open(`https://wa.me/${tel.replace(/[^0-9+]/g,'')}?text=${encodeURIComponent(msg)}`,'_blank');}
 
@@ -315,10 +285,10 @@ function loadStats(){
   const pendientes=allPedidos.filter(p=>p.estado==='pendiente').length;
   const enCamino=allPedidos.filter(p=>['camino','en_camino'].includes(p.estado)).length;
   const pBar=document.getElementById('pedidosStatsBar');
-  if(pBar)pBar.innerHTML=[['⏳',pendientes,'#856404','#fff3cd','Pendientes'],['🍳',allPedidos.filter(p=>['preparacion','preparando'].includes(p.estado)).length,'#004085','#cce5ff','Preparando'],['🛵',enCamino,'#c05621','#ffe5d0','En camino'],['📦',entregadosHoy.length,'#155724','#d4edda','Entregados']].map(([e,n,c,bg,l])=>`<div style="background:${bg};border-radius:12px;padding:10px 8px;text-align:center;"><div style="font-size:18px;">${e}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${c};">${n}</div><div style="font-size:10px;color:${c};font-weight:700;">${l}</div></div>`).join('');
+  if(pBar)pBar.innerHTML=[['⏳',pendientes,'#856404','#fff3cd','Pendientes'],['🍳',allPedidos.filter(p=>['preparacion','preparando'].includes(p.estado)).length,'#004085','#cce5ff','Preparando'],['🛵',enCamino,'#c05621','#ffe5d0','En camino'],['📦',entregadosHoy.length,'#155724','#d4edda','Entregados hoy']].map(([e,n,c,bg,l])=>`<div style="background:${bg};border-radius:12px;padding:10px 8px;text-align:center;"><div style="font-size:18px;">${e}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${c};">${n}</div><div style="font-size:10px;color:${c};font-weight:700;">${l}</div></div>`).join('');
 }
 
-async function cargarInventario(){if(!confirm('¿Cargar productos?'))return;const inv=[{emoji:'🧻',name:'Papel Higiénico',price:0.7,category:'Higiene'},{emoji:'🌽',name:'Harina Pan 1K',price:1.8,category:'Víveres'},{emoji:'🍚',name:'Arroz 900G',price:1.6,category:'Víveres'},{emoji:'☕',name:'Café 200G',price:2.7,category:'Víveres'},{emoji:'🥤',name:'Glup 2L',price:1.5,category:'Refrescos'},{emoji:'🧀',name:'Queso Duro',price:4.5,category:'Frescos'},{emoji:'🧴',name:'Desodorante',price:0.8,category:'Higiene'},{emoji:'🦷',name:'Crema Dental',price:0.8,category:'Higiene'},{emoji:'🍬',name:'Boka',price:0.4,category:'Dulces'},{emoji:'💡',name:'Bombillo LED',price:1.1,category:'Varios'}];for(const p of inv){await db.collection('productos').add({...p,variants:[],photo:'',visible:true,agotado:false,oferta:false,precioAnterior:0,etiqueta:'',tipo:'normal',stock:null});}showToast('✅ Inventario cargado');}
+async function cargarInventario(){if(!confirm('¿Cargar productos?'))return;const inv=[{emoji:'🧻',name:'Papel Higiénico',price:0.70,category:'Higiene'},{emoji:'🌽',name:'Harina Pan 1K',price:1.80,category:'Víveres'},{emoji:'🍚',name:'Arroz 900G',price:1.60,category:'Víveres'},{emoji:'☕',name:'Café 200G',price:2.70,category:'Víveres'},{emoji:'🥤',name:'Glup 2L',price:1.50,category:'Refrescos'},{emoji:'🧀',name:'Queso Duro',price:4.50,category:'Frescos'},{emoji:'🧴',name:'Desodorante',price:0.80,category:'Higiene'},{emoji:'🦷',name:'Crema Dental',price:0.80,category:'Higiene'},{emoji:'🍬',name:'Boka',price:0.40,category:'Dulces'},{emoji:'💡',name:'Bombillo LED',price:1.10,category:'Varios'},{emoji:'🧂',name:'Sal Perlamar 1K',price:0.80,category:'Víveres'},{emoji:'🍾',name:'Vinagre Emvapimola 500ML',price:0.60,category:'Víveres'},{emoji:'🍞',name:'Pan',price:1.00,category:'Panadería'}];for(const p of inv){await db.collection('productos').add({...p,variants:[],photo:'',visible:true,agotado:false,oferta:p.price<1?true:false,precioAnterior:p.price<1?(p.price*1.5).toFixed(2):0,etiqueta:'',tipo:'normal',stock:null});}showToast('✅ Inventario cargado con ' + inv.length + ' productos');}
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 </script>
