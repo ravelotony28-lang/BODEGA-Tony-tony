@@ -72,6 +72,10 @@ header{background:var(--oscuro);color:white;padding:14px 16px;display:flex;align
 .chat-input-wrap{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);}
 .chat-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:20px;outline:none;background:var(--bg);color:var(--text);}
 .chat-input-wrap button{background:var(--verde);color:white;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;}
+.resena-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;display:none;align-items:flex-end;justify-content:center;}
+.resena-modal.open{display:flex;}
+.resena-sheet{width:100%;max-width:400px;background:var(--card);border-radius:20px 20px 0 0;padding:20px;animation:slideUp 0.3s ease;}
+.resena-stars{display:flex;gap:4px;justify-content:center;margin:10px 0;font-size:28px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -121,13 +125,26 @@ header{background:var(--oscuro);color:white;padding:14px 16px;display:flex;align
   </div>
 </div>
 
+<div class="resena-modal" id="resenaModal">
+  <div class="resena-sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-weight:800;font-size:16px;">⭐ Deja tu reseña</div>
+      <button onclick="cerrarResena()" style="background:none;border:none;font-size:22px;cursor:pointer;">✕</button>
+    </div>
+    <div class="resena-stars" id="resenaStars"></div>
+    <input type="text" id="resenaTexto" placeholder="¿Qué te pareció el producto?" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin:10px 0;background:var(--bg);color:var(--text);">
+    <label style="cursor:pointer;display:block;margin:8px 0;"><div id="resenaFotoPreview" style="width:100%;height:80px;border:2px dashed var(--amarillo);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--subtext);font-size:13px;">📸 Toca para agregar foto</div><input type="file" id="resenaFoto" accept="image/*" style="display:none;" onchange="previewResenaFoto(this)"></label>
+    <button onclick="enviarResena()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:12px;font-weight:800;cursor:pointer;">Enviar reseña ⭐</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 firebase.initializeApp({apiKey:"AIzaSyBdv2cOMgbeBuW-V9Buz8EzGAoElnvySoI",authDomain:"bodegatonytony.firebaseapp.com",projectId:"bodegatonytony",storageBucket:"bodegatonytony.firebasestorage.app",messagingSenderId:"763208241886",appId:"1:763208241886:web:dd4a04d68c2c72ed24a84f"});
 const db=firebase.firestore();
 
-let products=[],cart={},selectedCategory='Todos',chatUnsub=null;
+let products=[],cart={},selectedCategory='Todos',chatUnsub=null,resenaProductoId=null,resenaFotoBase64='',resenaEstrellas=5;
 let config={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},tiempoPreparacion:30,pagoMovil:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cedula:'6.966.714',telefono:'04241572275'}};
 
 db.collection('config').doc('tienda').get().then(snap=>{if(snap.exists)config={...config,...snap.data()};});
@@ -163,12 +180,13 @@ function renderStore(){
   h+=filtered.length?'<div class="products-grid">'+filtered.map(p=>buildCard(p,false)).join('')+'</div>':'<div class="empty"><p>🔍 Sin resultados</p></div>';
   c.innerHTML=h;updateCartCount();
 }
+
 function buildCard(p,isScroll){
   const img=p.photo?`<img src="${p.photo}" class="product-img">`:`<div class="product-emoji">${p.emoji||'📦'}</div>`;
   const action=p.agotado?'<div style="background:#555;color:white;border-radius:50px;padding:8px;text-align:center;font-size:12px;margin-top:8px;">❌ Agotado</div>':
     (getQty(p.id,'')>0?`<div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('${p.id}','',-1)">−</button><span class="qty-num">${getQty(p.id,'')}</span><button class="qty-btn" onclick="addToCart('${p.id}','')">+</button></div>`:
     `<button class="add-btn" onclick="addToCart('${p.id}','')">+ Agregar</button>`);
-  return`<div class="product-card" style="${isScroll?'min-width:150px;flex-shrink:0;':''}">${p.oferta?'<span style="position:absolute;top:8px;left:8px;background:var(--rojo);color:white;border-radius:50px;padding:3px 8px;font-size:10px;font-weight:800;">🔥</span>':''}${img}<div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">$ ${p.price}</div>${action}</div></div>`;
+  return`<div class="product-card" style="${isScroll?'min-width:150px;flex-shrink:0;':''}">${p.oferta?'<span style="position:absolute;top:8px;left:8px;background:var(--rojo);color:white;border-radius:50px;padding:3px 8px;font-size:10px;font-weight:800;">🔥</span>':''}${img}<div class="product-info"><div class="product-name">${p.name}</div><div class="product-price">$ ${p.price}</div>${action}<button onclick="event.stopPropagation();abrirResena('${p.id}')" style="background:none;border:none;font-size:14px;cursor:pointer;margin-top:4px;">⭐ Reseñas</button></div></div>`;
 }
 function filterCat(c){selectedCategory=c;renderStore();}
 function addToCart(pid,v){const p=products.find(x=>x.id===pid);if(!p||p.agotado){showToast('❌ No disponible');return;}const key=cartKey(pid,v);if(!cart[key])cart[key]={product:p,variant:v||'',qty:0};cart[key].qty++;renderStore();showToast('✅ Agregado');actualizarFloatingCart();}
@@ -201,38 +219,44 @@ function renderTracking(){
   db.collection('pedidos').doc(pid).get().then(snap=>{
     if(!snap.exists){c.innerHTML='<div class="empty"><p>Pedido no encontrado</p></div>';return;}
     const p=snap.data();
-    c.innerHTML=`<div style="text-align:center;padding:20px;"><div style="font-size:50px;">📦</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;">#${pid.slice(-4).toUpperCase()}</div><span style="padding:6px 14px;border-radius:50px;background:#fff3cd;color:#856404;font-weight:800;">${p.estado||'pendiente'}</span><div style="margin:16px 0;font-size:13px;white-space:pre-line;">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div></div>`;
+    const repNombre=p.nombreRepartidor||'',repTel=p.telefonoRepartidor||'';
+    const repHtml=repNombre?`<div style="background:var(--gris);border-radius:12px;padding:12px;margin:10px 0;text-align:center;"><div>🛵 Repartidor: <b>${repNombre}</b></div>${repTel?`<a href="https://wa.me/${repTel.replace(/\D/g,'')}" target="_blank" style="display:inline-block;margin-top:6px;background:#25d366;color:white;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;">📞 Contactar</a>`:''}</div>`:'';
+    const mapaHtml=p.geo?`<a href="https://www.google.com/maps?q=${p.geo.lat},${p.geo.lng}" target="_blank" style="display:block;background:#e8f5e9;color:#1b5e20;padding:10px;border-radius:10px;text-align:center;font-weight:700;margin:10px 0;">🗺️ Ver ubicación en Google Maps</a>`:'';
+    c.innerHTML=`<div style="text-align:center;padding:20px;"><div style="font-size:50px;">📦</div><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;">#${pid.slice(-4).toUpperCase()}</div><span style="padding:6px 14px;border-radius:50px;background:#fff3cd;color:#856404;font-weight:800;">${p.estado||'pendiente'}</span>${mapaHtml}${repHtml}<div style="margin:16px 0;font-size:13px;white-space:pre-line;">${p.productos}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--rojo);">$ ${p.total?.toFixed(2)||'0.00'}</div></div>`;
   });
 }
 
 function renderSoporte(){
-  document.getElementById('soporteContainer').innerHTML=`
-    <div style="background:var(--card);border-radius:16px;padding:18px;">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);">❗ Reportar problema</div>
-      <input type="text" id="sNombre" placeholder="Tu nombre *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);">
-      <input type="tel" id="sTelefono" placeholder="Tu teléfono *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);">
-      <textarea id="sDescripcion" placeholder="Describe el problema *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);min-height:90px;"></textarea>
-      <button onclick="enviarSoporte()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;">📤 Enviar reporte</button>
-    </div>`;
+  document.getElementById('soporteContainer').innerHTML=`<div style="background:var(--card);border-radius:16px;padding:18px;"><div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--rojo);">❗ Reportar problema</div><input type="text" id="sNombre" placeholder="Tu nombre *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><input type="tel" id="sTelefono" placeholder="Tu teléfono *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><textarea id="sDescripcion" placeholder="Describe el problema *" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);min-height:90px;"></textarea><button onclick="enviarSoporte()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;">📤 Enviar reporte</button></div>`;
 }
 async function enviarSoporte(){const n=document.getElementById('sNombre')?.value.trim(),t=document.getElementById('sTelefono')?.value.trim(),d=document.getElementById('sDescripcion')?.value.trim();if(!n||!t||!d){showToast('⚠️ Completa todos los campos');return;}await db.collection('soporte').add({clienteNombre:n,telefono:t,descripcion:d,estado:'nuevo',fecha:new Date().toISOString()});showToast('✅ Reporte enviado');showTab('tienda');}
 
-// ═══════════ CHAT EN VIVO + BOT ═══════════
-const botRespuestas={hola:'👋 ¡Hola! Soy el asistente virtual.\n1️⃣ Ver productos\n2️⃣ Hacer un pedido\n3️⃣ Estado de mi pedido\n4️⃣ Hablar con asesor',1:'Mira nuestros productos en 🏪 Tienda.',2:'Agrega productos al 🛒 y envía tu pedido.',3:'Ve a 📦 Pedido para hacer seguimiento.',4:'Te conecto con un asesor.',default:'Gracias por escribirnos 💚'};
+// ═══════════ CHAT MEJORADO (TIPO CHATGPT) ═══════════
+const botRespuestas={
+  'hola|buenas|saludos|buenos|hey|ola':'👋 ¡Hola! Soy Tony, el asistente virtual de Bodega Tony Tony. ¿En qué puedo ayudarte hoy?\n\n📦 *Productos:* Harina, Café, Arroz, Queso, Glup, Desodorante, Papel, Pan, Vinagre, Sal, Bombillo\n🛒 *Pedidos:* Por WhatsApp\n📍 *Delivery:* Domicilio gratis\n\nEscríbeme: "precios", "cómo pedir", "horario", "productos"',
+  'precio|precios|cuanto|cuesta|valor':'💰 *Lista de precios:*\n🧻 Papel Higiénico: $0.70\n🌽 Harina Pan 1K: $1.80\n🍚 Arroz 900G: $1.60\n☕ Café 200G: $2.70\n🥤 Glup 2L: $1.50\n🧀 Queso Duro: $4.50\n🧴 Desodorante: $0.80\n🦷 Crema Dental: $0.80\n🍬 Boka: $0.40\n💡 Bombillo LED: $1.10\n🧂 Sal Perlamar 1K: $0.80\n🍾 Vinagre 500ML: $0.60\n🍞 Pan: $1.00',
+  'pedir|comprar|ordenar|pedido|como hago':'📝 *Para hacer un pedido:*\n1️⃣ Ve a la pestaña 🏪 Tienda\n2️⃣ Agrega productos al carrito 🛒\n3️⃣ Ve a 🛒 Mi Pedido\n4️⃣ Llena tus datos\n5️⃣ Toca "Enviar pedido por WhatsApp"\n\n¡Te confirmamos al instante! ⚡',
+  'horario|abierto|cierran|atienden|hora':'🕐 *Horario de atención:*\n📅 Todos los días\n🕘 9:00 AM - 10:00 PM\n\n🛵 *Domicilio:* ¡Gratis!',
+  'producto|productos|tienen|venden|hay':'📦 *Productos disponibles:*\n🧻 Higiene: Papel, Desodorante, Crema Dental\n🌽 Víveres: Harina, Arroz, Café, Sal, Vinagre\n🥤 Refrescos: Glup 2L\n🧀 Frescos: Queso Duro\n🍬 Dulces: Boka\n💡 Varios: Bombillo LED\n🍞 Panadería: Pan\n\nTodos los precios en la tienda 🏪',
+  'gracias|agradezco|te quiero|buena onda':'😊 ¡De nada! Gracias a ti por preferirnos. ¿Algo más en lo que pueda ayudarte?',
+  'default':'💚 ¡Gracias por escribir a Bodega Tony Tony!\n\nPuedo ayudarte con:\n📦 "precios" - Lista de precios\n📝 "cómo pedir" - Instrucciones\n🕐 "horario" - Horarios\n📋 "productos" - Qué vendemos\n\nO escríbele directamente a Tony por WhatsApp 📤'
+};
 let chatIniciado=false;
 function toggleChat(){const m=document.getElementById('chatModal');m.classList.toggle('open');if(m.classList.contains('open')&&!chatIniciado){chatIniciado=true;initChat();}}
-function initChat(){if(chatUnsub)return;const phone=localStorage.getItem('clientPhone')||'anonimo';chatUnsub=db.collection('chats').doc(phone).collection('mensajes').orderBy('fecha','asc').onSnapshot(snap=>{const msgs=document.getElementById('chatMessages');if(!msgs)return;msgs.innerHTML=snap.empty?'<div style="text-align:center;color:var(--subtext);padding:20px;">¡Hola! ¿En qué te ayudamos? 😊</div>':snap.docs.map(d=>{const m=d.data();let cls='tienda',n='Bodega Tony';if(m.de==='cliente'){cls='cliente';n='Tú';}else if(m.de==='bot'){cls='bot';n='🤖 Bot';}return`<div class="chat-msg ${cls}"><div style="font-size:10px;opacity:0.7;">${n}</div>${m.texto}</div>`;}).join('');msgs.scrollTop=msgs.scrollHeight;});}
-function sendChat(){const input=document.getElementById('chatInput');const texto=input?.value.trim();if(!texto)return;const phone=localStorage.getItem('clientPhone')||'anonimo';db.collection('chats').doc(phone).collection('mensajes').add({texto,fecha:new Date().toISOString(),de:'cliente'});input.value='';setTimeout(()=>{const tl=texto.toLowerCase();let r=botRespuestas['default'];for(const k in botRespuestas){if(tl.includes(k)){r=botRespuestas[k];break;}}db.collection('chats').doc(phone).collection('mensajes').add({texto:r,fecha:new Date().toISOString(),de:'bot'});},800);}
+function initChat(){if(chatUnsub)return;const phone=localStorage.getItem('clientPhone')||'anonimo';chatUnsub=db.collection('chats').doc(phone).collection('mensajes').orderBy('fecha','asc').onSnapshot(snap=>{const msgs=document.getElementById('chatMessages');if(!msgs)return;msgs.innerHTML=snap.empty?'<div style="text-align:center;color:var(--subtext);padding:20px;">¡Hola! ¿En qué te ayudamos? 😊</div>':snap.docs.map(d=>{const m=d.data();let cls='tienda',n='Bodega Tony';if(m.de==='cliente'){cls='cliente';n='Tú';}else if(m.de==='bot'){cls='bot';n='🤖 Tony';}return`<div class="chat-msg ${cls}"><div style="font-size:10px;opacity:0.7;">${n}</div>${m.texto}</div>`;}).join('');msgs.scrollTop=msgs.scrollHeight;});}
+function sendChat(){const input=document.getElementById('chatInput');const texto=input?.value.trim();if(!texto)return;const phone=localStorage.getItem('clientPhone')||'anonimo';db.collection('chats').doc(phone).collection('mensajes').add({texto,fecha:new Date().toISOString(),de:'cliente'});input.value='';setTimeout(()=>{const tl=texto.toLowerCase();let r=botRespuestas['default'];for(const k in botRespuestas){if(k==='default')continue;const claves=k.split('|');if(claves.some(c=>tl.includes(c))){r=botRespuestas[k];break;}}db.collection('chats').doc(phone).collection('mensajes').add({texto:r,fecha:new Date().toISOString(),de:'bot'});},600);}
+
+// ═══════════ RESEÑAS ═══════════
+function abrirResena(pid){resenaProductoId=pid;resenaEstrellas=5;resenaFotoBase64='';const m=document.getElementById('resenaModal');m.classList.add('open');renderStars();document.getElementById('resenaTexto').value='';document.getElementById('resenaFotoPreview').innerHTML='📸 Toca para agregar foto';cargarResenas(pid);}
+function cerrarResena(){document.getElementById('resenaModal').classList.remove('open');}
+function renderStars(){const s=document.getElementById('resenaStars');s.innerHTML='';for(let i=1;i<=5;i++){const star=document.createElement('span');star.textContent=i<=resenaEstrellas?'⭐':'☆';star.style.cursor='pointer';star.onclick=()=>{resenaEstrellas=i;renderStars();};s.appendChild(star);}}
+function previewResenaFoto(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{resenaFotoBase64=e.target.result;document.getElementById('resenaFotoPreview').innerHTML=`<img src="${resenaFotoBase64}" style="width:100%;height:100%;object-fit:cover;">`;};reader.readAsDataURL(file);}
+async function cargarResenas(pid){try{const snap=await db.collection('productos').doc(pid).collection('resenas').orderBy('fecha','desc').limit(10).get();const container=document.getElementById('resenaTexto').parentElement;let html='<div style="max-height:150px;overflow-y:auto;margin-bottom:10px;">';if(snap.empty)html+='<p style="color:var(--subtext);text-align:center;">Sin reseñas aún</p>';else snap.docs.forEach(d=>{const r=d.data();html+=`<div style="border-bottom:1px solid var(--border);padding:6px 0;"><div style="font-weight:700;">${r.autor||'Cliente'}</div><div>${'⭐'.repeat(r.estrellas||5)}</div><div style="font-size:12px;color:var(--subtext);">${r.texto||''}</div>${r.foto?`<img src="${r.foto}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;margin-top:4px;">`:''}</div>`;});html+='</div>';container.querySelector('div:first-child').insertAdjacentHTML('afterend',html);}catch(e){}}
+async function enviarResena(){const texto=document.getElementById('resenaTexto').value.trim();if(!texto){showToast('⚠️ Escribe tu reseña');return;}const autor=localStorage.getItem('clientName')||'Cliente';await db.collection('productos').doc(resenaProductoId).collection('resenas').add({autor,texto,estrellas:resenaEstrellas,foto:resenaFotoBase64||'',fecha:new Date().toISOString()});showToast('✅ ¡Gracias por tu reseña!');cerrarResena();}
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
-setTimeout(()=>{
-  if(!localStorage.getItem('clientName')){
-    const modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
-    modal.innerHTML=`<div style="background:var(--card);border-radius:24px;padding:28px 20px;width:100%;max-width:320px;text-align:center;"><img src="logo.png" style="width:100px;height:auto;margin-bottom:12px;" onerror="this.style.display='none'"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text);">Bodega Tony Tony</div><input type="text" id="regNombre" placeholder="Tu nombre" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><div style="position:relative;margin-bottom:16px;"><select id="regCodigo" style="position:absolute;left:0;top:0;bottom:0;width:80px;border:2px solid var(--border);border-right:none;border-radius:12px 0 0 12px;font-weight:700;outline:none;background:var(--bg);color:var(--text);"><option value="+58">🇻🇪 +58</option><option value="+57">🇨🇴 +57</option></select><input type="tel" id="regTelefono" placeholder="Número sin código" style="width:100%;padding:12px 16px 12px 90px;border:2px solid var(--border);border-radius:12px;outline:none;background:var(--bg);color:var(--text);"></div><button onclick="window._g()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;">Continuar →</button></div>`;document.body.appendChild(modal);
-    window._g=function(){const n=document.getElementById('regNombre')?.value.trim(),c=document.getElementById('regCodigo')?.value||'+58',t=document.getElementById('regTelefono')?.value.trim();if(!n||!t||t.length<7){showToast('⚠️ Completa tus datos');return;}localStorage.setItem('clientName',n);localStorage.setItem('clientPhone',c+t.replace(/\D/g,''));modal.remove();showToast('¡Bienvenido '+n+'!');};
-  }
-},800);
+setTimeout(()=>{if(!localStorage.getItem('clientName')){const modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';modal.innerHTML=`<div style="background:var(--card);border-radius:24px;padding:28px 20px;width:100%;max-width:320px;text-align:center;"><img src="logo.png" style="width:100px;height:auto;margin-bottom:12px;" onerror="this.style.display='none'"><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text);">Bodega Tony Tony</div><input type="text" id="regNombre" placeholder="Tu nombre" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin-bottom:10px;background:var(--bg);color:var(--text);"><div style="position:relative;margin-bottom:16px;"><select id="regCodigo" style="position:absolute;left:0;top:0;bottom:0;width:80px;border:2px solid var(--border);border-right:none;border-radius:12px 0 0 12px;font-weight:700;outline:none;background:var(--bg);color:var(--text);"><option value="+58">🇻🇪 +58</option><option value="+57">🇨🇴 +57</option></select><input type="tel" id="regTelefono" placeholder="Número sin código" style="width:100%;padding:12px 16px 12px 90px;border:2px solid var(--border);border-radius:12px;outline:none;background:var(--bg);color:var(--text);"></div><button onclick="window._g()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;">Continuar →</button></div>`;document.body.appendChild(modal);window._g=function(){const n=document.getElementById('regNombre')?.value.trim(),c=document.getElementById('regCodigo')?.value||'+58',t=document.getElementById('regTelefono')?.value.trim();if(!n||!t||t.length<7){showToast('⚠️ Completa tus datos');return;}localStorage.setItem('clientName',n);localStorage.setItem('clientPhone',c+t.replace(/\D/g,''));modal.remove();showToast('¡Bienvenido '+n+'!');};}},800);
 setTimeout(()=>{const s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.style.display='none',400);}},1200);
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
 </script>
