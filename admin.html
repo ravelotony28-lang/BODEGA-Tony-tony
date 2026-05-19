@@ -126,7 +126,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
       <button class="btn-primary" onclick="addProduct()" style="width:100%;">✅ Agregar Producto</button>
     </div>
     <div class="admin-section"><h3>📦 Mis Productos</h3><input type="text" id="adminSearch" placeholder="🔍 Buscar..." oninput="renderProductList()" style="width:100%;padding:10px;border:2px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);margin-bottom:10px;"><div class="product-list-admin" id="adminProductList"></div></div>
-    <div style="text-align:center;padding-bottom:20px;"><button onclick="cargarInventario()" style="background:none;border:2px solid var(--border);border-radius:12px;padding:10px 20px;font-weight:700;cursor:pointer;color:var(--subtext);">📦 Cargar inventario inicial</button></div>
+    <div style="text-align:center;padding-bottom:20px;"><button onclick="cargarInventario()" style="background:var(--rojo);color:white;border:none;border-radius:12px;padding:12px 24px;font-weight:800;font-size:15px;cursor:pointer;">📦 Cargar 30 productos con variantes</button></div>
   </div>
 
   <div class="view" id="view-pedidos">
@@ -146,7 +146,7 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
   <div class="view" id="view-cupones"><div class="admin-section"><h3>➕ Crear Cupón</h3><div class="form-row"><input type="text" id="cuponCodigo" placeholder="Código" style="text-transform:uppercase;"><select id="cuponTipo"><option value="porcentaje">%</option><option value="fijo">$ Fijo</option></select></div><div class="form-row"><input type="number" id="cuponDescuento" placeholder="Valor"><input type="date" id="cuponExpira"></div><button class="btn-primary" onclick="crearCupon()" style="width:100%;">✅ Crear</button></div><div class="admin-section"><h3>🎟️ Cupones</h3><div id="cuponesList">Cargando...</div></div></div>
   <div class="view" id="view-resenas"><div class="admin-section"><h3>⭐ Reseñas de Clientes</h3><div id="resenasAdminList">Cargando...</div></div></div>
   <div class="view" id="view-soporte"><div class="admin-section"><h3>📞 Soporte</h3><div id="soporteList">Cargando...</div></div></div>
-  <div class="view" id="view-config"><div class="admin-section"><h3>📱 WhatsApp</h3><div class="form-row"><input type="tel" id="configWhatsapp" placeholder="+58424..."><button class="btn-primary" onclick="saveWhatsapp()">Guardar</button></div></div><div class="admin-section"><h3>💳 Métodos de Pago</h3><div id="metodosConfig"></div></div><div class="admin-section"><h3>⏱️ Tiempo Preparación</h3><div class="form-row"><input type="number" id="configTiempo" placeholder="Minutos"><button class="btn-primary" onclick="saveTiempo()">Guardar</button></div></div><div class="admin-section"><h3>💰 Pedido Mínimo</h3><div class="form-row"><input type="number" id="configPedidoMinimo" placeholder="$"><button class="btn-primary" onclick="savePedidoMinimo()">Guardar</button></div></div><div class="admin-section"><h3>🛵 Envío</h3><div class="form-row"><label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;"><input type="checkbox" id="envioGratis" onchange="saveEnvioGratis()"> Domicilio gratis</label><input type="number" id="configMontoEnvio" placeholder="Monto envío gratis"><button class="btn-primary" onclick="saveMontoEnvio()">Guardar</button></div></div><div class="admin-section"><h3>🕐 Horario</h3><div class="form-row"><input type="number" id="configApertura" placeholder="Apertura (0-23)"><input type="number" id="configCierre" placeholder="Cierre (0-23)"><button class="btn-primary" onclick="saveHorario()">Guardar</button></div></div></div>
+  <div class="view" id="view-config"><div class="admin-section"><h3>📱 Pago Móvil</h3><div class="form-row"><input type="text" id="pmBanco" placeholder="Banco"><input type="text" id="pmNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="pmCedula" placeholder="Cédula"><input type="tel" id="pmTelefono" placeholder="Teléfono"></div><button class="btn-primary" onclick="savePagoMovil()" style="width:100%;">💾 Guardar Pago Móvil</button></div><div class="admin-section"><h3>🏦 Transferencia</h3><div class="form-row"><input type="text" id="trBanco" placeholder="Banco"><input type="text" id="trNombre" placeholder="Nombre"></div><div class="form-row"><input type="text" id="trCuenta" placeholder="Cuenta"></div><button class="btn-primary" onclick="saveTransferencia()" style="width:100%;">💾 Guardar Transferencia</button></div><div class="admin-section"><h3>📱 WhatsApp</h3><div class="form-row"><input type="tel" id="configWhatsapp" placeholder="+58424..."><button class="btn-primary" onclick="saveWhatsapp()">Guardar</button></div></div><div class="admin-section"><h3>💳 Métodos de Pago</h3><div id="metodosConfig"></div></div><div class="admin-section"><h3>⏱️ Tiempo Preparación</h3><div class="form-row"><input type="number" id="configTiempo" placeholder="Minutos"><button class="btn-primary" onclick="saveTiempo()">Guardar</button></div></div><div class="admin-section"><h3>💰 Pedido Mínimo</h3><div class="form-row"><input type="number" id="configPedidoMinimo" placeholder="$"><button class="btn-primary" onclick="savePedidoMinimo()">Guardar</button></div></div><div class="admin-section"><h3>🛵 Envío</h3><div class="form-row"><label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;"><input type="checkbox" id="envioGratis" onchange="saveEnvioGratis()"> Domicilio gratis</label><input type="number" id="configMontoEnvio" placeholder="Monto envío gratis"><button class="btn-primary" onclick="saveMontoEnvio()">Guardar</button></div></div><div class="admin-section"><h3>🕐 Horario</h3><div class="form-row"><input type="number" id="configApertura" placeholder="Apertura (0-23)"><input type="number" id="configCierre" placeholder="Cierre (0-23)"><button class="btn-primary" onclick="saveHorario()">Guardar</button></div></div></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -155,35 +155,17 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
 firebase.initializeApp({apiKey:"AIzaSyBdv2cOMgbeBuW-V9Buz8EzGAoElnvySoI",authDomain:"bodegatonytony.firebaseapp.com",projectId:"bodegatonytony",storageBucket:"bodegatonytony.firebasestorage.app",messagingSenderId:"763208241886",appId:"1:763208241886:web:dd4a04d68c2c72ed24a84f"});
 const db=firebase.firestore();
 
-// ═══════════ PIN DESDE FIRESTORE ═══════════
 let ADMIN_PIN='';
-async function loadAdminPin(){
-  try{
-    const snap=await db.collection('config').doc('seguridad').get();
-    ADMIN_PIN=snap.exists?snap.data().adminPin:'';
-    if(!ADMIN_PIN)ADMIN_PIN='300419'; // Fallback por si no existe
-  }catch(e){ADMIN_PIN='300419';}
-}
+async function loadAdminPin(){try{const snap=await db.collection('config').doc('seguridad').get();ADMIN_PIN=snap.exists?snap.data().adminPin:'300419';}catch(e){ADMIN_PIN='300419';}}
 loadAdminPin();
 
-let products=[],allPedidos=[],repartidores=[],zonas=[],allCupones=[],allSoporte=[],configData={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},envioGratis:true,pedidoMinimo:0,tiempoPreparacion:30};
+let products=[],allPedidos=[],repartidores=[],zonas=[],allCupones=[],allSoporte=[],configData={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},envioGratis:true,pedidoMinimo:0,tiempoPreparacion:30,pagoMovil:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cedula:'6.966.714',telefono:'04241572275'},transferencia:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cuenta:''}};
 let pinEntered='',pedidosFiltro='todos',chartVentas=null,chartProductos=null,chartIngresos=null,chartHoras=null,chatAdminUnsub=null,currentVariants=[];
 
 function pinPress(d){if(pinEntered.length>=6)return;pinEntered+=d;updatePinDots();if(pinEntered.length===6)setTimeout(checkPin,200);}
 function pinClear(){pinEntered=pinEntered.slice(0,-1);updatePinDots();document.getElementById('pinError').textContent='';}
 function updatePinDots(){for(let i=0;i<6;i++){const d=document.getElementById('dot'+i);if(d)d.classList.toggle('filled',i<pinEntered.length);}}
-async function checkPin(){
-  if(!ADMIN_PIN){document.getElementById('pinError').textContent='⏳ Cargando seguridad...';setTimeout(checkPin,500);return;}
-  if(pinEntered===ADMIN_PIN){
-    document.getElementById('lockScreen').style.display='none';
-    document.getElementById('adminPanel').style.display='block';
-    pinEntered='';updatePinDots();initAdmin();
-  }else{
-    document.getElementById('pinError').textContent='❌ PIN incorrecto';
-    pinEntered='';updatePinDots();
-    setTimeout(()=>{document.getElementById('pinError').textContent='';},2000);
-  }
-}
+async function checkPin(){if(!ADMIN_PIN){document.getElementById('pinError').textContent='⏳ Cargando...';setTimeout(checkPin,500);return;}if(pinEntered===ADMIN_PIN){document.getElementById('lockScreen').style.display='none';document.getElementById('adminPanel').style.display='block';pinEntered='';updatePinDots();initAdmin();}else{document.getElementById('pinError').textContent='❌ PIN incorrecto';pinEntered='';updatePinDots();setTimeout(()=>{document.getElementById('pinError').textContent='';},2000);}}
 function lockPanel(){document.getElementById('lockScreen').style.display='flex';document.getElementById('adminPanel').style.display='none';pinEntered='';updatePinDots();}
 
 function initAdmin(){
@@ -194,8 +176,7 @@ function initAdmin(){
   db.collection('soporte').orderBy('fecha','desc').limit(100).onSnapshot(snap=>{allSoporte=snap.docs.map(d=>({id:d.id,...d.data()}));renderSoporteAdmin();});
   db.collection('cupones').orderBy('fecha','desc').onSnapshot(snap=>{allCupones=snap.docs.map(d=>({id:d.id,...d.data()}));renderCupones();});
   db.collection('config').doc('tienda').onSnapshot(snap=>{if(snap.exists){configData={...configData,...snap.data()};fillConfigFields();renderMetodosConfig();}});
-  initChatAdmin();
-  cargarResenasAdmin();
+  initChatAdmin();cargarResenasAdmin();
 }
 
 function fillConfigFields(){
@@ -205,6 +186,8 @@ function fillConfigFields(){
   if(el('configTiempo')&&configData.tiempoPreparacion)el('configTiempo').value=configData.tiempoPreparacion;
   if(el('configPedidoMinimo')&&configData.pedidoMinimo!=null)el('configPedidoMinimo').value=configData.pedidoMinimo;
   if(el('configMontoEnvio')&&configData.montoEnvioGratis!=null)el('configMontoEnvio').value=configData.montoEnvioGratis;
+  if(configData.pagoMovil){if(el('pmBanco'))el('pmBanco').value=configData.pagoMovil.banco||'';if(el('pmNombre'))el('pmNombre').value=configData.pagoMovil.nombre||'';if(el('pmCedula'))el('pmCedula').value=configData.pagoMovil.cedula||'';if(el('pmTelefono'))el('pmTelefono').value=configData.pagoMovil.telefono||'';}
+  if(configData.transferencia){if(el('trBanco'))el('trBanco').value=configData.transferencia.banco||'';if(el('trNombre'))el('trNombre').value=configData.transferencia.nombre||'';if(el('trCuenta'))el('trCuenta').value=configData.transferencia.cuenta||'';}
   if(configData.horario){if(el('configApertura'))el('configApertura').value=configData.horario.apertura;if(el('configCierre'))el('configCierre').value=configData.horario.cierre;}
 }
 
@@ -270,7 +253,7 @@ async function updateEstado(id,estado){
   if(estado==='camino'||estado==='en_camino')updates.fechaSalida=new Date().toISOString();
   if(estado==='entregado')updates.fechaEntrega=new Date().toISOString();
   await db.collection('pedidos').doc(id).update(updates);showToast('✅ Actualizado');
-  const p=allPedidos.find(x=>x.id===id);if(p&&p.telefono){const msgs={confirmado:'✅ ¡Tu pedido fue CONFIRMADO!',preparacion:'🍳 ¡Tu pedido está en PREPARACIÓN!',camino:'🛵 ¡Tu pedido está EN CAMINO!',entregado:'📦 ¡Tu pedido fue ENTREGADO! Gracias 🙏'};if(msgs[estado]){let tel=p.telefono.replace(/\s+/g,'');if(!tel.startsWith('+')){tel=tel.replace(/^0+/,'');tel='+58'+tel;}window.open(`https://wa.me/${tel.replace(/[^0-9+]/g,'')}?text=${encodeURIComponent('🛒 *Bodega Tony Tony*\n\n'+msgs[estado])}`,'_blank');}}
+  const p=allPedidos.find(x=>x.id===id);if(p&&p.telefono){const msgs={confirmado:'✅ ¡Tu pedido fue CONFIRMADO! Ya lo estamos procesando.',preparacion:'🍳 ¡Tu pedido está en PREPARACIÓN!',camino:'🛵 ¡Tu pedido está EN CAMINO!',entregado:'📦 ¡Tu pedido fue ENTREGADO! Gracias por comprar 🙏'};if(msgs[estado]){let tel=p.telefono.replace(/\s+/g,'');if(!tel.startsWith('+')){tel=tel.replace(/^0+/,'');tel='+58'+tel;}window.open(`https://wa.me/${tel.replace(/[^0-9+]/g,'')}?text=${encodeURIComponent('🛒 *Bodega Tony Tony*\n\n'+msgs[estado])}`,'_blank');}}
 }
 
 async function addRepartidor(){const n=document.getElementById('repNombre').value.trim(),t=document.getElementById('repTelefono').value.trim(),p=document.getElementById('repPlaca').value.trim(),v=document.getElementById('repVehiculo').value.trim();if(!n||!t){showToast('⚠️ Completa');return;}await db.collection('repartidores').add({nombre:n,telefono:t,placa:p,vehiculo:v});['repNombre','repTelefono','repPlaca','repVehiculo'].forEach(id=>document.getElementById(id).value='');showToast('✅ Agregado');}
@@ -296,6 +279,8 @@ async function cargarResenasAdmin(){
 
 function renderSoporteAdmin(){const el=document.getElementById('soporteList');if(!el)return;if(!allSoporte.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay reportes</p>';return;}el.innerHTML=allSoporte.map(s=>`<div style="background:var(--gris);border-radius:14px;padding:14px;margin-bottom:10px;"><div style="font-weight:800;">👤 ${s.clienteNombre}</div><div style="font-size:12px;color:var(--subtext);">📞 ${s.telefono}</div><div style="font-size:13px;color:var(--rojo);">⚠️ ${s.tipoProblema||''}</div><div style="font-size:13px;">${s.descripcion||''}</div></div>`).join('');}
 
+async function savePagoMovil(){const b=document.getElementById('pmBanco').value.trim(),n=document.getElementById('pmNombre').value.trim(),c=document.getElementById('pmCedula').value.trim(),t=document.getElementById('pmTelefono').value.trim();if(!b||!n||!t){showToast('⚠️ Completa banco, nombre y teléfono');return;}await db.collection('config').doc('tienda').set({pagoMovil:{banco:b,nombre:n,cedula:c,telefono:t}},{merge:true});showToast('✅ Pago Móvil guardado');}
+async function saveTransferencia(){const b=document.getElementById('trBanco').value.trim(),n=document.getElementById('trNombre').value.trim(),c=document.getElementById('trCuenta').value.trim();if(!b||!n){showToast('⚠️ Completa banco y nombre');return;}await db.collection('config').doc('tienda').set({transferencia:{banco:b,nombre:n,cuenta:c}},{merge:true});showToast('✅ Transferencia guardada');}
 async function saveWhatsapp(){const w=document.getElementById('configWhatsapp').value.trim();if(!w){showToast('⚠️ Escribe número');return;}await db.collection('config').doc('tienda').set({whatsapp:w},{merge:true});showToast('✅ WhatsApp: '+w);}
 async function saveEnvioGratis(){const v=document.getElementById('envioGratis').checked;await db.collection('config').doc('tienda').set({envioGratis:v},{merge:true});showToast(v?'✅ Activado':'❌ Desactivado');}
 async function saveTiempo(){const v=parseInt(document.getElementById('configTiempo').value);if(isNaN(v)||v<1){showToast('⚠️ Inválido');return;}await db.collection('config').doc('tienda').set({tiempoPreparacion:v},{merge:true});showToast('✅ Guardado');}
@@ -305,7 +290,46 @@ async function saveHorario(){const a=parseInt(document.getElementById('configApe
 async function toggleMetodo(m,v){const mp={...configData.metodosPago,[m]:v};await db.collection('config').doc('tienda').set({metodosPago:mp},{merge:true});showToast('✅ Actualizado');}
 function renderMetodosConfig(){const el=document.getElementById('metodosConfig');if(!el)return;const labels={efectivo:'💵 Efectivo',pagoMovil:'📱 Pago Móvil',transferencia:'🏦 Transferencia'};el.innerHTML=Object.entries(labels).map(([k,l])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);"><span style="font-weight:700;">${l}</span><label class="toggle-switch"><input type="checkbox" ${configData.metodosPago[k]?'checked':''} onchange="toggleMetodo('${k}',this.checked)"><span class="toggle-slider"></span></label></div>`).join('');}
 
-async function cargarInventario(){if(!confirm('¿Cargar 13 productos?'))return;const inv=[{emoji:'🧻',name:'Papel Higiénico',price:0.70,category:'Higiene'},{emoji:'🌽',name:'Harina Pan 1K',price:1.80,category:'Víveres'},{emoji:'🍚',name:'Arroz 900G',price:1.60,category:'Víveres'},{emoji:'☕',name:'Café 200G',price:2.70,category:'Víveres'},{emoji:'🥤',name:'Glup',price:1.50,category:'Refrescos',variants:['Cola 2L','Kolita 2L','Uva 2L']},{emoji:'🧀',name:'Queso Duro',price:4.50,category:'Frescos'},{emoji:'🧴',name:'Desodorante',price:0.80,category:'Higiene'},{emoji:'🦷',name:'Crema Dental',price:0.80,category:'Higiene'},{emoji:'🍬',name:'Boka',price:0.40,category:'Dulces',variants:['Parchita','Salpicón','Limón','Naranja']},{emoji:'💡',name:'Bombillo LED',price:1.10,category:'Varios'},{emoji:'🧂',name:'Sal Perlamar 1K',price:0.80,category:'Víveres'},{emoji:'🍾',name:'Vinagre 500ML',price:0.60,category:'Víveres'},{emoji:'🍞',name:'Pan',price:1.00,category:'Panadería'}];for(const p of inv){await db.collection('productos').add({...p,photo:'',visible:true,agotado:false,oferta:p.price<1?true:false,precioAnterior:p.price<1?(p.price*1.5).toFixed(2):0,variants:p.variants||[],etiqueta:'',tipo:'normal',stock:null});}showToast('✅ '+inv.length+' productos cargados');}
+async function cargarInventario(){
+  if(!confirm('¿Cargar 30 productos con variantes?'))return;
+  const inv=[
+    {emoji:'🧻',name:'Papel Higiénico Luciano 4/84M',price:0.70,category:'Higiene Personal'},
+    {emoji:'🧴',name:'Desodorante Hombre Speed Stick 9G',price:0.50,category:'Higiene Personal'},
+    {emoji:'🧴',name:'Desodorante Mujer Speed Stick 9G',price:0.80,category:'Higiene Personal'},
+    {emoji:'🦷',name:'Crema Dental Alident 75G',price:0.80,category:'Higiene Personal'},
+    {emoji:'🦷',name:'Pasta de Dientes Colgate 90G',price:0.80,category:'Higiene Personal'},
+    {emoji:'🧼',name:'Jabón Anita Almendra 80G',price:1.20,category:'Higiene Personal'},
+    {emoji:'🧼',name:'Jabón Bebé Las Llaves 160G',price:1.00,category:'Higiene Personal'},
+    {emoji:'🪒',name:'Afeitadora Hombre Dorco',price:0.70,category:'Higiene Personal'},
+    {emoji:'🪒',name:'Afeitadora Mujer Dorco',price:0.70,category:'Higiene Personal'},
+    {emoji:'🩸',name:'Toallas Sanitarias Wanita 10pcs',price:1.40,category:'Higiene Personal'},
+    {emoji:'🧴',name:'Shampoo H&S Limpieza Renovadora 18ML',price:0.40,category:'Cabello'},
+    {emoji:'💆',name:'Nutribela Reparación Intensiva 27ML',price:0.60,category:'Cabello'},
+    {emoji:'🫧',name:'Cloro Ultra ABI 900ML',price:0.70,category:'Limpieza del Hogar'},
+    {emoji:'🍽️',name:'Lava Platos Axion 150G',price:1.30,category:'Limpieza del Hogar'},
+    {emoji:'🧺',name:'Detergente Alive Floral 500G',price:1.50,category:'Limpieza del Hogar'},
+    {emoji:'🍼',name:'Pañal Baby Finger M 18UN',price:0.30,category:'Bebé'},
+    {emoji:'🍼',name:'Pañal Baby Finger G 18UN',price:0.30,category:'Bebé'},
+    {emoji:'🌽',name:'Harina Pan 1K',price:1.80,category:'Víveres'},
+    {emoji:'🌾',name:'Harina Kaly 1K',price:1.40,category:'Víveres'},
+    {emoji:'🍚',name:'Arroz Kaly 900G',price:1.60,category:'Víveres'},
+    {emoji:'☕',name:'Café Arauca 200G',price:2.70,category:'Víveres'},
+    {emoji:'🥚',name:'Huevos',price:0.20,category:'Víveres'},
+    {emoji:'🐟',name:'Atún Willinger 170G',price:1.80,category:'Víveres'},
+    {emoji:'🥤',name:'Glup',price:1.50,category:'Refrescos',variants:['Cola 2L','Kolita 2L','Uva 2L']},
+    {emoji:'🧃',name:'Justy',price:1.50,category:'Refrescos',variants:['Durazno','Pera','Manzana']},
+    {emoji:'🍬',name:'Boka',price:0.40,category:'Dulces',variants:['Parchita','Salpicón','Limón','Naranja']},
+    {emoji:'🧀',name:'Queso Duro',price:4.50,category:'Frescos'},
+    {emoji:'✏️',name:'Bolígrafo Azul',price:0.30,category:'Papelería'},
+    {emoji:'💊',name:'Acetaminofén 500MG',price:0.10,category:'Farmacia'},
+    {emoji:'💡',name:'Bombillo LED Veneluz 15W',price:1.10,category:'Varios'}
+  ];
+  showToast('⏳ Cargando '+inv.length+' productos...');
+  for(const p of inv){
+    await db.collection('productos').add({emoji:p.emoji,name:p.name,price:p.price,category:p.category,variants:p.variants||[],photo:'',visible:true,agotado:false,oferta:false,precioAnterior:0,etiqueta:'',tipo:'normal',stock:null});
+  }
+  showToast('✅ ¡'+inv.length+' productos cargados!');
+}
 
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 </script>
