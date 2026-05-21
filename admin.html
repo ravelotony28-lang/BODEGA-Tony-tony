@@ -30,6 +30,8 @@ header{background:var(--oscuro);color:white;padding:16px 20px;display:flex;align
 .form-row{display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
 .form-row input,.form-row select{flex:1;min-width:120px;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-size:14px;outline:none;background:var(--bg);color:var(--text);}
 .btn-primary{background:var(--rojo);color:white;border:none;border-radius:10px;padding:10px 20px;font-weight:800;font-size:14px;cursor:pointer;}
+.photo-upload{width:100%;height:100px;border:2px dashed #ddd;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#999;font-size:13px;font-weight:700;overflow:hidden;margin-bottom:10px;}
+.photo-upload img{width:100%;height:100%;object-fit:cover;}
 .product-list-admin{display:flex;flex-direction:column;gap:10px;}
 .product-item-admin{display:flex;align-items:center;gap:10px;background:var(--gris);border-radius:12px;padding:10px 14px;}
 .product-item-admin .thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;}
@@ -118,6 +120,10 @@ input:checked+.toggle-slider:before{transform:translateX(20px);}
 
   <div class="view" id="view-productos">
     <div class="admin-section"><h3>➕ Agregar Producto</h3>
+      <label for="newPhoto" style="cursor:pointer;display:block;margin-bottom:10px;">
+        <div class="photo-upload" id="photoPreview"><span style="font-size:30px;">📸</span><span>Toca para agregar foto</span></div>
+        <input type="file" id="newPhoto" accept="image/*" style="display:none;" onchange="previewPhoto(this)">
+      </label>
       <div class="form-row"><input type="text" id="newEmoji" placeholder="Emoji" maxlength="4" style="max-width:80px;text-align:center;font-size:20px;"><input type="text" id="newName" placeholder="Nombre del producto"></div>
       <div class="form-row"><input type="number" id="newPrice" placeholder="Precio ($)" min="0" step="0.01"><input type="text" id="newCategory" placeholder="Categoría"></div>
       <div class="form-row"><label style="display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer;"><input type="checkbox" id="newOferta">🔥 Oferta</label><input type="number" id="newPrecioAnterior" placeholder="Precio anterior" style="flex:1;"><label style="display:flex;align-items:center;gap:6px;font-weight:700;cursor:pointer;"><input type="checkbox" id="newVisible" checked>👁️ Visible</label></div>
@@ -160,7 +166,7 @@ async function loadAdminPin(){try{const snap=await db.collection('config').doc('
 loadAdminPin();
 
 let products=[],allPedidos=[],repartidores=[],zonas=[],allCupones=[],allSoporte=[],configData={whatsapp:'+584242520138',metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},envioGratis:true,pedidoMinimo:0,tiempoPreparacion:30,pagoMovil:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cedula:'6.966.714',telefono:'04241572275'},transferencia:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cuenta:''}};
-let pinEntered='',pedidosFiltro='todos',chartVentas=null,chartProductos=null,chartIngresos=null,chartHoras=null,chatAdminUnsub=null,currentVariants=[];
+let pinEntered='',pedidosFiltro='todos',chartVentas=null,chartProductos=null,chartIngresos=null,chartHoras=null,chatAdminUnsub=null,currentVariants=[],pendingPhotoBase64='';
 
 function pinPress(d){if(pinEntered.length>=6)return;pinEntered+=d;updatePinDots();if(pinEntered.length===6)setTimeout(checkPin,200);}
 function pinClear(){pinEntered=pinEntered.slice(0,-1);updatePinDots();document.getElementById('pinError').textContent='';}
@@ -231,11 +237,13 @@ function initChatAdmin(){db.collection('chats').orderBy('fecha','desc').onSnapsh
 function cargarChatAdmin(){const tel=document.getElementById('chatClienteSelect')?.value;if(!tel)return;if(chatAdminUnsub)chatAdminUnsub();chatAdminUnsub=db.collection('chats').doc(tel).collection('mensajes').orderBy('fecha','asc').onSnapshot(snap=>{const el=document.getElementById('chatAdminMessages');if(!el)return;if(snap.empty){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay mensajes</p>';return;}el.innerHTML=snap.docs.map(d=>{const m=d.data();return`<div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${m.de==='admin'||m.de==='bot'?'var(--rojo)':'var(--gris)'};color:${m.de==='admin'||m.de==='bot'?'white':'var(--text)'};align-self:${m.de==='admin'||m.de==='bot'?'flex-end':'flex-start'};">${m.texto}</div>`;}).join('');});}
 function sendChatAdmin(){const tel=document.getElementById('chatClienteSelect')?.value;const txt=document.getElementById('chatAdminInput')?.value.trim();if(!tel||!txt)return;db.collection('chats').doc(tel).collection('mensajes').add({texto:txt,fecha:new Date().toISOString(),de:'admin'});document.getElementById('chatAdminInput').value='';}
 
+function previewPhoto(input){const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=e=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');const MAX=400;let w=img.width,h=img.height;if(w>h){if(w>MAX){h=h*MAX/w;w=MAX;}}else{if(h>MAX){w=w*MAX/h;h=MAX;}}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);pendingPhotoBase64=canvas.toDataURL('image/jpeg',0.7);document.getElementById('photoPreview').innerHTML=`<img src="${pendingPhotoBase64}" style="width:100%;height:100%;object-fit:cover;">`;};img.src=e.target.result;};reader.readAsDataURL(file);}
+
 function addVariantTag(){const v=document.getElementById('variantInput').value.trim();if(!v||currentVariants.includes(v))return;currentVariants.push(v);renderVariantTags();document.getElementById('variantInput').value='';}
 function renderVariantTags(){document.getElementById('variantTags').innerHTML=currentVariants.map(v=>`<div class="variant-tag">${v}<button onclick="removeVariantTag('${v}')">×</button></div>`).join('');}
 function removeVariantTag(v){currentVariants=currentVariants.filter(x=>x!==v);renderVariantTags();}
 
-async function addProduct(){const name=document.getElementById('newName').value.trim();const price=parseFloat(document.getElementById('newPrice').value);const category=document.getElementById('newCategory').value.trim()||'General';if(!name||isNaN(price)||price<=0){showToast('⚠️ Revisa nombre y precio');return;}const oferta=document.getElementById('newOferta').checked||false;const precioAnterior=parseFloat(document.getElementById('newPrecioAnterior').value)||0;const visible=document.getElementById('newVisible').checked!==false;const agotado=document.getElementById('newAgotado').checked||false;const stockVal=document.getElementById('newStock').value;const stock=stockVal!==''?parseInt(stockVal):null;await db.collection('productos').add({emoji:document.getElementById('newEmoji').value.trim()||'📦',name,price,category,oferta,precioAnterior:oferta&&precioAnterior?precioAnterior:0,visible,agotado,stock,variants:[...currentVariants],photo:'',etiqueta:'',tipo:'normal'});['newEmoji','newName','newPrice','newCategory','newPrecioAnterior','newStock'].forEach(id=>document.getElementById(id).value='');document.getElementById('variantInput').value='';currentVariants=[];renderVariantTags();showToast('✅ Producto agregado');}
+async function addProduct(){const name=document.getElementById('newName').value.trim();const price=parseFloat(document.getElementById('newPrice').value);const category=document.getElementById('newCategory').value.trim()||'General';if(!name||isNaN(price)||price<=0){showToast('⚠️ Revisa nombre y precio');return;}const oferta=document.getElementById('newOferta').checked||false;const precioAnterior=parseFloat(document.getElementById('newPrecioAnterior').value)||0;const visible=document.getElementById('newVisible').checked!==false;const agotado=document.getElementById('newAgotado').checked||false;const stockVal=document.getElementById('newStock').value;const stock=stockVal!==''?parseInt(stockVal):null;await db.collection('productos').add({emoji:document.getElementById('newEmoji').value.trim()||'📦',name,price,category,oferta,precioAnterior:oferta&&precioAnterior?precioAnterior:0,visible,agotado,stock,variants:[...currentVariants],photo:pendingPhotoBase64,etiqueta:'',tipo:'normal'});['newEmoji','newName','newPrice','newCategory','newPrecioAnterior','newStock'].forEach(id=>document.getElementById(id).value='');document.getElementById('variantInput').value='';currentVariants=[];renderVariantTags();pendingPhotoBase64='';document.getElementById('photoPreview').innerHTML='<span style="font-size:30px;">📸</span><span>Toca para agregar foto</span>';showToast('✅ Producto agregado');}
 async function deleteProduct(id){if(!confirm('¿Eliminar?'))return;await db.collection('productos').doc(id).delete();showToast('🗑️ Eliminado');}
 function renderProductList(){const el=document.getElementById('adminProductList');if(!el)return;const q=(document.getElementById('adminSearch')?.value||'').toLowerCase();const filtered=q?products.filter(p=>p.name.toLowerCase().includes(q)):products;if(!filtered.length){el.innerHTML='<p style="color:var(--subtext);text-align:center;">No hay productos</p>';return;}el.innerHTML=filtered.map(p=>`<div class="product-item-admin">${p.photo?`<img src="${p.photo}" class="thumb">`:`<div class="pemoji">${p.emoji||'📦'}</div>`}<div class="info"><div style="font-weight:700;">${p.name}${p.agotado?' ❌':''}${p.variants&&p.variants.length?' — '+p.variants.join(', '):''}</div><div style="font-size:12px;color:var(--subtext);">${p.category||'General'} — $${p.price}${p.oferta?' 🔥':''}</div></div><button onclick="toggleAgotado('${p.id}',${!!p.agotado})" style="background:none;border:none;font-size:18px;cursor:pointer;">${p.agotado?'🔴':'🟢'}</button><button class="del-btn" onclick="deleteProduct('${p.id}')">🗑️</button></div>`).join('');}
 async function toggleAgotado(id,a){await db.collection('productos').doc(id).update({agotado:!a});showToast(!a?'❌ Agotado':'✅ Disponible');}
@@ -292,42 +300,9 @@ function renderMetodosConfig(){const el=document.getElementById('metodosConfig')
 
 async function cargarInventario(){
   if(!confirm('¿Cargar 30 productos con variantes?'))return;
-  const inv=[
-    {emoji:'🧻',name:'Papel Higiénico Luciano 4/84M',price:0.70,category:'Higiene Personal'},
-    {emoji:'🧴',name:'Desodorante Hombre Speed Stick 9G',price:0.50,category:'Higiene Personal'},
-    {emoji:'🧴',name:'Desodorante Mujer Speed Stick 9G',price:0.80,category:'Higiene Personal'},
-    {emoji:'🦷',name:'Crema Dental Alident 75G',price:0.80,category:'Higiene Personal'},
-    {emoji:'🦷',name:'Pasta de Dientes Colgate 90G',price:0.80,category:'Higiene Personal'},
-    {emoji:'🧼',name:'Jabón Anita Almendra 80G',price:1.20,category:'Higiene Personal'},
-    {emoji:'🧼',name:'Jabón Bebé Las Llaves 160G',price:1.00,category:'Higiene Personal'},
-    {emoji:'🪒',name:'Afeitadora Hombre Dorco',price:0.70,category:'Higiene Personal'},
-    {emoji:'🪒',name:'Afeitadora Mujer Dorco',price:0.70,category:'Higiene Personal'},
-    {emoji:'🩸',name:'Toallas Sanitarias Wanita 10pcs',price:1.40,category:'Higiene Personal'},
-    {emoji:'🧴',name:'Shampoo H&S Limpieza Renovadora 18ML',price:0.40,category:'Cabello'},
-    {emoji:'💆',name:'Nutribela Reparación Intensiva 27ML',price:0.60,category:'Cabello'},
-    {emoji:'🫧',name:'Cloro Ultra ABI 900ML',price:0.70,category:'Limpieza del Hogar'},
-    {emoji:'🍽️',name:'Lava Platos Axion 150G',price:1.30,category:'Limpieza del Hogar'},
-    {emoji:'🧺',name:'Detergente Alive Floral 500G',price:1.50,category:'Limpieza del Hogar'},
-    {emoji:'🍼',name:'Pañal Baby Finger M 18UN',price:0.30,category:'Bebé'},
-    {emoji:'🍼',name:'Pañal Baby Finger G 18UN',price:0.30,category:'Bebé'},
-    {emoji:'🌽',name:'Harina Pan 1K',price:1.80,category:'Víveres'},
-    {emoji:'🌾',name:'Harina Kaly 1K',price:1.40,category:'Víveres'},
-    {emoji:'🍚',name:'Arroz Kaly 900G',price:1.60,category:'Víveres'},
-    {emoji:'☕',name:'Café Arauca 200G',price:2.70,category:'Víveres'},
-    {emoji:'🥚',name:'Huevos',price:0.20,category:'Víveres'},
-    {emoji:'🐟',name:'Atún Willinger 170G',price:1.80,category:'Víveres'},
-    {emoji:'🥤',name:'Glup',price:1.50,category:'Refrescos',variants:['Cola 2L','Kolita 2L','Uva 2L']},
-    {emoji:'🧃',name:'Justy',price:1.50,category:'Refrescos',variants:['Durazno','Pera','Manzana']},
-    {emoji:'🍬',name:'Boka',price:0.40,category:'Dulces',variants:['Parchita','Salpicón','Limón','Naranja']},
-    {emoji:'🧀',name:'Queso Duro',price:4.50,category:'Frescos'},
-    {emoji:'✏️',name:'Bolígrafo Azul',price:0.30,category:'Papelería'},
-    {emoji:'💊',name:'Acetaminofén 500MG',price:0.10,category:'Farmacia'},
-    {emoji:'💡',name:'Bombillo LED Veneluz 15W',price:1.10,category:'Varios'}
-  ];
+  const inv=[{emoji:'🧻',name:'Papel Higiénico Luciano 4/84M',price:0.70,category:'Higiene Personal'},{emoji:'🧴',name:'Desodorante Hombre Speed Stick 9G',price:0.50,category:'Higiene Personal'},{emoji:'🧴',name:'Desodorante Mujer Speed Stick 9G',price:0.80,category:'Higiene Personal'},{emoji:'🦷',name:'Crema Dental Alident 75G',price:0.80,category:'Higiene Personal'},{emoji:'🦷',name:'Pasta de Dientes Colgate 90G',price:0.80,category:'Higiene Personal'},{emoji:'🧼',name:'Jabón Anita Almendra 80G',price:1.20,category:'Higiene Personal'},{emoji:'🧼',name:'Jabón Bebé Las Llaves 160G',price:1.00,category:'Higiene Personal'},{emoji:'🪒',name:'Afeitadora Hombre Dorco',price:0.70,category:'Higiene Personal'},{emoji:'🪒',name:'Afeitadora Mujer Dorco',price:0.70,category:'Higiene Personal'},{emoji:'🩸',name:'Toallas Sanitarias Wanita 10pcs',price:1.40,category:'Higiene Personal'},{emoji:'🧴',name:'Shampoo H&S Limpieza Renovadora 18ML',price:0.40,category:'Cabello'},{emoji:'💆',name:'Nutribela Reparación Intensiva 27ML',price:0.60,category:'Cabello'},{emoji:'🫧',name:'Cloro Ultra ABI 900ML',price:0.70,category:'Limpieza del Hogar'},{emoji:'🍽️',name:'Lava Platos Axion 150G',price:1.30,category:'Limpieza del Hogar'},{emoji:'🧺',name:'Detergente Alive Floral 500G',price:1.50,category:'Limpieza del Hogar'},{emoji:'🍼',name:'Pañal Baby Finger M 18UN',price:0.30,category:'Bebé'},{emoji:'🍼',name:'Pañal Baby Finger G 18UN',price:0.30,category:'Bebé'},{emoji:'🌽',name:'Harina Pan 1K',price:1.80,category:'Víveres'},{emoji:'🌾',name:'Harina Kaly 1K',price:1.40,category:'Víveres'},{emoji:'🍚',name:'Arroz Kaly 900G',price:1.60,category:'Víveres'},{emoji:'☕',name:'Café Arauca 200G',price:2.70,category:'Víveres'},{emoji:'🥚',name:'Huevos',price:0.20,category:'Víveres'},{emoji:'🐟',name:'Atún Willinger 170G',price:1.80,category:'Víveres'},{emoji:'🥤',name:'Glup',price:1.50,category:'Refrescos',variants:['Cola 2L','Kolita 2L','Uva 2L']},{emoji:'🧃',name:'Justy',price:1.50,category:'Refrescos',variants:['Durazno','Pera','Manzana']},{emoji:'🍬',name:'Boka',price:0.40,category:'Dulces',variants:['Parchita','Salpicón','Limón','Naranja']},{emoji:'🧀',name:'Queso Duro',price:4.50,category:'Frescos'},{emoji:'✏️',name:'Bolígrafo Azul',price:0.30,category:'Papelería'},{emoji:'💊',name:'Acetaminofén 500MG',price:0.10,category:'Farmacia'},{emoji:'💡',name:'Bombillo LED Veneluz 15W',price:1.10,category:'Varios'}];
   showToast('⏳ Cargando '+inv.length+' productos...');
-  for(const p of inv){
-    await db.collection('productos').add({emoji:p.emoji,name:p.name,price:p.price,category:p.category,variants:p.variants||[],photo:'',visible:true,agotado:false,oferta:false,precioAnterior:0,etiqueta:'',tipo:'normal',stock:null});
-  }
+  for(const p of inv){await db.collection('productos').add({emoji:p.emoji,name:p.name,price:p.price,category:p.category,variants:p.variants||[],photo:'',visible:true,agotado:false,oferta:false,precioAnterior:0,etiqueta:'',tipo:'normal',stock:null});}
   showToast('✅ ¡'+inv.length+' productos cargados!');
 }
 
