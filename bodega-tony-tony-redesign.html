@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rediseño Visual — Bodega Tony Tony</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand-red:#e63946; --brand-yellow:#f4d35e;
+    --brand-dark:#1a1a2e; --brand-green:#2dc653;
+    --bg-paper:#fcfcf9;
+  }
+  body{font-family:'Nunito',sans-serif;color:var(--brand-dark);background:#fafafa;}
+  .font-display{font-family:'Bebas Neue',sans-serif;letter-spacing:.02em;}
+  .text-brand-red{color:var(--brand-red);} .bg-brand-red{background:var(--brand-red);}
+  .text-brand-yellow{color:var(--brand-yellow);} .bg-brand-yellow{background:var(--brand-yellow);}
+  .text-brand-dark{color:var(--brand-dark);} .bg-brand-dark{background:var(--brand-dark);}
+  .text-brand-green{color:var(--brand-green);} .bg-brand-green{background:var(--brand-green);}
+  .bg-bg-paper{background:var(--bg-paper);}
+  .ring-brand-yellow\/30{--tw-ring-color:rgba(244,211,94,.3);}
+  .no-scrollbar::-webkit-scrollbar{display:none;}
+  .no-scrollbar{scrollbar-width:none;}
+  @keyframes fadeInSlide{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .animate-in{animation:fadeInSlide .6s cubic-bezier(0.16,1,0.3,1) both;}
+</style>
+</head>
+<body class="min-h-screen bg-neutral-50 text-brand-dark">
+
+  <!-- ADMIN -->
+  <div class="relative pb-20">
+    <div class="absolute top-6 left-6 z-20 bg-brand-red text-white px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full">Admin</div>
+
+    <header class="bg-brand-dark text-white px-8 py-4 flex items-center justify-between sticky top-0 z-10">
+      <div class="flex items-center gap-8">
+        <h1 class="font-display text-4xl tracking-tight">
+          <span class="text-brand-yellow">TONY</span> <span class="text-brand-red">TONY</span>
+        </h1>
+        <nav class="flex gap-6 overflow-x-auto no-scrollbar pt-1">
+          <a class="text-brand-yellow border-b-2 border-[color:var(--brand-yellow)] pb-1 text-sm font-semibold whitespace-nowrap">Dashboard</a>
+          <a class="text-white/60 hover:text-white pb-1 text-sm font-semibold whitespace-nowrap">Productos</a>
+          <a class="text-white/60 hover:text-white pb-1 text-sm font-semibold whitespace-nowrap">Pedidos</a>
+          <a class="text-white/60 hover:text-white pb-1 text-sm font-semibold whitespace-nowrap">Repartidores</a>
+          <a class="text-white/60 hover:text-white pb-1 text-sm font-semibold whitespace-nowrap">Zonas</a>
+          <a class="text-white/60 hover:text-white pb-1 text-sm font-semibold whitespace-nowrap">Cupones</a>
+          <a class="text-white/60 hover:text-white pb-1 text-sm font-semibold whitespace-nowrap">Config</a>
+        </nav>
+      </div>
+      <div class="size-8 rounded-full bg-brand-yellow/20 border border-brand-yellow/30 grid place-items-center text-brand-yellow font-bold text-xs">T</div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-8 animate-in">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+        <div class="bg-white p-6 rounded-[20px] shadow-sm ring-1 ring-black/5">
+          <p class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">Ventas Hoy</p>
+          <div class="flex items-baseline gap-2"><h2 class="font-display text-4xl leading-none">$42.500</h2><span class="text-brand-green text-xs font-bold">+12%</span></div>
+        </div>
+        <div class="bg-white p-6 rounded-[20px] shadow-sm ring-1 ring-black/5">
+          <p class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">Pedidos</p>
+          <div class="flex items-baseline gap-2"><h2 class="font-display text-4xl leading-none">18</h2><span class="text-brand-red text-xs font-bold">-2</span></div>
+        </div>
+        <div class="bg-white p-6 rounded-[20px] shadow-sm ring-1 ring-black/5">
+          <p class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">Ticket Prom.</p>
+          <h2 class="font-display text-4xl leading-none">$2.360</h2>
+        </div>
+        <div class="bg-white p-6 rounded-[20px] shadow-sm ring-1 ring-black/5">
+          <p class="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-2">Clientes</p>
+          <div class="flex items-baseline gap-2"><h2 class="font-display text-4xl leading-none">142</h2><span class="text-brand-green text-xs font-bold">+8</span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 bg-white rounded-[24px] shadow-sm ring-1 ring-black/5 p-6 flex flex-col">
+          <h3 class="font-display text-2xl mb-6">Ventas — Últimos 7 Días</h3>
+          <div class="mt-auto flex items-end justify-between h-48 gap-2">
+            <div class="w-full rounded-t-lg" style="background:rgba(244,211,94,.2);height:40%"></div>
+            <div class="w-full rounded-t-lg" style="background:rgba(244,211,94,.35);height:60%"></div>
+            <div class="w-full rounded-t-lg" style="background:rgba(244,211,94,.5);height:45%"></div>
+            <div class="w-full rounded-t-lg" style="background:rgba(230,57,70,.25);height:80%"></div>
+            <div class="w-full rounded-t-lg" style="background:rgba(230,57,70,.45);height:95%"></div>
+            <div class="w-full rounded-t-lg" style="background:rgba(230,57,70,.65);height:70%"></div>
+            <div class="w-full rounded-t-lg bg-brand-red" style="height:85%"></div>
+          </div>
+          <div class="flex justify-between mt-4 text-[10px] font-bold text-neutral-400 uppercase px-2">
+            <span>Lun</span><span>Mar</span><span>Mie</span><span>Jue</span><span>Vie</span><span>Sab</span><span>Dom</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-[24px] shadow-sm ring-1 ring-black/5 overflow-hidden">
+          <div class="p-6 border-b border-neutral-100 flex justify-between items-center">
+            <h3 class="font-display text-2xl">Stock Rápido</h3>
+            <button class="text-brand-red text-xs font-bold uppercase hover:underline">Ver todos</button>
+          </div>
+          <div class="divide-y divide-neutral-50">
+            <div class="p-4 flex items-center gap-4 hover:bg-neutral-50">
+              <div class="size-12 bg-neutral-100 rounded-xl grid place-items-center text-2xl">🍷</div>
+              <div class="flex-1"><p class="text-sm font-bold">Fernet Branca 750ml</p><p class="text-xs text-neutral-400">$8.400</p></div>
+              <div class="w-10 h-5 bg-brand-green rounded-full relative"><div class="absolute right-0.5 top-0.5 size-4 bg-white rounded-full shadow-sm"></div></div>
+            </div>
+            <div class="p-4 flex items-center gap-4 hover:bg-neutral-50">
+              <div class="size-12 bg-neutral-100 rounded-xl grid place-items-center text-2xl">🥤</div>
+              <div class="flex-1"><p class="text-sm font-bold">Coca Cola 2.25L</p><p class="text-xs text-neutral-400">$2.100</p></div>
+              <div class="w-10 h-5 bg-neutral-200 rounded-full relative"><div class="absolute left-0.5 top-0.5 size-4 bg-white rounded-full shadow-sm"></div></div>
+            </div>
+            <div class="p-4 flex items-center gap-4 hover:bg-neutral-50">
+              <div class="size-12 bg-neutral-100 rounded-xl grid place-items-center text-2xl">🍟</div>
+              <div class="flex-1"><p class="text-sm font-bold">Papas Fritas Lay's</p><p class="text-xs text-neutral-400">$1.200</p></div>
+              <div class="w-10 h-5 bg-brand-green rounded-full relative"><div class="absolute right-0.5 top-0.5 size-4 bg-white rounded-full shadow-sm"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pedido card ejemplo -->
+      <div class="mt-8 bg-white rounded-[20px] shadow-sm ring-1 ring-black/5 p-6 flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <span class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold uppercase rounded-full tracking-wider">Preparando</span>
+          <p class="font-display text-2xl mt-2">Pedido #842 · $5.640</p>
+          <p class="text-xs text-neutral-500">Cliente: Carlos M. · 3 productos</p>
+        </div>
+        <div class="flex gap-2">
+          <button class="px-4 py-2 rounded-xl bg-neutral-100 text-sm font-bold hover:bg-neutral-200">Detalle</button>
+          <button class="px-4 py-2 rounded-xl bg-brand-red text-white text-sm font-bold">Avanzar estado</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="h-2 bg-brand-yellow w-full"></div>
+
+  <!-- STOREFRONT -->
+  <div class="bg-bg-paper relative pb-32">
+    <div class="absolute top-6 left-6 z-20 bg-brand-yellow text-brand-dark px-3 py-1 text-[10px] font-bold tracking-widest uppercase rounded-full shadow-sm">Tienda</div>
+
+    <section class="relative h-[500px] overflow-hidden">
+      <div class="w-full h-full bg-gradient-to-br from-brand-dark via-[#2a1a1f] to-[#3a1010] grid place-items-center"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-80"></div>
+      <div class="absolute inset-0 flex flex-col items-center justify-end pb-20 px-6 text-center">
+        <h2 class="font-display text-7xl md:text-9xl text-white mb-2 drop-shadow-lg animate-in">
+          BODEGA <span class="text-brand-yellow italic">TONY TONY</span>
+        </h2>
+        <p class="text-brand-yellow text-lg font-semibold tracking-wide uppercase">Lo que te falta, te lo llevamos ya.</p>
+      </div>
+    </section>
+
+    <div class="sticky top-0 bg-bg-paper/90 backdrop-blur-md z-40 py-6 px-6 border-b border-neutral-100">
+      <div class="max-w-6xl mx-auto flex gap-3 overflow-x-auto no-scrollbar">
+        <button class="px-6 py-2.5 bg-brand-dark text-white rounded-full font-bold text-sm whitespace-nowrap">Todo</button>
+        <button class="px-6 py-2.5 bg-white border border-neutral-200 rounded-full font-bold text-sm whitespace-nowrap hover:border-[color:var(--brand-red)]">Bebidas Frías</button>
+        <button class="px-6 py-2.5 bg-white border border-neutral-200 rounded-full font-bold text-sm whitespace-nowrap hover:border-[color:var(--brand-red)]">Snacks</button>
+        <button class="px-6 py-2.5 bg-white border border-neutral-200 rounded-full font-bold text-sm whitespace-nowrap hover:border-[color:var(--brand-red)]">Almacén</button>
+        <button class="px-6 py-2.5 bg-white border border-neutral-200 rounded-full font-bold text-sm whitespace-nowrap hover:border-[color:var(--brand-red)]">Limpieza</button>
+        <button class="px-6 py-2.5 bg-white border border-neutral-200 rounded-full font-bold text-sm whitespace-nowrap hover:border-[color:var(--brand-red)]">Lácteos</button>
+      </div>
+    </div>
+
+    <main class="max-w-6xl mx-auto p-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div class="group animate-in">
+          <div class="relative aspect-square rounded-[32px] bg-white ring-1 ring-black/5 overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300 grid place-items-center text-6xl">🍷
+            <button class="absolute bottom-4 right-4 size-12 bg-brand-red text-white rounded-full shadow-lg flex items-center justify-center font-bold text-2xl group-hover:scale-110 transition-transform">+</button>
+          </div>
+          <h4 class="text-lg font-bold px-1">Fernet Branca 750ml</h4>
+          <p class="font-display text-2xl text-brand-red px-1">$8.400</p>
+        </div>
+        <div class="group animate-in">
+          <div class="relative aspect-square rounded-[32px] bg-white ring-1 ring-black/5 overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300 grid place-items-center text-6xl">🥤
+            <button class="absolute bottom-4 right-4 size-12 bg-brand-red text-white rounded-full shadow-lg flex items-center justify-center font-bold text-2xl group-hover:scale-110 transition-transform">+</button>
+          </div>
+          <h4 class="text-lg font-bold px-1">Coca Cola 2.25L</h4>
+          <p class="font-display text-2xl text-brand-red px-1">$2.100</p>
+        </div>
+        <div class="group animate-in">
+          <div class="relative aspect-square rounded-[32px] bg-white ring-1 ring-black/5 overflow-hidden mb-4 shadow-sm group-hover:shadow-xl transition-all duration-300 grid place-items-center text-6xl">🍟
+            <button class="absolute bottom-4 right-4 size-12 bg-brand-red text-white rounded-full shadow-lg flex items-center justify-center font-bold text-2xl group-hover:scale-110 transition-transform">+</button>
+          </div>
+          <h4 class="text-lg font-bold px-1">Lays Clásicas 150g</h4>
+          <p class="font-display text-2xl text-brand-red px-1">$1.450</p>
+        </div>
+        <div class="group animate-in flex flex-col h-full">
+          <div class="relative flex-1 rounded-[32px] bg-brand-dark p-6 flex flex-col justify-between overflow-hidden shadow-xl" style="box-shadow:0 0 0 4px rgba(244,211,94,.3),0 20px 40px rgba(0,0,0,.15)">
+            <div class="flex justify-between items-start">
+              <span class="px-2 py-1 bg-brand-yellow text-brand-dark text-[10px] font-bold uppercase rounded-md tracking-wider">En Camino</span>
+              <span class="font-display text-brand-yellow text-xl">#842</span>
+            </div>
+            <div class="mt-8">
+              <p class="text-white/60 text-xs font-semibold">Repartidor</p>
+              <p class="text-white font-bold">Cacho "El Rayo"</p>
+              <div class="mt-4 w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div class="w-3/4 h-full bg-brand-yellow rounded-full"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center bg-brand-red text-white px-8 py-4 rounded-full shadow-2xl cursor-pointer hover:scale-105 active:scale-95 transition-all" style="box-shadow:0 20px 50px -10px rgba(230,57,70,.5)">
+      <span class="font-display text-2xl tracking-wide">Ver Carrito</span>
+      <span class="ml-4 px-2 py-0.5 bg-brand-yellow text-brand-dark rounded-md font-black text-sm">3</span>
+    </div>
+  </div>
+</body>
+</html>
