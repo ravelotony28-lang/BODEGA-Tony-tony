@@ -442,7 +442,11 @@ function notificarCambioEstado(nuevoEstado, pedidoId) {
 // ═══════════════════════════════════════════════════════════════════════════
 // CHECKOUT - doOrder OPTIMIZADA
 // ═══════════════════════════════════════════════════════════════════════════
-
+const firebaseConfig = {
+  apiKey: "AIzaSyDwJdFsG...",
+  authDomain: "bodegaton.firebaseapp.com",
+  // ... tu config de Firebase
+};
 function doOrder(link) {
   const n = (document.getElementById('cName') || {}).value?.trim() || '';
   const ph = (document.getElementById('cPhone') || {}).value?.trim() || '';
@@ -452,7 +456,7 @@ function doOrder(link) {
     showToast('⚠️ Completa nombre y teléfono');
     return false;
   }
-
+whatsapp: '+58XXXXXXXXXXXX' // Reemplaza con tu número
   if (entrega === 'domicilio' && !ad) {
     showToast('⚠️ Escribe tu dirección');
     return false;
