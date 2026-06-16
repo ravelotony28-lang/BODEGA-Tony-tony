@@ -1,0 +1,17 @@
+{
+  "name": "Bodega Tony Tony",
+  "short_name": "TonyTony",
+  "start_url": "./pages/index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "description": "Bodega Tony Tony - Mini Market ¡Siempre fresco y cerca!",
+  "icons": [
+    {
+      "src": "../assets/images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "lang": "es-VE"
+}
