@@ -1,8 +1,12 @@
 const CACHE_NAME = 'bodega-tony-v2';
 const urlsToCache = [
-  './index.html',
-  './admin.html',
-  './manifest.json'
+  './pages/index.html',
+  './pages/admin.html',
+  './public/manifest.json',
+  './assets/css/style.css',
+  './assets/css/admin.css',
+  './assets/js/app.js',
+  './assets/js/admin.js'
 ];
 
 self.addEventListener('install', event => {

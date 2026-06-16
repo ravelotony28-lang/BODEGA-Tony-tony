@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bodega Tony Tony">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="../assets/images/logo.png">
+<link rel="apple-touch-icon" href="../assets/images/logo.png">
+<link rel="manifest" href="../public/manifest.json">
+<title>Bodega Tony Tony</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+<!-- Contenido de index.html aquí - mismo que el original pero con rutas actualizadas -->
+<div id="splash" style="position:fixed;inset:0;background:var(--oscuro);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .4s;">
+  <img src="../assets/images/logo.png" alt="Logo" style="width:120px;height:auto;margin-bottom:16px;" onerror="this.style.display='none'">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;color:var(--amarillo);">Bodega <span style="color:var(--rojo);">Tony</span> Tony</div>
+  <div style="width:30px;height:30px;border:3px solid rgba(255,255,255,.2);border-radius:50%;border-top-color:var(--rojo);animation:spin .8s linear infinite;margin-top:16px;"></div>
+</div>
+<header>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <img src="../assets/images/logo.png" alt="Logo" style="width:34px;height:34px;border-radius:6px;" onerror="this.style.display='none'">
+    <div>
+      <div class="logo-text">Bodega <span>Tony</span> Tony</div>
+      <div style="font-size:9px;color:#aaa;">Mini Market · Siempre fresco</div>
+    </div>
+  </div>
+  <button class="cart-btn" onclick="showTab('carrito)">🛒 <span class="cart-count" id="cartCount">0</span></button>
+</header>
+<div class="status-bar" id="statusBar">✅ Abierto · 09:00 AM - 10:00 PM</div>
+<div class="tabs">
+  <button class="tab-btn active" id="tab-tienda" onclick="showTab('tienda')">🏬 Tienda</button>
+  <button class="tab-btn" id="tab-carrito" onclick="showTab('carrito')">🛒 Mi Pedido</button>
+  <button class="tab-btn" id="tab-tracking" onclick="showTab('tracking')">📦 Seguimiento</button>
+  <button class="tab-btn" id="tab-soporte" onclick="showTab('soporte')">❓ Soporte</button>
+  <button class="tab-btn" id="tab-puntos" onclick="showTab('puntos')">⭐ Mis Puntos</button>
+</div>
+<div class="search-wrap">
+  <input type="text" id="searchInput" placeholder="🔍 Buscar producto..." oninput="renderStore()">
+</div>
+<div class="view active" id="view-tienda"><div id="storeContainer"></div></div>
+<div class="view" id="view-carrito"><div id="cartContainer"></div></div>
+<div class="view" id="view-tracking"><div id="trackingContainer"></div></div>
+<div class="view" id="view-soporte"><div id="soporteContainer"></div></div>
+<div class="view" id="view-puntos"><div id="puntosContainer"></div></div>
+<div class="floating-cart" id="floatingCart">
+  <div>
+    <div style="font-size:10px;color:#aaa;">Tu pedido</div>
+    <div class="floating-cart-total" id="floatTotal">$ 0.00</div>
+  </div>
+  <button class="floating-cart-btn" onclick="showTab('carrito')">Ver pedido 🛒</button>
+</div>
+<button class="chat-fab" onclick="toggleChat()">💬</button>
+<div class="chat-modal" id="chatModal">
+  <div class="chat-window">
+    <div class="chat-header">
+      <span>💬 Bodega Tony Tony</span>
+      <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div style="text-align:center;color:var(--subtext);padding:20px;">¡Hola! ¿En qué te ayudamos? 😊</div>
+    </div>
+    <div class="chat-input-wrap">
+      <input type="text" id="chatInput" placeholder="Escribe aquí..." onkeyup="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">↪️</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="../assets/js/app.js"></script>
+</body>
+</html>

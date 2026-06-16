@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Admin Tony Tony">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="../assets/images/logo.png">
+<link rel="apple-touch-icon" href="../assets/images/logo.png">
+<link rel="manifest" href="../public/manifest-admin.json">
+<title>⚙️ Admin - Bodega Tony Tony</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-card">
+    <img src="../assets/images/logo.png" alt="Logo" style="width:90px;height:auto;margin-bottom:14px;border-radius:12px;" onerror="this.style.display='none'">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:white;letter-spacing:2px;">ADMIN</div>
+    <div style="font-size:15px;color:var(--rojo);margin-bottom:22px;font-weight:800;">BODEGA TONY TONY</div>
+    <div style="margin-bottom:20px;">
+      <span class="pin-dot" id="dot0"></span>
+      <span class="pin-dot" id="dot1"></span>
+      <span class="pin-dot" id="dot2"></span>
+      <span class="pin-dot" id="dot3"></span>
+      <span class="pin-dot" id="dot4"></span>
+      <span class="pin-dot" id="dot5"></span>
+    </div>
+    <p id="pinError" style="color:var(--rojo);font-size:13px;font-weight:700;margin-bottom:14px;min-height:20px;"></p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:240px;margin:0 auto;">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" onclick="pinClear()" style="background:#555;">⌫</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" onclick="checkPin()" style="background:var(--rojo);">✓</button>
+    </div>
+  </div>
+</div>
+<div id="adminPanel" style="display:none;">
+  <header>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <img src="../assets/images/logo.png" alt="Logo" style="width:38px;height:38px;border-radius:8px;" onerror="this.style.display='none'">
+      <div>
+        <div class="logo-text">Admin <span>Tony</span> Tony</div>
+        <div style="font-size:11px;color:#aaa;">Panel de Administración</div>
+      </div>
+    </div>
+    <button onclick="lockPanel()" style="background:var(--rojo);color:white;border:none;border-radius:50px;padding:8px 16px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;">🔒 Salir</button>
+  </header>
+  <div class="tabs" id="tabBar">
+    <button class="tab-btn active" id="tab-dashboard" onclick="showAdminTab('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn" id="tab-productos" onclick="showAdminTab('productos')">📦 Productos</button>
+    <button class="tab-btn" id="tab-pedidos" onclick="showAdminTab('pedidos')">📋 Pedidos</button>
+    <button class="tab-btn" id="tab-config" onclick="showAdminTab('config')">⚙️ Config</button>
+  </div>
+  <div class="view active" id="view-dashboard"><div id="statsRow"></div></div>
+  <div class="view" id="view-productos"><div id="productosContent"></div></div>
+  <div class="view" id="view-pedidos"><div id="pedidosContent"></div></div>
+  <div class="view" id="view-config"><div id="configContent"></div></div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="../assets/js/admin.js"></script>
+</body>
+</html>
