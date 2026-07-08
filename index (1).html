@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bodega Tony Tony">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="manifest" href="manifest.json">
+<title>Bodega Tony Tony</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  /* Colores originales (no cambian para no romper nada) */
+  --rojo:#e63946;--amarillo:#f4d35e;--verde:#2dc653;--oscuro:#1a1a2e;
+  --bg:#f7f7f7;--card:#fff;--text:#1a1a2e;--subtext:#666;--border:#e0e0e0;--gris:#f1f1f1;
+  /* Nuevas variables de mejora */
+  --shadow-sm:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);
+  --shadow-md:0 3px 6px rgba(0,0,0,.15),0 2px 4px rgba(0,0,0,.12);
+  --shadow-lg:0 10px 20px rgba(0,0,0,.15),0 3px 6px rgba(0,0,0,.10);
+  --trans-fast:150ms cubic-bezier(0.4,0,0.2,1);
+  --trans-standard:300ms cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;}
+header{background:var(--oscuro);color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:var(--shadow-md);}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--amarillo);}
+.logo-text span{color:var(--rojo);}
+.cart-btn{background:var(--rojo);color:white;border:none;border-radius:50px;padding:10px 16px;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all var(--trans-fast);min-height:44px;}
+.cart-btn:hover{background:#ff4444;transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.cart-btn:active{transform:scale(0.97);}
+.cart-count{background:var(--amarillo);color:var(--oscuro);border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;}
+.status-bar{text-align:center;padding:8px;font-size:13px;font-weight:700;background:linear-gradient(90deg,#2dc653,#1a9e3f);color:white;}
+.tabs{display:flex;background:var(--card);border-bottom:3px solid var(--amarillo);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{padding:12px 14px;border:none;background:transparent;font-weight:700;font-size:13px;color:var(--subtext);cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-3px;transition:color var(--trans-fast);min-height:48px;display:inline-flex;align-items:center;}
+.tab-btn:hover{color:var(--rojo);}
+.tab-btn.active{color:var(--rojo);border-bottom-color:var(--rojo);}
+.search-wrap{padding:8px 14px;background:var(--card);box-shadow:var(--shadow-sm);}
+.search-wrap input{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:50px;font-size:14px;outline:none;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;transition:all var(--trans-fast);}
+.search-wrap input:focus{border-color:var(--rojo);background:var(--card);box-shadow:0 0 0 3px rgba(230,57,70,.1);}
+.view{display:none;padding:12px;}
+.view.active{display:block;}
+.products-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.product-card{background:var(--card);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm);position:relative;transition:all var(--trans-standard);}
+.product-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);}
+.product-card:active{transform:translateY(-1px);}
+.product-img{width:100%;height:120px;object-fit:cover;}
+.product-emoji{font-size:40px;text-align:center;padding:20px 0 10px;}
+.product-info{padding:10px 12px 12px;}
+.product-name{font-weight:700;font-size:13px;margin-bottom:4px;line-height:1.4;}
+.product-price{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--rojo);}
+.price-old{font-size:11px;color:var(--subtext);text-decoration:line-through;}
+.price-new{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--verde);}
+.add-btn{background:var(--oscuro);color:white;border:none;border-radius:50px;padding:10px 14px;font-weight:800;font-size:13px;cursor:pointer;width:100%;margin-top:8px;transition:all var(--trans-fast);min-height:44px;font-family:'Nunito',sans-serif;}
+.add-btn:hover{background:#2a2a3f;}
+.add-btn:active{transform:scale(0.98);}
+.agotado-badge{background:#666;color:white;border-radius:50px;padding:8px;text-align:center;font-size:12px;margin-top:8px;font-weight:700;}
+.qty-ctrl{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:8px;}
+.qty-btn{background:var(--gris);border:none;border-radius:50%;width:36px;height:36px;font-size:18px;font-weight:900;cursor:pointer;transition:background var(--trans-fast);display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;}
+.qty-btn:hover{background:#e0e0e0;}
+.qty-btn:active{transform:scale(0.95);}
+.qty-num{font-weight:800;font-size:16px;min-width:28px;text-align:center;}
+.variants-label{font-size:11px;font-weight:700;color:var(--subtext);}
+.variants-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;}
+.variant-chip{padding:4px 8px;border:2px solid var(--border);border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;background:var(--card);color:var(--text);}
+.variant-chip.selected{border-color:var(--rojo);background:#fff0f0;color:var(--rojo);}
+.cat-filter{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none;}
+.cat-filter::-webkit-scrollbar{display:none;}
+.cats-scroll{display:flex;gap:10px;overflow-x:auto;padding:8px 14px 14px;scrollbar-width:none;}
+.cats-scroll::-webkit-scrollbar{display:none;}
+.cat-card{flex-shrink:0;width:80px;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cat-card:active .cat-circle{transform:scale(.92);}
+.cat-circle{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:transform .15s;}
+.cat-circle svg{width:38px;height:38px;}
+.cat-card-label{font-size:11px;font-weight:700;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cat-card.active .cat-card-label{color:var(--rojo);}
+.cat-card.active .cat-circle{box-shadow:0 0 0 3px var(--rojo),0 4px 14px rgba(0,0,0,.18);}
+.cart-item{background:var(--card);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.cart-item .thumb{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+.cart-item .cemoji{font-size:28px;flex-shrink:0;}
+.cart-total{background:var(--oscuro);color:white;border-radius:16px;padding:18px;margin:14px 0;text-align:center;}
+.cart-total .amount{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--amarillo);}
+.ci input,.ci select{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:14px;margin-bottom:8px;outline:none;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;}
+.ci input:focus{border-color:var(--rojo);}
+.wa-btn{display:block;width:100%;background:#25d366;color:white;border:none;border-radius:14px;padding:16px;font-weight:800;font-size:16px;cursor:pointer;text-align:center;text-decoration:none;margin-top:8px;font-family:'Nunito',sans-serif;}
+.wa-btn.off{background:#aaa;pointer-events:none;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--oscuro);color:white;padding:12px 24px;border-radius:50px;font-weight:700;z-index:9999;transition:transform .3s;max-width:90vw;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:40px 20px;color:var(--subtext);}
+.floating-cart{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:10px 16px;background:var(--oscuro);display:flex;align-items:center;justify-content:space-between;gap:10px;transform:translateY(100%);transition:transform .3s;}
+.floating-cart.visible{transform:translateY(0);}
+.floating-cart-total{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--amarillo);}
+.floating-cart-btn{background:var(--rojo);color:white;border:none;border-radius:50px;padding:10px 18px;font-weight:800;font-size:13px;cursor:pointer;}
+body.has-float .view{padding-bottom:70px;}
+.ofertas-banner{background:linear-gradient(135deg,#e63946,#ff6b2b);border-radius:14px;padding:14px;margin-bottom:12px;color:white;}
+.badge-oferta{position:absolute;top:8px;left:8px;background:var(--rojo);color:white;border-radius:50px;padding:3px 8px;font-size:10px;font-weight:800;z-index:2;}
+.resena-btn{background:none;border:none;font-size:14px;cursor:pointer;margin-top:4px;color:var(--subtext);}
+.chat-fab{position:fixed;bottom:120px;right:18px;z-index:400;background:var(--verde);color:white;width:54px;height:54px;border-radius:50%;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;}
+.chat-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.chat-modal.open{display:flex;}
+.chat-window{width:100%;max-width:400px;height:70vh;background:var(--card);border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:slideUp .3s ease;}
+.chat-header{background:var(--verde);color:white;padding:14px 16px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center;}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.chat-msg{max-width:80%;padding:10px 14px;border-radius:16px;font-size:13px;}
+.chat-msg.me{background:var(--verde);color:white;align-self:flex-end;}
+.chat-msg.bot{background:#e3f2fd;color:#0d47a1;align-self:flex-start;}
+.chat-msg.admin{background:var(--gris);color:var(--text);align-self:flex-start;}
+.chat-input-wrap{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);}
+.chat-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:20px;outline:none;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;}
+.chat-input-wrap button{background:var(--verde);color:white;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;}
+.resena-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;display:none;align-items:flex-end;justify-content:center;}
+.resena-modal.open{display:flex;}
+.resena-sheet{width:100%;max-width:400px;background:var(--card);border-radius:20px 20px 0 0;padding:20px;animation:slideUp .3s ease;}
+.pago-card{background:#fff8e1;border:2px solid var(--amarillo);border-radius:14px;padding:14px;margin-top:12px;line-height:2;}
+.entrega-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 14px;}
+.entrega-opt{padding:14px 8px;border:2px solid var(--border);border-radius:14px;background:var(--card);text-align:center;cursor:pointer;font-weight:800;font-size:14px;transition:all .2s;font-family:'Nunito',sans-serif;}
+.entrega-opt.active{border-color:var(--rojo);background:#fff0f0;color:var(--rojo);}
+.metodos-wrap{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px;}
+.metodo-chip{padding:9px 16px;border:2px solid var(--border);border-radius:50px;background:var(--card);font-weight:700;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.metodo-chip.active{border-color:var(--rojo);background:#fff0f0;color:var(--rojo);}
+.comp-box{border-radius:14px;padding:14px;margin:8px 0;}
+.comp-red{background:#fff0f0;border:2px solid var(--rojo);}
+.comp-yellow{background:#fff8e1;border:2px solid var(--amarillo);}
+.comp-upload{width:100%;min-height:100px;border:2px dashed #bbb;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--subtext);font-weight:700;font-size:13px;overflow:hidden;margin-top:10px;background:var(--bg);}
+.comp-ok{border:2px solid var(--verde);background:#e8f5e9;border-radius:12px;padding:10px;margin-top:8px;text-align:center;font-weight:800;color:#1b5e20;font-size:13px;}
+.geo-box{border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px;font-weight:700;}
+.geo-no{background:#fff8e1;border:2px solid var(--amarillo);color:#856404;}
+.geo-si{background:#e8f5e9;border:2px solid var(--verde);color:#1b5e20;}
+.hero-banner{background:linear-gradient(135deg,var(--oscuro) 0%,#2d1b69 100%);border-radius:18px;padding:20px 18px;margin:0 0 14px;color:white;position:relative;overflow:hidden;}
+.hero-banner::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:rgba(230,57,70,.15);border-radius:50%;}
+.hero-greeting{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;line-height:1.1;margin-bottom:12px;}
+.hero-title span{color:var(--amarillo);}
+.hero-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:6px 12px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;}
+.hero-badge b{color:var(--verde);}
+.promo-strip{background:var(--amarillo);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.promo-strip-text{font-weight:800;font-size:13px;color:var(--oscuro);}
+.promo-strip-link{background:var(--oscuro);color:white;border-radius:50px;padding:5px 12px;font-size:12px;font-weight:800;cursor:pointer;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px;padding:14px 14px 6px;display:flex;align-items:center;gap:6px;}
+.ofertas-section{padding:0 14px 14px;}
+.ofertas-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;}
+.ofertas-scroll::-webkit-scrollbar{display:none;}
+.products-section{padding:0 14px 14px;}
+.puntos-card{background:linear-gradient(135deg,#1a1a2e,#2d2d4e);border-radius:16px;padding:16px;margin:10px 0;color:white;}
+.puntos-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--amarillo);line-height:1;}
+.puntos-bar-bg{background:rgba(255,255,255,.15);border-radius:50px;height:10px;margin:8px 0;}
+.puntos-bar{background:linear-gradient(90deg,var(--amarillo),#ff6b2b);border-radius:50px;height:10px;transition:width .5s;}
+.puntos-historial{background:var(--card);border-radius:14px;padding:14px;margin-top:10px;}
+.puntos-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.puntos-item:last-child{border-bottom:none;}
+.puntos-badge{background:var(--oscuro);color:var(--amarillo);border-radius:50px;padding:2px 8px;font-size:11px;font-weight:800;}
+.reg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;}
+.reg-card{background:var(--card);border-radius:24px;padding:28px 20px;width:100%;max-width:330px;text-align:center;}
+.reg-field{width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:12px;font-size:16px;margin-bottom:12px;outline:none;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;-webkit-appearance:none;}
+.reg-field:focus{border-color:var(--rojo);}
+.reg-btn{width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:15px;font-weight:800;font-size:16px;cursor:pointer;font-family:'Nunito',sans-serif;}
+/* ANIMACIONES CATEGORÍAS */
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%,100%{opacity:.7}50%{opacity:1;filter:brightness(1.3)}}
+@keyframes escribir{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-10deg)}70%{transform:rotate(8deg)}}
+@keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes latido{0%,100%{transform:scale(1)}20%{transform:scale(1.18)}40%{transform:scale(1)}}
+@keyframes vapor{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes onda{0%,100%{transform:skewX(0)}40%{transform:skewX(-7deg)}70%{transform:skewX(6deg)}}
+@keyframes barrer{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+@keyframes tijera{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.82)}}
+.a-shimmer{animation:shimmer 2.5s ease-in-out infinite;}
+.a-escribir{animation:escribir 1.8s ease-in-out infinite;}
+.a-flotar{animation:flotar 2.2s ease-in-out infinite;}
+.a-latido{animation:latido 1.5s ease-in-out infinite;}
+.a-vapor{animation:vapor 2s ease-in-out infinite;}
+.a-onda{animation:onda 2.2s ease-in-out infinite;}
+.a-barrer{animation:barrer 1.8s ease-in-out infinite;}
+.a-tijera{animation:tijera 2s ease-in-out infinite;}
+.cat-card:hover .cat-circle,.cat-card.active .cat-circle{transform:scale(1.08);}
+
+/* ══════════════════════════════════════
+   CATEGORY 3D CLAY ICONS
+══════════════════════════════════════ */
+.cats-scroll{display:flex;gap:12px;overflow-x:auto;padding:6px 14px 16px;scrollbar-width:none;}
+.cats-scroll::-webkit-scrollbar{display:none;}
+.cat-card{display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:80px;-webkit-tap-highlight-color:transparent;user-select:none;}
+.cat-card-label{font-size:11px;font-weight:800;color:#444;text-align:center;max-width:80px;margin-top:6px;line-height:1.3;}
+.cat-card.active .cat-card-label{color:var(--rojo);}
+.cat-icon-wrap{
+  width:72px;height:72px;border-radius:22px;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:visible;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
+  filter:drop-shadow(0 6px 12px rgba(0,0,0,.22)) drop-shadow(0 2px 4px rgba(0,0,0,.12));
+}
+.cat-card:active .cat-icon-wrap{transform:scale(.86)!important;filter:drop-shadow(0 2px 6px rgba(0,0,0,.18));}
+.cat-card.active .cat-icon-wrap{filter:drop-shadow(0 0 0 3px var(--rojo)) drop-shadow(0 6px 12px rgba(0,0,0,.22));}
+.cat-icon-wrap svg{width:72px;height:72px;display:block;overflow:visible;}
+
+/* ── KEYFRAMES ────────────────────────── */
+
+/* 1. Joyería — giro + destello */
+@keyframes k-joy-spin{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-18deg)}75%{transform:rotate(18deg)}}
+@keyframes k-joy-glow{0%,100%{opacity:0;r:3}50%{opacity:1;r:6}}
+.anim-joyeria .obj{animation:k-joy-spin 3s ease-in-out infinite;transform-origin:50% 50%;}
+.anim-joyeria .shine{animation:k-joy-glow 3s ease-in-out infinite;}
+
+/* 2. Papelería — trazo escritura */
+@keyframes k-pap-move{0%,100%{transform:rotate(-8deg) translate(0,0)}30%{transform:rotate(-6deg) translate(3px,-2px)}60%{transform:rotate(-10deg) translate(-2px,2px)}}
+.anim-papeleria .obj{animation:k-pap-move 2s ease-in-out infinite;transform-origin:70% 70%;}
+
+/* 3. Higiene — burbujas flotando */
+@keyframes k-bub-float{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(-7px);opacity:1}}
+@keyframes k-bub2{0%,100%{transform:translateY(0) scale(1)}60%{transform:translateY(-5px) scale(1.1)}}
+.anim-higiene .obj{animation:k-bub-float 2s ease-in-out infinite;}
+.anim-higiene .b1{animation:k-bub-float 2s .2s ease-in-out infinite;}
+.anim-higiene .b2{animation:k-bub2 2s .5s ease-in-out infinite;}
+.anim-higiene .b3{animation:k-bub-float 2s .8s ease-in-out infinite;}
+
+/* 4. Cabello — tijeras abriéndose */
+@keyframes k-sci-top{0%,100%{transform:rotate(0deg)}40%{transform:rotate(-14deg)}}
+@keyframes k-sci-bot{0%,100%{transform:rotate(0deg)}40%{transform:rotate(14deg)}}
+.anim-cabello .blade-top{animation:k-sci-top 1.6s ease-in-out infinite;transform-origin:30% 50%;}
+.anim-cabello .blade-bot{animation:k-sci-bot 1.6s ease-in-out infinite;transform-origin:30% 50%;}
+
+/* 5. Bebé — balanceo cuna */
+@keyframes k-rock{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-10deg)}70%{transform:rotate(10deg)}}
+.anim-bebe .obj{animation:k-rock 2.4s ease-in-out infinite;transform-origin:50% 80%;}
+
+/* 6. Bebidas — líquido sube y baja */
+@keyframes k-liq{0%,100%{transform:translateY(0) scaleX(1)}40%{transform:translateY(-5px) scaleX(1.04)}70%{transform:translateY(-2px) scaleX(.98)}}
+.anim-bebidas .obj{animation:k-liq 2s ease-in-out infinite;}
+
+/* 7. Carnes — vapor sube */
+@keyframes k-vap1{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-8px);opacity:.3}}
+@keyframes k-vap2{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(-6px);opacity:.2}}
+.anim-carnes .v1{animation:k-vap1 1.8s ease-in-out infinite;}
+.anim-carnes .v2{animation:k-vap2 1.8s .3s ease-in-out infinite;}
+.anim-carnes .v3{animation:k-vap1 1.8s .6s ease-in-out infinite;}
+
+/* 8. Lácteos — derretimiento suave */
+@keyframes k-melt{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.93) scaleX(1.04)}}
+.anim-lacteos .obj{animation:k-melt 2.6s ease-in-out infinite;transform-origin:50% 90%;}
+
+/* 9. Frutas — hoja oscila */
+@keyframes k-leaf{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-16deg)}70%{transform:rotate(12deg)}}
+.anim-frutas .leaf{animation:k-leaf 2s ease-in-out infinite;transform-origin:10% 90%;}
+
+/* 10. Granos — mecido viento */
+@keyframes k-sway{0%,100%{transform:rotate(0deg) translateX(0)}33%{transform:rotate(-12deg) translateX(-3px)}66%{transform:rotate(12deg) translateX(3px)}}
+.anim-granos .obj{animation:k-sway 2.4s ease-in-out infinite;transform-origin:50% 95%;}
+
+/* 11. Limpieza — barrido escoba */
+@keyframes k-sweep{0%,100%{transform:rotate(0deg)}20%{transform:rotate(-22deg)}60%{transform:rotate(18deg)}80%{transform:rotate(-8deg)}}
+.anim-limpieza .obj{animation:k-sweep 1.8s ease-in-out infinite;transform-origin:75% 75%;}
+
+/* 12. Licores — agitar botella */
+@keyframes k-swirl{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+.anim-licores .obj{animation:k-swirl 2s ease-in-out infinite;transform-origin:50% 90%;}
+
+/* DEFAULT */
+@keyframes k-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.anim-default .obj{animation:k-pulse 2s ease-in-out infinite;}
+
+/* ══════════════════════════════════════ */
+
+.cat-card-label{font-size:11px;font-weight:700;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cat-card.active .cat-card-label{color:var(--rojo);}
+.cat-card.active .cat-circle{box-shadow:0 0 0 3px var(--rojo),0 4px 14px rgba(0,0,0,.18);}
+.cart-item{background:var(--card);border-radius:14px;padding:12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.cart-item .thumb{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0;}
+.cart-item .cemoji{font-size:28px;flex-shrink:0;}
+.cart-total{background:var(--oscuro);color:white;border-radius:16px;padding:18px;margin:14px 0;text-align:center;}
+.cart-total .amount{font-family:'Bebas Neue',sans-serif;font-size:38px;color:var(--amarillo);}
+.ci input,.ci select{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:12px;font-size:14px;margin-bottom:8px;outline:none;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;}
+.ci input:focus{border-color:var(--rojo);}
+.wa-btn{display:block;width:100%;background:#25d366;color:white;border:none;border-radius:14px;padding:16px;font-weight:800;font-size:16px;cursor:pointer;text-align:center;text-decoration:none;margin-top:8px;font-family:'Nunito',sans-serif;}
+.wa-btn.off{background:#aaa;pointer-events:none;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--oscuro);color:white;padding:12px 24px;border-radius:50px;font-weight:700;z-index:9999;transition:transform .3s;max-width:90vw;text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:40px 20px;color:var(--subtext);}
+.floating-cart{position:fixed;bottom:0;left:0;right:0;z-index:300;padding:10px 16px;background:var(--oscuro);display:flex;align-items:center;justify-content:space-between;gap:10px;transform:translateY(100%);transition:transform .3s;}
+.floating-cart.visible{transform:translateY(0);}
+.floating-cart-total{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--amarillo);}
+.floating-cart-btn{background:var(--rojo);color:white;border:none;border-radius:50px;padding:10px 18px;font-weight:800;font-size:13px;cursor:pointer;}
+body.has-float .view{padding-bottom:70px;}
+.ofertas-banner{background:linear-gradient(135deg,#e63946,#ff6b2b);border-radius:14px;padding:14px;margin-bottom:12px;color:white;}
+.badge-oferta{position:absolute;top:8px;left:8px;background:var(--rojo);color:white;border-radius:50px;padding:3px 8px;font-size:10px;font-weight:800;z-index:2;}
+.resena-btn{background:none;border:none;font-size:14px;cursor:pointer;margin-top:4px;color:var(--subtext);}
+.chat-fab{position:fixed;bottom:120px;right:18px;z-index:400;background:var(--verde);color:white;width:54px;height:54px;border-radius:50%;border:none;font-size:26px;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;}
+.chat-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:flex-end;justify-content:center;}
+.chat-modal.open{display:flex;}
+.chat-window{width:100%;max-width:400px;height:70vh;background:var(--card);border-radius:20px 20px 0 0;display:flex;flex-direction:column;animation:slideUp .3s ease;}
+.chat-header{background:var(--verde);color:white;padding:14px 16px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center;}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.chat-msg{max-width:80%;padding:10px 14px;border-radius:16px;font-size:13px;}
+.chat-msg.me{background:var(--verde);color:white;align-self:flex-end;}
+.chat-msg.bot{background:#e3f2fd;color:#0d47a1;align-self:flex-start;}
+.chat-msg.admin{background:var(--gris);color:var(--text);align-self:flex-start;}
+.chat-input-wrap{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);}
+.chat-input-wrap input{flex:1;padding:10px 14px;border:2px solid var(--border);border-radius:20px;outline:none;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;}
+.chat-input-wrap button{background:var(--verde);color:white;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;}
+.resena-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;display:none;align-items:flex-end;justify-content:center;}
+.resena-modal.open{display:flex;}
+.resena-sheet{width:100%;max-width:400px;background:var(--card);border-radius:20px 20px 0 0;padding:20px;animation:slideUp .3s ease;}
+.pago-card{background:#fff8e1;border:2px solid var(--amarillo);border-radius:14px;padding:14px;margin-top:12px;line-height:2;}
+.entrega-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 14px;}
+.entrega-opt{padding:14px 8px;border:2px solid var(--border);border-radius:14px;background:var(--card);text-align:center;cursor:pointer;font-weight:800;font-size:14px;transition:all .2s;font-family:'Nunito',sans-serif;}
+.entrega-opt.active{border-color:var(--rojo);background:#fff0f0;color:var(--rojo);}
+.metodos-wrap{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px;}
+.metodo-chip{padding:9px 16px;border:2px solid var(--border);border-radius:50px;background:var(--card);font-weight:700;font-size:13px;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s;}
+.metodo-chip.active{border-color:var(--rojo);background:#fff0f0;color:var(--rojo);}
+.comp-box{border-radius:14px;padding:14px;margin:8px 0;}
+.comp-red{background:#fff0f0;border:2px solid var(--rojo);}
+.comp-yellow{background:#fff8e1;border:2px solid var(--amarillo);}
+.comp-upload{width:100%;min-height:100px;border:2px dashed #bbb;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:var(--subtext);font-weight:700;font-size:13px;overflow:hidden;margin-top:10px;background:var(--bg);}
+.comp-ok{border:2px solid var(--verde);background:#e8f5e9;border-radius:12px;padding:10px;margin-top:8px;text-align:center;font-weight:800;color:#1b5e20;font-size:13px;}
+.geo-box{border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px;font-weight:700;}
+.geo-no{background:#fff8e1;border:2px solid var(--amarillo);color:#856404;}
+.geo-si{background:#e8f5e9;border:2px solid var(--verde);color:#1b5e20;}
+.hero-banner{background:linear-gradient(135deg,var(--oscuro) 0%,#2d1b69 100%);border-radius:18px;padding:20px 18px;margin:0 0 14px;color:white;position:relative;overflow:hidden;}
+.hero-banner::after{content:'';position:absolute;right:-20px;top:-20px;width:120px;height:120px;background:rgba(230,57,70,.15);border-radius:50%;}
+.hero-greeting{font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;line-height:1.1;margin-bottom:12px;}
+.hero-title span{color:var(--amarillo);}
+.hero-badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:6px 12px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;}
+.hero-badge b{color:var(--verde);}
+.promo-strip{background:var(--amarillo);border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+.promo-strip-text{font-weight:800;font-size:13px;color:var(--oscuro);}
+.promo-strip-link{background:var(--oscuro);color:white;border-radius:50px;padding:5px 12px;font-size:12px;font-weight:800;cursor:pointer;}
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px;padding:14px 14px 6px;display:flex;align-items:center;gap:6px;}
+.ofertas-section{padding:0 14px 14px;}
+.ofertas-scroll{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;}
+.ofertas-scroll::-webkit-scrollbar{display:none;}
+.products-section{padding:0 14px 14px;}
+.puntos-card{background:linear-gradient(135deg,#1a1a2e,#2d2d4e);border-radius:16px;padding:16px;margin:10px 0;color:white;}
+.puntos-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--amarillo);line-height:1;}
+.puntos-bar-bg{background:rgba(255,255,255,.15);border-radius:50px;height:10px;margin:8px 0;}
+.puntos-bar{background:linear-gradient(90deg,var(--amarillo),#ff6b2b);border-radius:50px;height:10px;transition:width .5s;}
+.puntos-historial{background:var(--card);border-radius:14px;padding:14px;margin-top:10px;}
+.puntos-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.puntos-item:last-child{border-bottom:none;}
+.puntos-badge{background:var(--oscuro);color:var(--amarillo);border-radius:50px;padding:2px 8px;font-size:11px;font-weight:800;}
+.reg-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99998;display:flex;align-items:center;justify-content:center;padding:20px;}
+.reg-card{background:var(--card);border-radius:24px;padding:28px 20px;width:100%;max-width:330px;text-align:center;}
+.reg-field{width:100%;padding:13px 14px;border:2px solid var(--border);border-radius:12px;font-size:16px;margin-bottom:12px;outline:none;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;-webkit-appearance:none;}
+.reg-field:focus{border-color:var(--rojo);}
+.reg-btn{width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:15px;font-weight:800;font-size:16px;cursor:pointer;font-family:'Nunito',sans-serif;}
+/* ANIMACIONES CATEGORÍAS */
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%,100%{opacity:.7}50%{opacity:1;filter:brightness(1.3)}}
+@keyframes escribir{0%,100%{transform:rotate(0deg)}30%{transform:rotate(-10deg)}70%{transform:rotate(8deg)}}
+@keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes latido{0%,100%{transform:scale(1)}20%{transform:scale(1.18)}40%{transform:scale(1)}}
+@keyframes vapor{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes onda{0%,100%{transform:skewX(0)}40%{transform:skewX(-7deg)}70%{transform:skewX(6deg)}}
+@keyframes barrer{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+@keyframes tijera{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.82)}}
+.a-shimmer{animation:shimmer 2.5s ease-in-out infinite;}
+.a-escribir{animation:escribir 1.8s ease-in-out infinite;}
+.a-flotar{animation:flotar 2.2s ease-in-out infinite;}
+.a-latido{animation:latido 1.5s ease-in-out infinite;}
+.a-vapor{animation:vapor 2s ease-in-out infinite;}
+.a-onda{animation:onda 2.2s ease-in-out infinite;}
+.a-barrer{animation:barrer 1.8s ease-in-out infinite;}
+.a-tijera{animation:tijera 2s ease-in-out infinite;}
+.cat-card:hover .cat-circle,.cat-card.active .cat-circle{transform:scale(1.08);}
+
+/* ── CATEGORY ICON ANIMATIONS ── */
+.cat-icon-wrap{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:6px;box-shadow:0 4px 14px rgba(0,0,0,.18);overflow:hidden;position:relative;}
+.cat-icon-wrap svg{width:100%;height:100%;}
+.cat-card:active .cat-icon-wrap{transform:scale(.9);}
+.cat-card.active .cat-icon-wrap{outline:3px solid var(--rojo);outline-offset:2px;}
+@keyframes shimmer{0%,100%{filter:brightness(1)}50%{filter:brightness(1.3) drop-shadow(0 0 6px rgba(255,255,255,.8))}}
+.anim-shimmer svg{animation:shimmer 2.4s ease-in-out infinite;}
+@keyframes writeAnim{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(-4deg)}}
+.anim-write svg{animation:writeAnim 1.8s ease-in-out infinite;transform-origin:65% 65%;}
+@keyframes floatAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.anim-float svg{animation:floatAnim 2s ease-in-out infinite;}
+@keyframes heartbeat{0%,100%{transform:scale(1)}15%{transform:scale(1.1)}30%{transform:scale(1)}45%{transform:scale(1.07)}70%{transform:scale(1)}}
+.anim-pulse svg{animation:heartbeat 2s ease-in-out infinite;}
+@keyframes steamAnim{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px) skewX(1deg)}}
+.anim-steam svg{animation:steamAnim 2s ease-in-out infinite;}
+@keyframes waveAnim{0%,100%{transform:rotate(0)}33%{transform:rotate(4deg)}66%{transform:rotate(-4deg)}}
+.anim-wave svg{animation:waveAnim 2.2s ease-in-out infinite;transform-origin:bottom center;}
+@keyframes sweepAnim{0%,100%{transform:rotate(0) translateX(0)}30%{transform:rotate(9deg) translateX(3px)}70%{transform:rotate(-9deg) translateX(-3px)}}
+.anim-sweep svg{animation:sweepAnim 1.6s ease-in-out infinite;transform-origin:bottom center;}
+
+/* ══════════════════════════════════════════
+   MEJORAS VISUALES — Hero, Animaciones, Cards
+══════════════════════════════════════════ */
+
+/* HERO MEJORADO */
+.hero-banner{
+  background:linear-gradient(135deg,#1a1a2e 0%,#2d1b69 55%,#3d0a1e 100%) !important;
+  border-radius:20px !important;padding:22px 18px !important;
+  box-shadow:0 8px 32px rgba(230,57,70,.25) !important;
+  animation:heroEntrada .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.hero-banner::before{
+  content:'';position:absolute;right:-30px;top:-30px;
+  width:150px;height:150px;
+  background:radial-gradient(circle,rgba(230,57,70,.35) 0%,transparent 70%);
+  border-radius:50%;animation:heroPulso 3s ease-in-out infinite;
+}
+.hero-banner::after{
+  content:'';position:absolute;left:-20px;bottom:-20px !important;
+  right:auto !important;top:auto !important;
+  width:100px;height:100px;
+  background:radial-gradient(circle,rgba(244,211,94,.2) 0%,transparent 70%);
+  border-radius:50%;
+}
+.hero-title{font-size:34px !important;letter-spacing:1.5px !important;}
+.hero-title span{text-shadow:0 0 20px rgba(244,211,94,.4);}
+.hero-badge{backdrop-filter:blur(6px);transition:background .2s;}
+.hero-badge:hover{background:rgba(255,255,255,.2) !important;}
+.hero-badge b{color:#4dff7c !important;}
+
+/* ANIMACIONES DE ENTRADA */
+@keyframes heroEntrada{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes heroPulso{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.15);opacity:1}}
+@keyframes cardEntrada{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARDS CON ENTRADA ESCALONADA */
+.product-card{animation:cardEntrada .35s ease-out both;}
+.products-grid .product-card:nth-child(1){animation-delay:.05s}
+.products-grid .product-card:nth-child(2){animation-delay:.1s}
+.products-grid .product-card:nth-child(3){animation-delay:.15s}
+.products-grid .product-card:nth-child(4){animation-delay:.2s}
+.products-grid .product-card:nth-child(5){animation-delay:.25s}
+.products-grid .product-card:nth-child(6){animation-delay:.3s}
+.products-grid .product-card:nth-child(n+7){animation-delay:.35s}
+.product-card:hover{transform:translateY(-5px) scale(1.01);box-shadow:0 10px 24px rgba(0,0,0,.15);}
+
+/* BOTÓN AGREGAR */
+.add-btn{
+  background:linear-gradient(135deg,var(--oscuro),#2d2d4e) !important;
+  box-shadow:0 4px 12px rgba(26,26,46,.35);
+}
+.add-btn:hover{box-shadow:0 6px 16px rgba(26,26,46,.45);transform:translateY(-1px);}
+
+/* FLOATING CART */
+.floating-cart{
+  background:linear-gradient(135deg,var(--oscuro),#2d1b69) !important;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1) !important;
+  box-shadow:0 -4px 20px rgba(0,0,0,.3) !important;
+}
+.floating-cart-btn{
+  background:linear-gradient(135deg,var(--rojo),#ff6b2b) !important;
+  box-shadow:0 4px 12px rgba(230,57,70,.4);
+}
+.floating-cart-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(230,57,70,.5);}
+
+/* TOAST */
+.toast{
+  background:linear-gradient(135deg,#1a1a2e,#2d2d4e) !important;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1) !important;
+  border:1px solid rgba(255,255,255,.1);
+}
+
+/* WA BUTTON */
+.wa-btn{
+  background:linear-gradient(135deg,#25d366,#128c4a) !important;
+  box-shadow:0 6px 20px rgba(37,211,102,.35);
+}
+.wa-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(37,211,102,.45);}
+.wa-btn:active{transform:scale(0.98);}
+
+/* PROMO STRIP */
+.promo-strip{
+  background:linear-gradient(135deg,var(--amarillo),#ffb830) !important;
+  box-shadow:0 4px 12px rgba(244,211,94,.4);
+}
+
+/* SECCIÓN TITLE DEGRADADO */
+.section-title{
+  background:linear-gradient(90deg,var(--text),rgba(26,26,46,.5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+</style>
+</head>
+<body>
+
+<div id="splash" style="position:fixed;inset:0;background:var(--oscuro);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .4s;">
+  <img src="logo.png" alt="Logo" style="width:120px;height:auto;margin-bottom:16px;" onerror="this.style.display='none'">
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px;color:var(--amarillo);">Bodega <span style="color:var(--rojo);">Tony</span> Tony</div>
+  <div style="width:30px;height:30px;border:3px solid rgba(255,255,255,.2);border-radius:50%;border-top-color:var(--rojo);animation:spin .8s linear infinite;margin-top:16px;"></div>
+</div>
+
+<div class="reg-overlay" id="regModal" style="display:none;">
+  <div class="reg-card">
+    <img src="logo.png" alt="Logo" style="width:90px;margin-bottom:12px;" onerror="this.style.display='none'">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--text);">Bodega Tony Tony</div>
+    <div style="font-size:13px;color:var(--subtext);margin:6px 0 18px;">&#128722; Ingresa tus datos para continuar</div>
+    <input class="reg-field" type="text" id="regNombre" placeholder="Tu nombre completo" autocomplete="name">
+    <div style="display:flex;margin-bottom:12px;">
+      <select id="regCodigo" style="width:90px;padding:13px 6px;border:2px solid var(--border);border-right:none;border-radius:12px 0 0 12px;font-weight:700;outline:none;background:var(--bg);color:var(--text);font-size:13px;-webkit-appearance:none;">
+        <option value="+58">&#127483;&#127466; +58</option>
+        <option value="+57">&#127464;&#127476; +57</option>
+        <option value="+1">&#127482;&#127480; +1</option>
+      </select>
+      <input class="reg-field" type="tel" id="regTel" placeholder="N&#250;mero sin c&#243;digo" style="border-radius:0 12px 12px 0;margin-bottom:0;flex:1;" inputmode="numeric" autocomplete="tel">
+    </div>
+    <p id="regErr" style="color:var(--rojo);font-size:13px;font-weight:700;min-height:18px;margin-bottom:10px;"></p>
+    <button class="reg-btn" id="regBtn">&#161;Entrar! &#8594;</button>
+  </div>
+</div>
+
+<header>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <img src="logo.png" alt="Logo" style="width:34px;height:34px;border-radius:6px;" onerror="this.style.display='none'">
+    <div>
+      <div class="logo-text">Bodega <span>Tony</span> Tony</div>
+      <div style="font-size:9px;color:#aaa;">Mini Market &#183; Siempre fresco</div>
+    </div>
+  </div>
+  <button class="cart-btn" onclick="showTab('carrito')">&#128722; <span class="cart-count" id="cartCount">0</span></button>
+</header>
+
+<div class="status-bar" id="statusBar">&#9989; Abierto &#183; 09:00 AM - 10:00 PM</div>
+
+<div class="tabs">
+  <button class="tab-btn active" id="tab-tienda"   onclick="showTab('tienda')">&#127978; Tienda</button>
+  <button class="tab-btn"        id="tab-carrito"  onclick="showTab('carrito')">&#128722; Mi Pedido</button>
+  <button class="tab-btn"        id="tab-tracking" onclick="showTab('tracking')">&#128230; Seguimiento</button>
+  <button class="tab-btn"        id="tab-soporte"  onclick="showTab('soporte')">&#10069; Soporte</button>
+  <button class="tab-btn"        id="tab-puntos"   onclick="showTab('puntos')">&#11088; Mis Puntos</button>
+</div>
+
+<div class="search-wrap">
+  <input type="text" id="searchInput" placeholder="&#128269; Buscar producto..." oninput="renderStore()">
+</div>
+
+<div class="view active" id="view-tienda"><div id="storeContainer"></div></div>
+<div class="view"        id="view-carrito"><div id="cartContainer"></div></div>
+<div class="view"        id="view-tracking"><div id="trackingContainer"></div></div>
+<div class="view"        id="view-soporte"><div id="soporteContainer"></div></div>
+<div class="view"        id="view-puntos"><div id="puntosContainer"></div></div>
+
+<div class="floating-cart" id="floatingCart">
+  <div>
+    <div style="font-size:10px;color:#aaa;">Tu pedido</div>
+    <div class="floating-cart-total" id="floatTotal">$ 0.00</div>
+  </div>
+  <button class="floating-cart-btn" onclick="showTab('carrito')">Ver pedido &#128722;</button>
+</div>
+
+<button class="chat-fab" onclick="toggleChat()">&#128172;</button>
+
+<div class="chat-modal" id="chatModal">
+  <div class="chat-window">
+    <div class="chat-header">
+      <span>&#128172; Bodega Tony Tony</span>
+      <button onclick="toggleChat()" style="background:none;border:none;color:white;font-size:24px;cursor:pointer;">&#10005;</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div style="text-align:center;color:var(--subtext);padding:20px;">&#161;Hola! &#191;En qu&#233; te ayudamos? &#128522;</div>
+    </div>
+    <div class="chat-input-wrap">
+      <input type="text" id="chatInput" placeholder="Escribe aqu&#237;..." onkeyup="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">&#10148;</button>
+    </div>
+  </div>
+</div>
+
+<div class="resena-modal" id="resenaModal">
+  <div class="resena-sheet">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-weight:800;font-size:16px;">&#11088; Deja tu rese&#241;a</div>
+      <button onclick="cerrarResena()" style="background:none;border:none;font-size:22px;cursor:pointer;">&#10005;</button>
+    </div>
+    <div id="rStars" style="display:flex;gap:4px;justify-content:center;margin:10px 0;"></div>
+    <input type="text" id="rTxt" placeholder="&#191;Qu&#233; te pareci&#243;?" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:12px;margin:10px 0;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;outline:none;">
+    <label style="cursor:pointer;display:block;margin:8px 0;">
+      <div id="rFotoPrev" style="width:100%;height:80px;border:2px dashed var(--amarillo);border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--subtext);font-size:13px;font-weight:700;">&#128248; Toca para agregar foto</div>
+      <input type="file" accept="image/*" style="display:none;" onchange="prevRFoto(this)">
+    </label>
+    <button onclick="enviarResena()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:12px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;">Enviar rese&#241;a &#11088;</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyBdv2cOMgbeBuW-V9Buz8EzGAoElnvySoI",
+  authDomain:"bodegatonytony.firebaseapp.com",
+  projectId:"bodegatonytony",
+  storageBucket:"bodegatonytony.firebasestorage.app",
+  messagingSenderId:"763208241886",
+  appId:"1:763208241886:web:dd4a04d68c2c72ed24a84f"
+});
+const db=firebase.firestore();
+
+// ESTADO
+let products=[],cart={},cat='Todos',geo=null,chatUnsub=null,chatOn=false;
+let rPid=null,rFoto='',rStars=5;
+let entrega='domicilio',comp64='',metodo='';
+let cfg={
+  whatsapp:'+584242520138',
+  metodosPago:{efectivo:true,pagoMovil:true,transferencia:false},
+  tiempoPreparacion:30,
+  pagoMovil:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cedula:'6.966.714',telefono:'04241572275'},
+  transferencia:{banco:'Banco del Tesoro',nombre:'Lisbe Ovalle',cuenta:''}
+};
+
+db.collection('config').doc('tienda').get().then(snap=>{
+  if(!snap.exists)return;
+  const d=snap.data();
+  if(d.whatsapp)cfg.whatsapp=d.whatsapp;
+  if(d.metodosPago)cfg.metodosPago=d.metodosPago;
+  if(d.tiempoPreparacion)cfg.tiempoPreparacion=d.tiempoPreparacion;
+  if(d.pagoMovil)cfg.pagoMovil=d.pagoMovil;
+  if(d.transferencia)cfg.transferencia=d.transferencia;
+  if(d.horario){
+    const h=d.horario,now=new Date().getHours();
+    const open=now>=h.apertura&&now<h.cierre;
+    const sb=document.getElementById('statusBar');
+    if(sb){sb.style.background=open?'linear-gradient(90deg,#2dc653,#1a9e3f)':'linear-gradient(90deg,#888,#555)';sb.textContent=(open?'✅ Abierto':'❌ Cerrado')+' · '+h.apertura+':00 - '+h.cierre+':00';}
+  }
+}).catch(()=>{});
+
+db.collection('productos').onSnapshot(snap=>{
+  products=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.visible!==false);
+  renderStore();
+});
+
+// HELPERS
+function ckey(pid,v){return pid+'_'+(v||'');}
+function qty(pid,v){return(cart[ckey(pid,v)]||{}).qty||0;}
+function total(){return Object.values(cart).reduce((s,i)=>s+i.p.price*i.qty,0);}
+function updateCount(){document.getElementById('cartCount').textContent=Object.values(cart).reduce((a,b)=>a+b.qty,0);}
+function updateFloat(){
+  const t=total(),n=Object.values(cart).reduce((a,b)=>a+b.qty,0);
+  const b=document.getElementById('floatingCart');if(!b)return;
+  if(n>0){b.classList.add('visible');document.body.classList.add('has-float');document.getElementById('floatTotal').textContent='$ '+t.toFixed(2)+' · '+n+' item'+(n>1?'s':'');}
+  else{b.classList.remove('visible');document.body.classList.remove('has-float');}
+  updateCount();
+}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// TABS
+function showTab(t){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+t)?.classList.add('active');
+  document.getElementById('tab-'+t)?.classList.add('active');
+  if(t==='tienda')renderStore();
+  if(t==='carrito')renderCart();
+  if(t==='tracking')renderTracking();
+  if(t==='soporte')renderSoporte();
+  if(t==='puntos')renderPuntos();
+}
+
+// ICONOS CATEGORÍAS — círculo color + SVG blanco animado
+
+function filterCat(v){cat=v;renderStore();}
+
+// ── CATEGORY 3D CLAY ICONS ────────────────────────────
+const CAT_DATA = [
+  {keys:['todos'],                                                 anim:'anim-default',  label:'Todos',    svgId:'todos'},
+  {keys:['joya','joyería','joyeria','aret','bisut','accesorio'],   anim:'anim-joyeria',  label:'Joyería',  svgId:'joyeria'},
+  {keys:['papel','escolar','lapiz','lápiz','cuaderno','ofici'],     anim:'anim-papeleria',label:'Papelería',svgId:'papeleria'},
+  {keys:['higiene','jabón','jabon','shamp','desodor','cuidado'],   anim:'anim-higiene',  label:'Higiene',  svgId:'higiene'},
+  {keys:['cabello','pelo','belleza','maquill','cosmét','cosmet'],  anim:'anim-cabello',  label:'Cabello',  svgId:'cabello'},
+  {keys:['bebé','bebe','niño','niña','infant','pañal','juguete'],  anim:'anim-bebe',     label:'Bebé',     svgId:'bebe'},
+  {keys:['bebi','refre','agua','jugo','soda','gaseo','gaseosa'],   anim:'anim-bebidas',  label:'Bebidas',  svgId:'bebidas'},
+  {keys:['carne','pollo','res ','cerdo','jamón','embut','charcutería'], anim:'anim-carnes', label:'Carnes', svgId:'carnes'},
+  {keys:['lácteo','lacteo','queso','leche','yogur','mant'],        anim:'anim-lacteos',  label:'Lácteos',  svgId:'lacteos'},
+  {keys:['fruta','manza','naranj','banano','mango','uva'],         anim:'anim-frutas',   label:'Frutas',   svgId:'frutas'},
+  {keys:['grano','arroz','caraota','frijol','lenteja','harina'],   anim:'anim-granos',   label:'Granos',   svgId:'granos'},
+  {keys:['limpie','hogar','deterg','escoba','trapeador'],          anim:'anim-limpieza', label:'Limpieza', svgId:'limpieza'},
+  {keys:['licor','cerve','vino','whisky','ron','aguard','alcohol'],'anim':'anim-licores','label':'Licores','svgId':'licores'},
+];
+
+// Inline SVG map — 3D clay illustrations
+const CAT_SVGS = {
+  'todos': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g-todos" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff8fa3"/><stop offset="100%" stop-color="#e63946"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-todos)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.18)"/><g class="obj"> <rect x="12" y="30" width="48" height="30" rx="6" fill="white" opacity=".92"/> <rect x="18" y="22" width="36" height="14" rx="5" fill="white"/> <circle cx="24" cy="44" r="4" fill="#e63946"/> <circle cx="36" cy="44" r="4" fill="#e63946"/> <circle cx="48" cy="44" r="4" fill="#e63946"/> <rect x="30" y="50" width="12" height="9" rx="2" fill="#e63946"/></g><ellipse cx="20" cy="18" rx="8" ry="5" fill="rgba(255,255,255,.3)"/></svg>`,
+  'joyeria': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-joy-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe9b8"/><stop offset="100%" stop-color="#f5c84a"/></linearGradient> <linearGradient id="g-joy-obj" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe57a"/><stop offset="100%" stop-color="#c8960c"/></linearGradient> <radialGradient id="g-joy-shine" cx="35%" cy="30%"><stop offset="0%" stop-color="rgba(255,255,255,.9)"/><stop offset="100%" stop-color="rgba(255,255,255,0)"/></radialGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-joy-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.22)"/><g class="obj"> <path d="M24 20 Q22 28 22 34 Q22 44 27 50 L27 62 Q27 65 25 66" stroke="url(#g-joy-obj)" stroke-width="4" fill="none" stroke-linecap="round"/> <circle cx="25" cy="67" r="5" fill="url(#g-joy-obj)"/> <ellipse cx="25" cy="67" rx="3" ry="2" fill="rgba(255,255,255,.5)" transform="translate(-1,-1)"/> <path d="M48 20 Q50 28 50 34 Q50 44 45 50 L45 62 Q45 65 47 66" stroke="url(#g-joy-obj)" stroke-width="4" fill="none" stroke-linecap="round"/> <circle cx="47" cy="67" r="5" fill="url(#g-joy-obj)"/> <ellipse cx="47" cy="67" rx="3" ry="2" fill="rgba(255,255,255,.5)" transform="translate(-1,-1)"/> <circle class="shine" cx="30" cy="24" r="4" fill="white" opacity=".85"/> <circle class="shine" cx="42" cy="22" r="3" fill="white" opacity=".7"/> <circle class="shine" cx="52" cy="28" r="2" fill="white" opacity=".6"/></g></svg>`,
+  'papeleria': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-pap-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8edca"/><stop offset="100%" stop-color="#5dba7a"/></linearGradient> <linearGradient id="g-pap-pen" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe57a"/><stop offset="100%" stop-color="#ff9800"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-pap-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.22)"/><g class="obj"> <rect x="16" y="18" width="30" height="38" rx="4" fill="white" opacity=".95"/> <rect x="16" y="18" width="30" height="9" rx="4" fill="rgba(93,186,122,.4)"/> <line x1="22" y1="34" x2="40" y2="34" stroke="#5dba7a" stroke-width="2.5" stroke-linecap="round"/> <line x1="22" y1="40" x2="40" y2="40" stroke="#5dba7a" stroke-width="2.5" stroke-linecap="round"/> <line x1="22" y1="46" x2="34" y2="46" stroke="#5dba7a" stroke-width="2.5" stroke-linecap="round"/> <rect x="40" y="12" width="8" height="36" rx="3" fill="url(#g-pap-pen)" transform="rotate(35,44,30)"/> <polygon points="40,52 48,44 50,50" fill="#333" transform="rotate(35,44,30) translate(-4,8)"/> <ellipse cx="38" cy="14" rx="5" ry="3" fill="rgba(255,255,255,.6)" transform="rotate(35,38,14)"/></g></svg>`,
+  'higiene': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-hig-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d4b8f0"/><stop offset="100%" stop-color="#9c6bd4"/></linearGradient> <linearGradient id="g-hig-bot" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8d4ff"/><stop offset="100%" stop-color="#c49ef0"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-hig-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.2)"/><g class="obj"> <rect x="22" y="26" width="22" height="36" rx="9" fill="url(#g-hig-bot)"/> <rect x="22" y="26" width="22" height="14" rx="7" fill="rgba(255,255,255,.3)"/> <rect x="27" y="18" width="12" height="10" rx="4" fill="url(#g-hig-bot)"/> <rect x="31" y="12" width="5" height="8" rx="2" fill="rgba(200,160,240,.9)"/> <ellipse cx="31" cy="36" rx="7" ry="3.5" fill="rgba(255,255,255,.3)"/> <path d="M26 50 Q33 56 40 50" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none" stroke-linecap="round"/></g><circle class="b1" cx="52" cy="24" r="5" fill="rgba(255,255,255,.7)" stroke="rgba(255,255,255,.4)" stroke-width="1"/><circle class="b2" cx="58" cy="34" r="3.5" fill="rgba(255,255,255,.6)" stroke="rgba(255,255,255,.3)" stroke-width="1"/><circle class="b3" cx="54" cy="44" r="4.5" fill="rgba(255,255,255,.65)" stroke="rgba(255,255,255,.4)" stroke-width="1"/></svg>`,
+  'cabello': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-cab-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb8cb"/><stop offset="100%" stop-color="#f06292"/></linearGradient> <linearGradient id="g-cab-met" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e0e0e0"/><stop offset="100%" stop-color="#9e9e9e"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-cab-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.2)"/><g class="blade-top"> <path d="M18 36 L52 22" stroke="url(#g-cab-met)" stroke-width="5" stroke-linecap="round"/> <circle cx="18" cy="36" r="6" fill="url(#g-cab-met)"/> <circle cx="18" cy="36" r="2.5" fill="white" opacity=".6"/></g><g class="blade-bot"> <path d="M18 36 L52 50" stroke="url(#g-cab-met)" stroke-width="5" stroke-linecap="round"/> <circle cx="18" cy="36" r="6" fill="url(#g-cab-met)"/> <circle cx="18" cy="36" r="2.5" fill="white" opacity=".6"/></g><line x1="58" y1="18" x2="58" y2="54" stroke="rgba(255,255,255,.6)" stroke-width="3.5" stroke-linecap="round"/><line x1="62" y1="22" x2="62" y2="50" stroke="rgba(255,255,255,.5)" stroke-width="3" stroke-linecap="round"/><ellipse cx="34" cy="14" rx="10" ry="4" fill="rgba(255,255,255,.3)"/></svg>`,
+  'bebe': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-beb-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#b8d8f8"/><stop offset="100%" stop-color="#5ba8e8"/></linearGradient> <linearGradient id="g-bib" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f8f8f8"/><stop offset="100%" stop-color="#e0e0e0"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-beb-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.22)"/><g class="obj"> <rect x="27" y="14" width="18" height="5" rx="2.5" fill="url(#g-bib)"/> <rect x="24" y="18" width="24" height="38" rx="12" fill="url(#g-bib)"/> <rect x="24" y="18" width="24" height="16" rx="10" fill="rgba(255,255,255,.5)"/> <path d="M32 42 Q36 46 40 42" stroke="#5ba8e8" stroke-width="2.5" fill="none" stroke-linecap="round"/> <ellipse cx="36" cy="48" rx="5" ry="4" fill="rgba(91,168,232,.25)"/> <line x1="30" y1="50" x2="42" y2="50" stroke="rgba(91,168,232,.4)" stroke-width="1.5" stroke-linecap="round"/> <line x1="30" y1="54" x2="42" y2="54" stroke="rgba(91,168,232,.4)" stroke-width="1.5" stroke-linecap="round"/> <ellipse cx="30" cy="22" rx="5" ry="3" fill="rgba(255,255,255,.6)"/></g></svg>`,
+  'bebidas': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-bev-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#60b8f0"/><stop offset="100%" stop-color="#1565c0"/></linearGradient> <linearGradient id="g-cup" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/><stop offset="100%" stop-color="#cce4ff" stop-opacity=".9"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-bev-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.18)"/><g class="obj"> <path d="M20 30 L24 62 Q24 66 28 66 L44 66 Q48 66 48 62 L52 30 Z" fill="url(#g-cup)"/> <path d="M20 30 L52 30 Q48 38 36 38 Q24 38 20 30 Z" fill="rgba(255,255,255,.8)"/> <rect x="28" y="46" width="16" height="12" rx="4" fill="rgba(91,168,232,.35)"/> <path d="M38 16 Q42 10 48 12 Q54 14 52 22 L50 30" stroke="white" stroke-width="3" fill="none" stroke-linecap="round"/> <ellipse cx="24" cy="30" rx="5" ry="2.5" fill="rgba(255,255,255,.5)"/></g></svg>`,
+  'carnes': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-car-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb0a0"/><stop offset="100%" stop-color="#e05040"/></linearGradient> <linearGradient id="g-steak" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#d45040"/><stop offset="100%" stop-color="#8b2020"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-car-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.18)"/><path class="v1" d="M28 18 Q26 12 28 8" stroke="rgba(255,255,255,.7)" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="v2" d="M36 16 Q34 10 36 6" stroke="rgba(255,255,255,.65)" stroke-width="2.5" fill="none" stroke-linecap="round"/><path class="v3" d="M44 18 Q42 12 44 8" stroke="rgba(255,255,255,.7)" stroke-width="2.5" fill="none" stroke-linecap="round"/><g class="obj"> <path d="M14 50 Q14 62 36 62 Q58 62 58 50 Q58 36 50 30 Q44 26 36 30 Q28 26 22 30 Q14 36 14 50 Z" fill="url(#g-steak)"/> <path d="M20 44 Q36 38 52 44" stroke="rgba(255,180,150,.6)" stroke-width="3" fill="none" stroke-linecap="round"/> <ellipse cx="26" cy="52" rx="5" ry="3" fill="rgba(255,180,150,.4)" transform="rotate(-10,26,52)"/> <path d="M14 44 Q36 54 58 44" fill="rgba(180,40,40,.3)"/> <ellipse cx="26" cy="38" rx="8" ry="4" fill="rgba(255,255,255,.15)" transform="rotate(-15,26,38)"/></g></svg>`,
+  'lacteos': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-lac-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffe985"/><stop offset="100%" stop-color="#f5a623"/></linearGradient> <linearGradient id="g-cheese" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe57a"/><stop offset="100%" stop-color="#f5a623"/></linearGradient> <linearGradient id="g-milk" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#e0e0e0"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-lac-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.22)"/><g class="obj"> <polygon points="14,38 30,38 30,64 14,64" fill="url(#g-cheese)"/> <polygon points="14,38 22,22 30,38" fill="rgba(255,220,80,.9)"/> <circle cx="18" cy="50" r="3.5" fill="rgba(245,166,35,.6)"/> <circle cx="25" cy="45" r="2.5" fill="rgba(245,166,35,.6)"/> <circle cx="20" cy="58" r="2" fill="rgba(245,166,35,.5)"/> <ellipse cx="16" cy="30" rx="5" ry="3" fill="rgba(255,255,255,.5)"/> <rect x="38" y="28" width="20" height="36" rx="4" fill="url(#g-milk)"/> <path d="M38 28 L58 28 L58 38 L38 38 Z" fill="rgba(91,168,232,.5)"/> <rect x="43" y="31" width="10" height="3" rx="1" fill="rgba(255,255,255,.7)"/> <ellipse cx="42" cy="28" rx="5" ry="2.5" fill="rgba(255,255,255,.6)"/></g></svg>`,
+  'frutas': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-fru-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb8b8"/><stop offset="100%" stop-color="#e03030"/></linearGradient> <radialGradient id="g-apple" cx="40%" cy="35%"><stop offset="0%" stop-color="#ff6060"/><stop offset="100%" stop-color="#c01818"/></radialGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-fru-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.2)"/><line x1="36" y1="20" x2="36" y2="12" stroke="#5a3000" stroke-width="3" stroke-linecap="round"/><g class="leaf"> <path d="M36 14 Q44 8 48 14 Q44 20 36 14 Z" fill="#4caf50"/> <path d="M36 14 Q42 11 46 14" stroke="rgba(255,255,255,.4)" stroke-width="1" fill="none"/></g><path d="M14 40 Q14 66 36 66 Q58 66 58 40 Q58 22 36 22 Q14 22 14 40 Z" fill="url(#g-apple)"/><path d="M36 22 Q36 44 36 66" stroke="rgba(180,10,10,.4)" stroke-width="2" fill="none"/><ellipse cx="24" cy="32" rx="6" ry="9" fill="rgba(255,255,255,.25)" transform="rotate(-20,24,32)"/></svg>`,
+  'granos': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-gra-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e0c898"/><stop offset="100%" stop-color="#a07840"/></linearGradient> <linearGradient id="g-grain" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffe8b0"/><stop offset="100%" stop-color="#c8a050"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-gra-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.2)"/><g class="obj"> <line x1="36" y1="62" x2="36" y2="22" stroke="url(#g-grain)" stroke-width="3.5" stroke-linecap="round"/> <ellipse cx="36" cy="22" rx="5.5" ry="8" fill="url(#g-grain)"/> <ellipse cx="28" cy="28" rx="5" ry="7" fill="url(#g-grain)" transform="rotate(-22,28,28)"/> <ellipse cx="44" cy="28" rx="5" ry="7" fill="url(#g-grain)" transform="rotate(22,44,28)"/> <ellipse cx="22" cy="38" rx="4.5" ry="6.5" fill="url(#g-grain)" transform="rotate(-28,22,38)"/> <ellipse cx="50" cy="38" rx="4.5" ry="6.5" fill="url(#g-grain)" transform="rotate(28,50,38)"/> <ellipse cx="18" cy="50" rx="4" ry="6" fill="url(#g-grain)" transform="rotate(-32,18,50)"/> <ellipse cx="54" cy="50" rx="4" ry="6" fill="url(#g-grain)" transform="rotate(32,54,50)"/> <path d="M14 64 Q36 70 58 64" stroke="rgba(255,255,255,.5)" stroke-width="2" fill="none" stroke-linecap="round"/></g></svg>`,
+  'limpieza': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-lim-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#88d8c4"/><stop offset="100%" stop-color="#00897b"/></linearGradient> <linearGradient id="g-broom" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#a0700a"/><stop offset="100%" stop-color="#6b4800"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-lim-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.2)"/><g class="obj"> <rect x="33" y="10" width="6" height="38" rx="3" fill="url(#g-broom)"/> <path d="M18 56 Q36 48 54 56 L50 66 Q36 60 22 66 Z" fill="#f5a623"/> <path d="M18 56 Q36 50 54 56" stroke="rgba(180,120,10,.5)" stroke-width="1.5" fill="none"/> <path d="M22 58 L22 64" stroke="rgba(180,120,10,.4)" stroke-width="2" stroke-linecap="round"/> <path d="M28 56 L27 63" stroke="rgba(180,120,10,.4)" stroke-width="2" stroke-linecap="round"/> <path d="M34 55 L34 63" stroke="rgba(180,120,10,.4)" stroke-width="2" stroke-linecap="round"/> <path d="M40 55 L41 63" stroke="rgba(180,120,10,.4)" stroke-width="2" stroke-linecap="round"/> <path d="M46 56 L47 64" stroke="rgba(180,120,10,.4)" stroke-width="2" stroke-linecap="round"/> <ellipse cx="36" cy="14" rx="5" ry="2.5" fill="rgba(255,255,255,.4)"/></g></svg>`,
+  'licores': `<svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg"><defs> <linearGradient id="g-lic-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c490e8"/><stop offset="100%" stop-color="#6a1b9a"/></linearGradient> <linearGradient id="g-wine" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8b0ff"/><stop offset="100%" stop-color="#9c27b0"/></linearGradient> <linearGradient id="g-liquid" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c62ec6" stop-opacity=".8"/><stop offset="100%" stop-color="#7b0080" stop-opacity=".9"/></linearGradient></defs><rect width="72" height="72" rx="20" fill="url(#g-lic-bg)"/><rect x="0" y="0" width="72" height="36" rx="20" fill="rgba(255,255,255,.18)"/><g class="obj"> <path d="M28 12 L44 12 L44 20 Q52 28 52 42 Q52 58 36 58 Q20 58 20 42 Q20 28 28 20 Z" fill="url(#g-wine)"/> <rect x="28" y="8" width="16" height="6" rx="2" fill="rgba(200,160,240,.9)"/> <path d="M28 20 Q36 30 44 20" fill="rgba(255,255,255,.2)"/> <ellipse cx="36" cy="46" rx="12" ry="7" fill="url(#g-liquid)"/> <path d="M24 42 Q36 50 48 42" stroke="rgba(255,255,255,.3)" stroke-width="1.5" fill="none"/> <ellipse cx="28" cy="26" rx="6" ry="3.5" fill="rgba(255,255,255,.3)" transform="rotate(-20,28,26)"/> <circle cx="54" cy="16" r="3" fill="white" opacity=".6"/> <circle cx="58" cy="22" r="2" fill="white" opacity=".5"/> <circle cx="56" cy="10" r="2" fill="white" opacity=".7"/></g></svg>`,
+};
+
+function getCatData(name) {
+  const n = (name||'').toLowerCase().trim();
+  if(n==='todos') return CAT_DATA[0];
+  return CAT_DATA.find(d => d.keys.some(k => n.includes(k))) || null;
+}
+
+function getCatIcon(name) {
+  const n   = (name||'').toLowerCase().trim();
+  const dat = getCatData(name);
+  if (dat && CAT_SVGS[dat.svgId]) {
+    return `<div class="cat-icon-wrap ${dat.anim}">${CAT_SVGS[dat.svgId]}</div>`;
+  }
+  // Fallback
+  const palette = ['#fbe9d2','#dff2e1','#ede0ff','#ffe0ea','#d6eeff','#ffe0e0','#eedfc8','#c8f0e8'];
+  let hash = 0; for (let i=0;i<name.length;i++) hash = name.charCodeAt(i)+((hash<<5)-hash);
+  const bg = palette[Math.abs(hash)%palette.length];
+  return `<div class="cat-icon-wrap anim-default" style="background:${bg};font-size:28px;color:white;">${(name[0]||'?').toUpperCase()}</div>`;
+}
+
+function renderStore(){
+  const el=document.getElementById('storeContainer');
+  if(!products.length){el.innerHTML='<div class="empty"><p>&#127978; No hay productos a&uacute;n</p></div>';return;}
+  const q=(document.getElementById('searchInput')?.value||'').toLowerCase().trim();
+  const ofrs=products.filter(p=>p.oferta&&!p.agotado&&!q);
+  const cats=['Todos',...new Set(products.map(p=>p.category||'General'))];
+  const nombre=localStorage.getItem('clientName')||'';
+  let h='';
+  if(!q){
+    h+='<div class="hero-banner">';
+    h+='<div class="hero-greeting">'+(nombre?'&#128075; Hola, '+esc(nombre)+'!':'&#128075; &#161;Bienvenido!')+'</div>';
+    h+='<div class="hero-title">Tu <span>Bodega</span><br>de Confianza</div>';
+    h+='<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+    h+='<span class="hero-badge">&#128693; <b>Domicilio</b></span>';
+    h+='<span class="hero-badge">&#11088; <b>Puntos</b> por compra</span>';
+    if(ofrs.length)h+='<span class="hero-badge">&#128293; <b>'+ofrs.length+' ofertas</b></span>';
+    h+='</div></div>';
+    if(ofrs.length){
+      h+='<div class="promo-strip"><span class="promo-strip-text">&#128293; Ofertas especiales del d&iacute;a</span><span class="promo-strip-link" onclick="filterCat(\'Todos\')">Ver todo &rsaquo;</span></div>';
+    }
+    h+='<div class="section-title">Categor&iacute;as</div>';
+    h+='<div class="cats-scroll">';
+    cats.forEach(c2=>{
+      const safe=c2.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      h+='<div class="cat-card'+(cat===c2?' active':'')+'" onclick="filterCat(\''+safe+'\')">';
+      h+=getCatIcon(c2);
+      h+='<div class="cat-card-label">'+esc(c2)+'</div></div>';
+    });
+    h+='</div>';
+    if(ofrs.length){
+      h+='<div class="section-title">&#128293; Ofertas</div>';
+      h+='<div class="ofertas-section"><div class="ofertas-scroll">';
+      ofrs.forEach(p=>{h+=buildCard(p,true);});
+      h+='</div></div>';
+    }
+    h+='<div class="section-title">'+(cat==='Todos'?'&#128722; Todos los productos':'&#128230; '+esc(cat))+'</div>';
+  }
+  const list=products.filter(p=>{
+    const mc=cat==='Todos'||(p.category||'General')===cat;
+    const ms=!q||p.name.toLowerCase().includes(q);
+    return mc&&ms;
+  });
+  if(list.length){
+    h+='<div class="products-section"><div class="products-grid">';
+    list.forEach(p=>{h+=buildCard(p,false);});
+    h+='</div></div>';
+  }else{
+    h+='<div class="empty"><p>&#128269; Sin resultados</p></div>';
+  }
+  el.innerHTML=h;updateCount();
+}
+
+function buildCard(p,scroll){
+  const img=p.photo?'<img src="'+esc(p.photo)+'" class="product-img" loading="lazy">':'<div class="product-emoji">'+(p.emoji||'&#128230;')+'</div>';
+  const hasV=p.variants&&p.variants.length>0;
+  let ph=(p.oferta&&p.precioAnterior)?'<div class="price-old">$ '+p.precioAnterior+'</div><div class="price-new">$ '+p.price+'</div>':'<div class="product-price">$ '+p.price+'</div>';
+  let act='';
+  if(p.agotado){act='<div class="agotado-badge">&#10060; Agotado</div>';}
+  else if(hasV){
+    act='<div class="variants-label">Elige:</div><div class="variants-list">';
+    p.variants.forEach(v=>{
+      const q2=qty(p.id,v),sv=v.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      act+='<span class="variant-chip'+(q2>0?' selected':'')+'" onclick="event.stopPropagation();addCart(\''+esc(p.id)+'\',\''+sv+'\')">'+esc(v)+(q2>0?' &times;'+q2:'')+' </span>';
+    });
+    act+='</div>';
+  }else{
+    const q2=qty(p.id,'');
+    act=q2>0?'<div class="qty-ctrl"><button class="qty-btn" onclick="event.stopPropagation();chgQty(\''+esc(p.id)+'\',\'\',-1)">&#8722;</button><span class="qty-num">'+q2+'</span><button class="qty-btn" onclick="event.stopPropagation();addCart(\''+esc(p.id)+'\',\'\')">+</button></div>':'<button class="add-btn" onclick="event.stopPropagation();addCart(\''+esc(p.id)+'\',\'\')">+ Agregar</button>';
+  }
+  return '<div class="product-card" style="'+(scroll?'min-width:155px;flex-shrink:0;':'')+'">'+
+    (p.oferta?'<span class="badge-oferta">&#128293;</span>':'')+img+
+    '<div class="product-info"><div class="product-name">'+esc(p.name)+'</div>'+ph+act+
+    '<button class="resena-btn" onclick="event.stopPropagation();abrirResena(\''+esc(p.id)+'\')">&#11088; Rese&ntilde;as</button></div></div>';
+}
+function addCart(pid,v){
+  const p=products.find(x=>x.id===pid);if(!p||p.agotado){showToast('&#10060; No disponible');return;}
+  const k=ckey(pid,v);if(!cart[k])cart[k]={p,v:v||'',qty:0};cart[k].qty++;
+  renderStore();showToast('&#9989; Agregado');updateFloat();
+}
+function chgQty(pid,v,d){
+  const k=ckey(pid,v);if(!cart[k])return;cart[k].qty+=d;if(cart[k].qty<=0)delete cart[k];
+  renderStore();updateFloat();
+}
+function getGPS(){
+  if(!navigator.geolocation){showToast('GPS no disponible');return;}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{geo={lat:pos.coords.latitude,lng:pos.coords.longitude};showToast('&#9989; Ubicaci&oacute;n obtenida');renderCart();},
+    ()=>showToast('&#9888;&#65039; No se pudo obtener GPS')
+  );
+}
+function setEntrega(t){entrega=t;comp64='';renderCart();}
+function setMetodo(m){metodo=m;comp64='';renderCart();}
+function needsComp(){return metodo!=='efectivo';}
+function subirComp(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const MAX=900,cv=document.createElement('canvas');
+      let w=img.width,h=img.height;
+      if(w>h){if(w>MAX){h=Math.round(h*MAX/w);w=MAX;}}else{if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}}
+      cv.width=w;cv.height=h;cv.getContext('2d').drawImage(img,0,0,w,h);
+      comp64=cv.toDataURL('image/jpeg',.82);renderCart();showToast('&#9989; Comprobante cargado');
+    };img.src=e.target.result;
+  };reader.readAsDataURL(file);
+}
+
+// CARRITO
+function renderCart(){
+  const el=document.getElementById('cartContainer');
+  const keys=Object.keys(cart);
+  if(!keys.length){el.innerHTML='<div class="empty"><p>&#128722; Carrito vac&iacute;o</p></div>';return;}
+  let tot=0,items='';
+  keys.forEach(k=>{
+    const i=cart[k],p=i.p,s=p.price*i.qty;tot+=s;
+    const thumb=p.photo?'<img src="'+esc(p.photo)+'" class="thumb">':'<div class="cemoji">'+(p.emoji||'&#128230;')+'</div>';
+    items+='<div class="cart-item">'+thumb+'<div style="flex:1;"><div style="font-weight:700;">'+esc(p.name)+'</div>'+(i.v?'<div style="font-size:11px;color:var(--subtext);">'+esc(i.v)+'</div>':'')+'<div style="color:var(--rojo);font-size:13px;">$ '+p.price+' &times; '+i.qty+' = $ '+s.toFixed(2)+'</div></div><div class="qty-ctrl" style="width:auto;"><button class="qty-btn" onclick="chgQty(\''+esc(p.id)+'\',\''+(i.v||'')+'\',-1);renderCart()">&#8722;</button><span class="qty-num">'+i.qty+'</span><button class="qty-btn" onclick="addCart(\''+esc(p.id)+'\',\''+(i.v||'')+'\');renderCart()">+</button></div></div>';
+  });
+  const n=localStorage.getItem('clientName')||'',ph=localStorage.getItem('clientPhone')||'',ad=localStorage.getItem('clientAddress')||'';
+  const mets=[];
+  if(cfg.metodosPago.efectivo)mets.push({id:'efectivo',label:'&#128181; Efectivo'});
+  if(cfg.metodosPago.pagoMovil)mets.push({id:'pagoMovil',label:'&#128241; Pago M&oacute;vil'});
+  if(cfg.metodosPago.transferencia)mets.push({id:'transferencia',label:'&#127970; Transferencia'});
+  if(!metodo&&mets.length)metodo=mets[0].id;
+  let infoPago='';
+  if(metodo==='pagoMovil')infoPago='<div class="pago-card"><div style="font-weight:800;">&#128241; Datos Pago M&oacute;vil</div>&#127970; '+esc(cfg.pagoMovil.banco)+'<br>&#128100; '+esc(cfg.pagoMovil.nombre)+'<br>C.I: '+esc(cfg.pagoMovil.cedula)+'<br>&#128241; '+esc(cfg.pagoMovil.telefono)+'</div>';
+  else if(metodo==='transferencia')infoPago='<div class="pago-card"><div style="font-weight:800;">&#127970; Transferencia</div>&#127970; '+esc(cfg.transferencia.banco)+'<br>&#128100; '+esc(cfg.transferencia.nombre)+'<br>'+esc(cfg.transferencia.cuenta||'Consultar')+'</div>';
+  const nc=needsComp(),oblig=nc&&entrega==='domicilio';
+  let compHTML='';
+  if(nc){
+    const upload=comp64?'<div class="comp-ok">&#9989; Comprobante cargado</div><img src="'+comp64+'" style="width:100%;max-height:180px;object-fit:contain;border-radius:10px;margin-top:8px;"><label style="display:block;margin-top:6px;text-align:center;cursor:pointer;font-size:12px;color:var(--subtext);text-decoration:underline;">&#128260; Cambiar foto<input type="file" accept="image/*" style="display:none;" onchange="subirComp(this)"></label>':'<label style="cursor:pointer;display:block;"><div class="comp-upload"><span style="font-size:36px;">&#128247;</span><span>Toca para subir foto del comprobante</span></div><input type="file" accept="image/*" style="display:none;" onchange="subirComp(this)"></label>';
+    compHTML='<div class="comp-box '+(oblig?'comp-red':'comp-yellow')+'"><div style="font-weight:800;font-size:14px;">'+(oblig?'&#128248; Comprobante OBLIGATORIO':'&#128248; Comprobante recomendado')+'</div><div style="font-size:12px;color:var(--subtext);margin-top:4px;">'+(oblig?'El pedido no se confirma hasta aprobar el pago.':'Sube la foto para agilizar el proceso.')+'</div>'+upload+'</div>';
+  }
+  const gpsHTML=entrega==='domicilio'?'<div class="geo-box '+(geo?'geo-si':'geo-no')+'">'+(geo?'&#9989; Ubicaci&oacute;n GPS obtenida':'&#128205; Ubicaci&oacute;n GPS requerida')+'</div><button onclick="getGPS()" style="width:100%;padding:10px;border:2px solid var(--verde);border-radius:12px;background:transparent;color:var(--verde);font-weight:700;cursor:pointer;margin-bottom:10px;font-family:Nunito,sans-serif;">'+(geo?'&#128205; Actualizar ubicaci&oacute;n':'&#128205; Compartir mi ubicaci&oacute;n GPS')+'</button>':'<div style="background:#e8f5e9;border:2px solid var(--verde);border-radius:12px;padding:10px;margin-bottom:8px;font-size:13px;font-weight:700;color:#1b5e20;">&#127978; Retiro en tienda</div>';
+  const bloq=entrega==='domicilio'&&nc&&!comp64;
+  const btnLabel=bloq?'&#128248; Sube el comprobante primero':'&#128228; Enviar pedido por WhatsApp';
+  const btn=bloq?'<div class="wa-btn off">'+btnLabel+'</div>':'<a href="#" class="wa-btn" id="waBtn" onclick="return doOrder(this)">'+btnLabel+'</a>';
+  el.innerHTML='<div>'+items+'</div>'+
+    '<div class="cart-total"><div>Total</div><div class="amount">$ '+tot.toFixed(2)+'</div></div>'+
+    '<div class="ci">'+
+    '<input type="text" id="cName" placeholder="&#128100; Tu nombre *" value="'+esc(n)+'">'+
+    '<input type="tel" id="cPhone" placeholder="&#128222; Tu tel&eacute;fono *" value="'+esc(ph)+'" inputmode="numeric">'+
+    (entrega==='domicilio'?'<input type="text" id="cAddr" placeholder="&#128205; Tu direcci&oacute;n *" value="'+esc(ad)+'">':'<input type="text" id="cAddr" placeholder="&#128205; Referencia (opcional)" value="">') +
+    '<div style="font-weight:800;margin-bottom:6px;font-size:14px;">&#128230; &#191;C&oacute;mo recibes tu pedido?</div>'+
+    '<div class="entrega-grid"><button class="entrega-opt'+(entrega==='domicilio'?' active':'')+'" onclick="setEntrega(\'domicilio\')">&#128693; Domicilio</button><button class="entrega-opt'+(entrega==='retiro'?' active':'')+'" onclick="setEntrega(\'retiro\')">&#127978; Retiro en tienda</button></div>'+
+    '<div style="font-weight:800;margin-bottom:6px;font-size:14px;">&#128179; M&eacute;todo de pago</div>'+
+    '<div class="metodos-wrap">'+mets.map(m=>'<button class="metodo-chip'+(metodo===m.id?' active':'')+'" onclick="setMetodo(\''+m.id+'\')">'+m.label+'</button>').join('')+'</div>'+
+    infoPago+compHTML+gpsHTML+
+    '</div>'+btn;
+}
+
+// FIX iOS: sincrónico, sin await
+function mkId(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let id='';for(let i=0;i<8;i++)id+=c[Math.floor(Math.random()*c.length)];return id;}
+function doOrder(link){
+  const n=(document.getElementById('cName')||{}).value?.trim()||'';
+  const ph=(document.getElementById('cPhone')||{}).value?.trim()||'';
+  const ad=(document.getElementById('cAddr')||{}).value?.trim()||'';
+  if(!n||!ph){showToast('⚠️ Completa nombre y teléfono');return false;}
+  if(entrega==='domicilio'&&!ad){showToast('⚠️ Escribe tu dirección');return false;}
+  if(needsComp()&&entrega==='domicilio'&&!comp64){showToast('⚠️ Sube la foto del comprobante');return false;}
+  // LOADING STATE
+  const btn=document.getElementById('waBtn');
+  if(btn){btn.style.opacity='0.7';btn.style.pointerEvents='none';btn.textContent='⏳ Procesando...';}
+  localStorage.setItem('clientName',n);localStorage.setItem('clientPhone',ph);if(ad)localStorage.setItem('clientAddress',ad);
+  let tot=0,msg='',parr=[];
+  Object.values(cart).forEach(i=>{
+    const s=i.p.price*i.qty;tot+=s;
+    msg+=(i.p.emoji||'')+' '+i.p.name+(i.v?' ('+i.v+')':'')+' x'+i.qty+' -- $'+s.toFixed(2)+'\n';
+    parr.push({name:i.p.name,variant:i.v,qty:i.qty,price:i.p.price});
+  });
+  const pid=mkId();
+  const geoTxt=(geo&&!geo.manual)?'\n📍 https://maps.google.com/?q='+geo.lat+','+geo.lng:'';
+  const compTxt=comp64?'\n🧾 Comprobante subido en la app':'';
+  const etxt=entrega==='domicilio'?'🛵 Domicilio':'🏪 Retiro en tienda';
+  const waText='🛒 *Pedido #'+pid+' - Bodega Tony Tony*\n👤 *'+n+'*\n📞 *'+ph+'*\n'+(ad?'📌 *'+ad+'*':'')+geoTxt+'\n📦 *'+etxt+'*\n💳 *'+metodo+'*'+compTxt+'\n\n🧺 *Productos:*\n'+msg+'\n💰 *TOTAL: $'+tot.toFixed(2)+'*';
+  const data={pedidoId:pid,nombre:n,telefono:ph,direccion:ad||'',productos:msg,productosArray:parr,total:tot,tipoEntrega:entrega,metodoPago:metodo,comprobante:comp64||'',geo:geo||null,fecha:new Date().toISOString(),estado:'pendiente'};
+  if(comp64)data.comprobanteAprobado=null;
+  db.collection('pedidos').doc(pid).set(data).catch(e=>console.error(e));
+  fetch('https://ntfy.sh/bodegatonytony-pedidos-admin',{method:'POST',headers:{'Title':'Nuevo pedido #'+pid,'Priority':'high','Tags':'shopping_cart'},body:n+' - $'+tot.toFixed(2)+' - '+etxt}).catch(()=>{});
+  // Puntos
+  const ptsG=Math.floor(tot);
+  const phone=localStorage.getItem('clientPhone')||'anonimo';
+  db.collection('clientes').doc(phone).get().then(snap=>{
+    const actual=snap.exists?(snap.data().puntos||0):0;
+    const hist=snap.exists?(snap.data().historial||[]):[];
+    hist.unshift({fecha:new Date().toISOString(),puntos:ptsG,pedido:pid,tipo:'ganado'});
+    db.collection('clientes').doc(phone).set({nombre:n,telefono:ph,puntos:actual+ptsG,totalGastado:(snap.exists?(snap.data().totalGastado||0):0)+tot,historial:hist.slice(0,20)},{merge:true});
+  }).catch(()=>{});
+  localStorage.setItem('pedidoActivoId',pid);
+  cart={};geo=null;comp64='';updateFloat();
+  showToast('✅ ¡Pedido enviado! +'+ptsG+' puntos ⭐', 4000);
+  setTimeout(()=>showTab('tracking'),800);
+  link.href='https://wa.me/'+cfg.whatsapp.replace(/[^0-9+]/g,'')+'?text='+encodeURIComponent(waText);
+  return true;
+}
+
+// TRACKING EN TIEMPO REAL - MEJORADO
+let unsubTracking=null;
+function renderTracking(){
+  const el=document.getElementById('trackingContainer');
+  const pid=localStorage.getItem('pedidoActivoId');
+  if(!pid){el.innerHTML='<div class="empty"><p>&#128230; No tienes pedidos activos</p></div>';return;}
+  el.innerHTML='<div class="empty"><div style="animation:spin .8s linear infinite;width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--rojo);border-radius:50%;margin:0 auto 10px;"></div>Cargando...</div>';
+  if(unsubTracking)unsubTracking();
+  // onSnapshot = actualización automática en tiempo real
+  unsubTracking=db.collection('pedidos').where('pedidoId','==',pid).limit(1)
+    .onSnapshot(snap=>{
+      if(snap.empty){el.innerHTML='<div class="empty"><p>Pedido no encontrado</p></div>';return;}
+      const p=snap.docs[0].data();
+      const anterior=window._ultimoEstadoPedido;
+      if(anterior&&anterior!==p.estado)notificarCambioEstado(p.estado,pid);
+      window._ultimoEstadoPedido=p.estado;
+      showTrack(pid,p);
+    },()=>el.innerHTML='<div class="empty"><p>Error al cargar</p></div>');
+}
+function showTrack(pid,p){
+  const el=document.getElementById('trackingContainer');
+  const mapH=p.geo&&!p.geo.manual?'<a href="https://www.google.com/maps?q='+p.geo.lat+','+p.geo.lng+'" target="_blank" style="display:block;background:#e8f5e9;color:#1b5e20;padding:10px;border-radius:10px;text-align:center;font-weight:700;margin:10px 0;text-decoration:none;">&#128506;&#65039; Ver ubicaci&oacute;n</a>':'';
+  const repH=p.nombreRepartidor?'<div style="background:var(--gris);border-radius:12px;padding:12px;margin:10px 0;text-align:center;"><div>&#128693; <b>'+esc(p.nombreRepartidor)+'</b></div>'+(p.telefonoRepartidor?'<a href="https://wa.me/'+p.telefonoRepartidor.replace(/\D/g,'')+'" target="_blank" style="display:inline-block;margin-top:6px;background:#25d366;color:white;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;">&#128222; Contactar</a>':'')+'</div>':'';
+  let compH='';
+  if(p.comprobante){const est=p.comprobanteAprobado===true?'<span style="color:#1b5e20;font-weight:800;">&#9989; Pago aprobado</span>':p.comprobanteAprobado===false?'<span style="color:var(--rojo);font-weight:800;">&#10060; Rechazado &mdash; env&iacute;a uno nuevo</span>':'<span style="color:#856404;font-weight:800;">&#9203; Revisando...</span>';compH='<div style="background:var(--gris);border-radius:12px;padding:12px;margin:10px 0;text-align:center;">&#129534; Estado de pago: '+est+'</div>';}
+  const bc={pendiente:'#fff3cd',confirmado:'#d4edda',preparacion:'#cce5ff',camino:'#ffe5d0',entregado:'#d4edda',cancelado:'#ffd6d6'};
+  const tc={pendiente:'#856404',confirmado:'#155724',preparacion:'#004085',camino:'#c05621',entregado:'#155724',cancelado:'#e63946'};
+  const st=p.estado||'pendiente';
+  el.innerHTML='<div style="text-align:center;padding:20px;">'+
+    '<div style="font-size:50px;">&#128230;</div>'+
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:24px;">#'+pid+'</div>'+
+    '<span style="padding:6px 14px;border-radius:50px;background:'+(bc[st]||'#fff3cd')+';color:'+(tc[st]||'#856404')+';font-weight:800;font-size:14px;">'+st+'</span>'+
+    '<div style="font-size:12px;color:var(--subtext);margin:6px 0;">'+(p.tipoEntrega==='domicilio'?'&#128693; Domicilio':'&#127978; Retiro en tienda')+'</div>'+
+    compH+mapH+repH+
+    '<div style="margin:16px 0;font-size:13px;white-space:pre-line;text-align:left;background:var(--gris);border-radius:12px;padding:12px;">'+esc(p.productos)+'</div>'+
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:28px;color:var(--rojo);">$ '+(p.total||0).toFixed(2)+'</div>'+
+    '<div style="font-size:11px;color:var(--subtext);margin-top:8px;">🔄 Se actualiza automáticamente</div>'+
+    '</div>';
+}
+
+// SOPORTE
+function renderSoporte(){
+  document.getElementById('soporteContainer').innerHTML='<div style="background:var(--card);border-radius:16px;padding:18px;">'+
+    '<div style="font-family:Bebas Neue,sans-serif;font-size:24px;color:var(--rojo);margin-bottom:14px;">&#10069; Reportar problema</div>'+
+    '<input type="text" id="sN" class="ci" placeholder="&#128100; Tu nombre *" style="display:block;"><input type="tel" id="sT" class="ci" placeholder="&#128222; Tu tel&eacute;fono *" style="display:block;" inputmode="numeric"><textarea id="sD" class="ci" placeholder="Describe el problema *" style="display:block;min-height:90px;resize:none;"></textarea>'+
+    '<button onclick="doSoporte()" style="width:100%;background:var(--rojo);color:white;border:none;border-radius:12px;padding:14px;font-weight:800;cursor:pointer;font-family:Nunito,sans-serif;font-size:15px;">&#128228; Enviar reporte</button></div>';
+}
+function doSoporte(){
+  const n=(document.getElementById('sN')||{}).value?.trim()||'',t=(document.getElementById('sT')||{}).value?.trim()||'',d=(document.getElementById('sD')||{}).value?.trim()||'';
+  if(!n||!t||!d){showToast('&#9888;&#65039; Completa todos los campos');return;}
+  db.collection('soporte').add({clienteNombre:n,telefono:t,descripcion:d,estado:'nuevo',fecha:new Date().toISOString()})
+    .then(()=>{showToast('&#9989; Reporte enviado');showTab('tienda');}).catch(()=>showToast('&#10060; Error al enviar'));
+}
+
+// PUNTOS
+function renderPuntos(){
+  const el=document.getElementById('puntosContainer');if(!el)return;
+  const phone=localStorage.getItem('clientPhone');
+  if(!phone){el.innerHTML='<div class="empty"><p>&#11088; Haz tu primer pedido para ganar puntos</p></div>';return;}
+  el.innerHTML='<div class="empty"><div style="animation:spin .8s linear infinite;width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--amarillo);border-radius:50%;margin:0 auto 8px;"></div>Cargando...</div>';
+  db.collection('clientes').doc(phone).get().then(snap=>{
+    const d=snap.exists?snap.data():{puntos:0,totalGastado:0,historial:[]};
+    const pts=d.puntos||0,gastado=d.totalGastado||0,hist=d.historial||[];
+    let nivel,sigNivel,ptsParaSig;
+    if(pts<100){nivel='&#129355; Bronce';sigNivel='&#129356; Plata';ptsParaSig=100;}
+    else if(pts<300){nivel='&#129356; Plata';sigNivel='&#129351; Oro';ptsParaSig=300;}
+    else if(pts<600){nivel='&#129351; Oro';sigNivel='&#128142; Diamante';ptsParaSig=600;}
+    else{nivel='&#128142; Diamante';sigNivel='';ptsParaSig=pts;}
+    const pct=sigNivel?Math.min(100,Math.round(pts/ptsParaSig*100)):100;
+    const histHTML=hist.length?hist.map(h=>{const f=new Date(h.fecha).toLocaleDateString('es-VE');return'<div class="puntos-item"><div><div style="font-weight:700;">&#9989; Compra #'+h.pedido.slice(-4)+'</div><div style="font-size:11px;color:var(--subtext);">'+f+'</div></div><span class="puntos-badge">+'+h.puntos+' pts</span></div>';}).join(''):'<p style="color:var(--subtext);text-align:center;padding:10px 0;font-size:13px;">Haz tu primer pedido</p>';
+    el.innerHTML='<div class="puntos-card">'+
+      '<div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:4px;">Nivel actual</div>'+
+      '<div style="font-family:Bebas Neue,sans-serif;font-size:22px;margin-bottom:2px;">'+nivel+'</div>'+
+      '<div style="margin:12px 0 4px;display:flex;justify-content:space-between;align-items:flex-end;">'+
+      '<div><div style="font-size:11px;color:rgba(255,255,255,.6);">Tus puntos</div><div class="puntos-num">'+pts+'</div></div>'+
+      (sigNivel?'<div style="text-align:right;font-size:11px;color:rgba(255,255,255,.5);">Pr&oacute;ximo: <b style="color:var(--amarillo);">'+sigNivel+'</b><br>'+ptsParaSig+' pts</div>':'<div style="font-size:13px;color:var(--amarillo);font-weight:800;">&#127942; Nivel m&aacute;ximo</div>')+
+      '</div><div class="puntos-bar-bg"><div class="puntos-bar" style="width:'+pct+'%"></div></div>'+
+      '<div style="font-size:11px;color:rgba(255,255,255,.5);">Total gastado: $'+gastado.toFixed(2)+'</div></div>'+
+      '<div style="background:var(--card);border-radius:16px;padding:16px;margin-top:12px;">'+
+      '<div style="font-weight:800;font-size:14px;margin-bottom:4px;">&#128161; C&oacute;mo funciona</div>'+
+      '<div style="font-size:13px;color:var(--subtext);line-height:1.8;">&bull; <b>1 punto</b> por cada $1 gastado<br>&bull; &#129355; Bronce: 0 | &#129356; Plata: 100 | &#129351; Oro: 300 | &#128142; Diamante: 600</div></div>'+
+      '<div class="puntos-historial"><div style="font-weight:800;font-size:15px;margin-bottom:8px;">&#128203; Historial</div>'+histHTML+'</div>';
+  }).catch(()=>{el.innerHTML='<div class="empty"><p>Error al cargar puntos</p></div>';});
+}
+
+// CHAT
+const bots={'hola|buenas':'&#128075; &#161;Hola! Soy Tony el asistente.\n\n&#128172; Pu\u00e9do ayudarte con:\n&#128176; "precios" | &#128221; "c\u00f3mo pedir"\n&#128336; "horario" | &#129534; "comprobante"','precio|cuanto':'&#128176; Los precios est\u00e1n en la pesta\u00f1a &#127978; Tienda.','pedir|comprar':'&#128221; Para pedir:\n1\ufe0f\u20e3 Ve a Tienda\n2\ufe0f\u20e3 Agrega productos\n3\ufe0f\u20e3 Ve a Mi Pedido\n4\ufe0f\u20e3 Llena datos y env\u00eda','horario|abierto':'&#128336; Horario: 9 AM - 10 PM\n&#128693; Domicilio disponible','comprobante|pago':'&#129534; Para domicilio con Pago M\u00f3vil o Transferencia debes subir el comprobante. &#161;Es obligatorio!','gracias':'&#128522; &#161;De nada! Aqu\u00ed estoy &#10084;','default':'&#128154; Puedo ayudarte con:\n&#128176; precios | &#128221; pedir | &#128336; horario | &#129534; comprobante'};
+function toggleChat(){const m=document.getElementById('chatModal');m.classList.toggle('open');if(m.classList.contains('open')&&!chatOn){chatOn=true;initChat();}}
+function initChat(){if(chatUnsub)return;const phone=localStorage.getItem('clientPhone')||'anonimo';chatUnsub=db.collection('chats').doc(phone).collection('mensajes').orderBy('fecha','asc').onSnapshot(snap=>{const el=document.getElementById('chatMessages');if(!el)return;el.innerHTML=snap.empty?'<div style="text-align:center;color:var(--subtext);padding:20px;">&#161;Hola! &#191;En qu&eacute; te ayudamos? &#128522;</div>':snap.docs.map(d=>{const m=d.data();let cls='admin',who='Bodega Tony';if(m.de==='cliente'){cls='me';who='T&uacute;';}else if(m.de==='bot'){cls='bot';who='&#129302; Tony';}return'<div class="chat-msg '+cls+'"><div style="font-size:10px;opacity:.7;">'+who+'</div>'+esc(m.texto)+'</div>';}).join('');el.scrollTop=el.scrollHeight;});}
+function sendChat(){const i=document.getElementById('chatInput'),t=i?.value.trim();if(!t)return;const phone=localStorage.getItem('clientPhone')||'anonimo';db.collection('chats').doc(phone).collection('mensajes').add({texto:t,fecha:new Date().toISOString(),de:'cliente'});i.value='';setTimeout(()=>{const tl=t.toLowerCase();let r=bots['default'];for(const k in bots){if(k==='default')continue;if(k.split('|').some(c=>tl.includes(c))){r=bots[k];break;}}db.collection('chats').doc(phone).collection('mensajes').add({texto:r,fecha:new Date().toISOString(),de:'bot'});},600);}
+
+// RESEÑAS
+function abrirResena(pid){rPid=pid;rStars=5;rFoto='';document.getElementById('resenaModal').classList.add('open');drawStars();document.getElementById('rTxt').value='';document.getElementById('rFotoPrev').innerHTML='&#128248; Toca para agregar foto';loadResenas(pid);}
+function cerrarResena(){document.getElementById('resenaModal').classList.remove('open');}
+function drawStars(){const s=document.getElementById('rStars');s.innerHTML='';for(let i=1;i<=5;i++){const sp=document.createElement('span');sp.textContent=i<=rStars?'⭐':'☆';sp.style.cssText='font-size:28px;cursor:pointer;color:'+(i<=rStars?'#f4a800':'#ccc');sp.onclick=()=>{rStars=i;drawStars();};s.appendChild(sp);}}
+function prevRFoto(input){const f=input.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{rFoto=e.target.result;document.getElementById('rFotoPrev').innerHTML='<img src="'+rFoto+'" style="width:100%;height:100%;object-fit:cover;">';};r.readAsDataURL(f);}
+function loadResenas(pid){db.collection('productos').doc(pid).collection('resenas').orderBy('fecha','desc').limit(10).get().then(snap=>{const c=document.getElementById('rTxt')?.parentElement;if(!c)return;const old=c.querySelector('.rlist');if(old)old.remove();let h='<div class="rlist" style="max-height:140px;overflow-y:auto;margin-bottom:10px;">';if(snap.empty)h+='<p style="color:var(--subtext);font-size:13px;">Sin rese&ntilde;as a&uacute;n</p>';else snap.docs.forEach(d=>{const r=d.data();h+='<div style="border-bottom:1px solid var(--border);padding:6px 0;"><div style="font-weight:700;font-size:13px;">'+esc(r.autor||'Cliente')+' '+(r.estrellas?'⭐'.repeat(r.estrellas):'⭐⭐⭐⭐⭐')+'</div><div style="font-size:12px;color:var(--subtext);">'+esc(r.texto||'')+'</div>'+(r.foto?'<img src="'+r.foto+'" style="width:56px;height:56px;object-fit:cover;border-radius:8px;margin-top:4px;">':'')+'</div>';});h+='</div>';c.insertAdjacentHTML('afterbegin',h);}).catch(()=>{});}
+function enviarResena(){const t=document.getElementById('rTxt')?.value.trim();if(!t){showToast('&#9888;&#65039; Escribe tu opini&oacute;n');return;}const autor=localStorage.getItem('clientName')||'Cliente';db.collection('productos').doc(rPid).collection('resenas').add({autor,texto:t,estrellas:rStars,foto:rFoto||'',fecha:new Date().toISOString()}).then(()=>{showToast('&#9989; &#161;Gracias por tu rese&ntilde;a!');cerrarResena();}).catch(()=>showToast('&#10060; Error'));}
+
+// TOAST
+// TOAST MEJORADO - duración configurable
+let tT=null;
+function showToast(msg, duration=2800){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');if(tT)clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),duration);}
+
+// NOTIFICACIONES DE ESTADO - NUEVO
+function notificarCambioEstado(estado, pedidoId){
+  const msgs={confirmado:`✅ ¡Pedido #${pedidoId} confirmado!`,preparacion:`👨‍🍳 Preparando tu pedido #${pedidoId}`,camino:`🚚 ¡Tu pedido #${pedidoId} va en camino!`,entregado:`🏠 ¡Pedido entregado! Gracias 🎉`,cancelado:`❌ Pedido #${pedidoId} cancelado`};
+  const m=msgs[estado];if(!m)return;
+  showToast(m,5000);
+  if('Notification' in window&&Notification.permission==='granted')new Notification('Bodega Tony Tony',{body:m,icon:'logo.png',tag:'pedido-'+pedidoId});
+}
+
+// DEBOUNCE - evita re-renders excesivos
+function debounce(fn,ms){let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),ms);}}
+
+// REGISTRO — FIX iOS
+function mostrarRegistro(){
+  const modal=document.getElementById('regModal');if(!modal)return;modal.style.display='flex';
+  const btn=document.getElementById('regBtn');if(!btn)return;
+  const nb=btn.cloneNode(true);btn.parentNode.replaceChild(nb,btn);
+  function reg(){
+    const n=(document.getElementById('regNombre')||{}).value?.trim()||'';
+    const code=(document.getElementById('regCodigo')||{}).value||'+58';
+    const t=(document.getElementById('regTel')||{}).value?.replace(/\D/g,'')||'';
+    const err=document.getElementById('regErr');
+    if(!n){if(err)err.textContent='&#9888;&#65039; Escribe tu nombre';return;}
+    if(!t||t.length<7){if(err)err.textContent='&#9888;&#65039; N&uacute;mero inv&aacute;lido';return;}
+    localStorage.setItem('clientName',n);localStorage.setItem('clientPhone',code+t);
+    modal.style.display='none';showToast('&#127881; &#161;Bienvenido '+n+'!');
+  }
+  nb.addEventListener('click',reg);
+  ['regNombre','regTel'].forEach(id=>{const el=document.getElementById(id);if(el)el.onkeyup=e=>{if(e.key==='Enter')reg();};});
+}
+
+// INICIO
+setTimeout(()=>{if(!localStorage.getItem('clientName'))mostrarRegistro();},900);
+setTimeout(()=>{const s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(()=>s.style.display='none',400);}},1300);
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// MEJORAS ADICIONALES (no modifican funciones existentes)
+// 1. Debounce en búsqueda - evita re-render en cada letra
+setTimeout(()=>{
+  const si=document.getElementById('searchInput');
+  if(si)si.oninput=debounce(()=>renderStore(),400);
+},1500);
+// 2. Pedir permiso notificaciones en primer toque del usuario
+if('Notification'in window&&Notification.permission==='default'){
+  document.addEventListener('click',()=>{if(Notification.permission==='default')Notification.requestPermission();},{once:true});
+}
+// 3. Limpiar listener de tracking al cambiar de pestaña
+const _showTab=window.showTab;
+window.showTab=function(tab){
+  if(tab!=='tracking'&&unsubTracking){unsubTracking();unsubTracking=null;window._ultimoEstadoPedido=null;}
+  _showTab(tab);
+};
+</script>
+</body>
+</html>
